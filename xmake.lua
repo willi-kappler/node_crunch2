@@ -1,7 +1,9 @@
 add_rules("mode.debug", "mode.release")
 
 set_warnings("everything", "error", "extra", "pedantic")
-add_cxxflags("-Wconversion")
+add_cxxflags("-Wconversion", "-Wshadow")
+-- -Wdouble-promotion
+
 set_languages("c11")
 set_version("0.1.0")
 -- set_optimize("fastest")

@@ -3,5 +3,5 @@
     Written by Willi Kappler, MIT License
     https://github.com/willi-kappler/node_crunch2
 
-    This file defines the node class
+    This file defines the node id
 */

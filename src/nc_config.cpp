@@ -26,5 +26,17 @@ NCConfiguration nc_config_from_file(std::string_view filename) {
         config.server_address = v->as<std::string>();
     }
 
+    if (auto v = json_config.find("server_port"); v != nullptr) {
+        config.server_port = v->as<uint16_t>();
+    }
+
+    if (auto v = json_config.find("heartbeat_timeout"); v != nullptr) {
+        config.heartbeat_timeout = v->as<uint16_t>();
+    }
+
+    if (auto v = json_config.find("quit_counter"); v != nullptr) {
+        config.quit_counter = v->as<uint8_t>();
+    }
+
     return config;
 }

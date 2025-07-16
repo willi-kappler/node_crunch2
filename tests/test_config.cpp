@@ -5,7 +5,7 @@
 
     This file contains the tests for the configuration class.
 
-    Run with: xmake run test
+    Run with: xmake run nc_test
 */
 
 // External includes:
@@ -30,7 +30,7 @@ TEST_CASE("Create invalid default configuration", "[configuration]" ) {
 }
 
 TEST_CASE("Read valid JSON configuration", "[configuration]" ) {
-    NCConfiguration config1 = nc_config_from_file("test/config1.json");
+    NCConfiguration config1 = nc_config_from_file("tests/config1.json");
 
     REQUIRE(config1.server_address == "33.44.55.66");
     REQUIRE(config1.server_port == 9999);

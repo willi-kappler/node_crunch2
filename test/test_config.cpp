@@ -17,6 +17,7 @@
 
 TEST_CASE("Create valid default configuration", "[configuration]" ) {
     NCConfiguration config1 = NCConfiguration("12345678901234567890123456789012");
+
     REQUIRE( config1.server_address == "127.0.0.1");
     REQUIRE( config1.server_port == 3100);
     REQUIRE( config1.heartbeat_timeout == 60*5);
@@ -26,4 +27,14 @@ TEST_CASE("Create valid default configuration", "[configuration]" ) {
 
 TEST_CASE("Create invalid default configuration", "[configuration]" ) {
     REQUIRE_THROWS_AS(NCConfiguration("12345"), NCInvalidKeyException);
+}
+
+TEST_CASE("Read valid JSON configuration", "[configuration]" ) {
+    NCConfiguration config1 = nc_config_from_file("test/config1.json");
+
+    REQUIRE(config1.server_address == "33.44.55.66");
+    REQUIRE(config1.server_port == 9999);
+    REQUIRE(config1.heartbeat_timeout == 10);
+    REQUIRE(config1.quit_counter == 3);
+    REQUIRE(config1.secret_key == "123456789012345678901234567890AB");
 }

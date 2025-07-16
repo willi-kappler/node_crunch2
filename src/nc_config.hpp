@@ -45,12 +45,16 @@ class NCConfiguration {
             secret_key = secret_key_user;
         }
 
-        // Disable all other Special member functions:
+        // Default special member functions:
+        NCConfiguration (NCConfiguration&&) = default;
+
+        // Disable all other special member functions:
         NCConfiguration() = delete;
         NCConfiguration(const NCConfiguration&) = delete;
         NCConfiguration& operator=(const NCConfiguration&) = delete;
-        NCConfiguration (NCConfiguration&&) = delete;
         NCConfiguration& operator=(NCConfiguration&&) = delete;
 };
+
+NCConfiguration nc_config_from_file(std::string_view);
 
 #endif // FILE_NC_CONFIG_HPP_INCLUDED

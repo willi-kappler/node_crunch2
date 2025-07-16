@@ -1,0 +1,7 @@
+{
+    "server_address": "33.44.55.66",
+    "server_port": 9999,
+    "heartbeat_timeout": 10,
+    "secret_key": "123456789012345678901234567890AB",
+    "quit_counter": 3
+}

@@ -6,4 +6,4 @@
     This file defines the server class
 */
 
-#include "./nc_server.hpp"
+#include "nc_server.hpp"

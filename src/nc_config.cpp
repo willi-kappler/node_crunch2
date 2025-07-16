@@ -6,5 +6,5 @@
     This file defines the configuration options
 */
 
-#include "./nc_config.hpp"
+#include "nc_config.hpp"
 

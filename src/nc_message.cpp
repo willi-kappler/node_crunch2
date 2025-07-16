@@ -6,5 +6,5 @@
     This file defines the message type and decoding / encoding
 */
 
-#include "./nc_message.hpp"
+#include "nc_message.hpp"
 

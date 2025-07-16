@@ -6,4 +6,4 @@
     This file defines the node id
 */
 
-#include "./nc_nodeid.hpp"
+#include "nc_nodeid.hpp"

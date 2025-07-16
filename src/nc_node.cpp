@@ -6,4 +6,4 @@
     This file defines the node class
 */
 
-#include "./nc_node.hpp"
+#include "nc_node.hpp"

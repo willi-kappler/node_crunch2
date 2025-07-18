@@ -13,9 +13,20 @@
 #include <string>
 #include <cstdint>
 #include <iostream>
+#include <expected>
+#include <filesystem>
+#include <string_view>
 
 // Local includes:
 #include "nc_exceptions.hpp"
+
+enum struct NCConfigurationError : uint8_t
+{
+    NCFileOpenError,
+    NCMissingSecretKey,
+    NCInvalidPort,
+    NCInvalidHeartbeat
+};
 
 class NCConfiguration {
     public:
@@ -37,12 +48,8 @@ class NCConfiguration {
             if (key_length != 32)
             {
                 std::cerr << "Secret key must be exactly 32 bytes long, but has " << key_length << " chars.\n";
-                // std::exit(EXIT_FAILURE);
                 throw NCInvalidKeyException();
             }
-
-            // TODO: convert string to array of bytes.
-            secret_key = secret_key_user;
         }
 
         // Default special member functions:
@@ -55,6 +62,8 @@ class NCConfiguration {
         NCConfiguration& operator=(NCConfiguration&&) = delete;
 };
 
-NCConfiguration nc_config_from_file(std::string_view);
+std::expected<NCConfiguration, NCConfigurationError> nc_config_from_string(std::string_view);
+
+std::expected<NCConfiguration, NCConfigurationError> nc_config_from_file(std::filesystem::path);
 
 #endif // FILE_NC_CONFIG_HPP_INCLUDED

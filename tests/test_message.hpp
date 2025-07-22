@@ -1,0 +1,143 @@
+/*
+    Node Crunch2
+    Written by Willi Kappler, MIT License
+    https://github.com/willi-kappler/node_crunch2
+
+    This file contains the tests for the message encoding / decoding functions.
+
+    Run only configuration tests:
+    xmake run -w ./ nc_test [message]
+*/
+
+// STD includes:
+#include <bit>
+
+// External includes:
+#include <snitch/snitch.hpp>
+
+// Local includes:
+#include "nc_message.hpp"
+
+TEST_CASE("Convert a number to a vector", "[message]" ) {
+    uint32_t num1 = 0xDEADBEEFu;
+    std::vector<uint8_t> buff1(4);
+
+    nc_to_big_endian_bytes(num1, buff1);
+
+    if (std::endian::native == std::endian::little) {
+        REQUIRE(buff1[0] == 0xDEu);
+        REQUIRE(buff1[1] == 0xADu);
+        REQUIRE(buff1[2] == 0xBEu);
+        REQUIRE(buff1[3] == 0xEFu);
+    } else {
+        REQUIRE(buff1[0] == 0xEFu);
+        REQUIRE(buff1[1] == 0xBEu);
+        REQUIRE(buff1[2] == 0xADu);
+        REQUIRE(buff1[3] == 0xDEu);
+    }
+
+    num1 = 0xAABBCCDDu;
+
+    nc_to_big_endian_bytes(num1, buff1);
+
+    if (std::endian::native == std::endian::little) {
+        REQUIRE(buff1[0] == 0xAAu);
+        REQUIRE(buff1[1] == 0xBBu);
+        REQUIRE(buff1[2] == 0xCCu);
+        REQUIRE(buff1[3] == 0xDDu);
+    } else {
+        REQUIRE(buff1[0] == 0xDDu);
+        REQUIRE(buff1[1] == 0xCCu);
+        REQUIRE(buff1[2] == 0xBBu);
+        REQUIRE(buff1[3] == 0xAAu);
+    }
+}
+
+TEST_CASE("Convert a vector to a number", "[message]" ) {
+    std::vector<uint8_t> buff1 = {0xDEu, 0xADu, 0xBEu, 0xEFu};
+
+    uint32_t num1 = nc_from_big_endian_bytes(buff1);
+
+    if (std::endian::native == std::endian::little) {
+        REQUIRE(num1 == 0xDEADBEEFu);
+    } else {
+        REQUIRE(num1 == 0xEFBEADDEu);
+    }
+
+    buff1 = {0xAAu, 0xBBu, 0xCCu, 0xDDu};
+
+    num1 = nc_from_big_endian_bytes(buff1);
+
+    if (std::endian::native == std::endian::little) {
+        REQUIRE(num1 == 0xAABBCCDDu);
+    } else {
+        REQUIRE(num1 == 0xDDCCBBAAu);
+    }
+}
+
+TEST_CASE("Compress / decompress a message", "[message]" ) {
+    std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
+    std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());
+
+    std::expected<std::vector<uint8_t>, NCMessageError> maybe_message1 = nc_compress_message(msg1v);
+    REQUIRE(maybe_message1.has_value() == true);
+
+    std::vector<uint8_t> compressed_message = *maybe_message1;
+    REQUIRE(compressed_message.size() == 99);
+
+    uint32_t msg_size = nc_from_big_endian_bytes(compressed_message);
+    REQUIRE(msg_size == 125);
+
+    std::expected<std::vector<uint8_t>, NCMessageError> maybe_message2 = nc_decompress_message(compressed_message);
+    REQUIRE(maybe_message2.has_value() == true);
+
+    std::vector<uint8_t> msg2v = *maybe_message2;
+    REQUIRE(msg2v.size() == 125);
+
+    std::string msg2(msg2v.begin(), msg2v.end());
+    REQUIRE(msg2 == msg1);
+}
+
+TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
+    std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
+    std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());
+
+    std::string key1 = "12345678901234567890123456789012";
+
+    std::expected<std::vector<uint8_t>, NCMessageError> maybe_message1 = nc_encrypt_message(msg1v, key1);
+    REQUIRE(maybe_message1.has_value() == true);
+
+    std::vector<uint8_t> encrypted_message = *maybe_message1;
+    REQUIRE(encrypted_message.size() == 125);
+
+    std::expected<std::vector<uint8_t>, NCMessageError> maybe_message2 = nc_decrypt_message(encrypted_message, key1);
+    REQUIRE(maybe_message2.has_value() == true);
+
+    std::vector<uint8_t> msg2v = *maybe_message2;
+    REQUIRE(msg2v.size() == 125);
+
+    std::string msg2(msg2v.begin(), msg2v.end());
+    REQUIRE(msg2 == msg1);
+}
+
+TEST_CASE("Encode / decode a message", "[message]" ) {
+    std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
+    std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());
+
+    std::string key1 = "12345678901234567890123456789012";
+
+    std::expected<NCEncodedMessage, NCMessageError> maybe_message1 = nc_encode_message(msg1v, key1);
+    REQUIRE(maybe_message1.has_value() == true);
+
+    NCEncodedMessage encoded_message = *maybe_message1;
+    REQUIRE(encoded_message.data.size() == 99);
+
+    std::expected<std::vector<uint8_t>, NCMessageError> maybe_message2 = nc_decode_message(encoded_message, key1);
+    REQUIRE(maybe_message2.has_value() == true);
+
+    std::vector<uint8_t> msg2v = *maybe_message2;
+    REQUIRE(msg2v.size() == 125);
+
+    std::string msg2(msg2v.begin(), msg2v.end());
+    REQUIRE(msg2 == msg1);
+}

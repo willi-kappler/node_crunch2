@@ -20,7 +20,7 @@
 // Local includes:
 #include "nc_exceptions.hpp"
 
-enum struct NCConfigurationError : uint8_t {
+enum struct NCConfigurationError: uint8_t {
     NCFileOpenError,
     NCMissingSecretKey,
     NCInvalidPort,

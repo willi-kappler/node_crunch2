@@ -27,7 +27,7 @@ class NCNodeID {
     public:
         std::string id;
 
-        NCNodeID() : id(gen_id()) {}
+        NCNodeID(): id(gen_id()) {}
 
         bool operator==(const NCNodeID&) const = default;
 

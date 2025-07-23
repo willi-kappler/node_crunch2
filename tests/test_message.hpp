@@ -24,33 +24,19 @@ TEST_CASE("Convert a number to a vector", "[message]" ) {
 
     nc_to_big_endian_bytes(num1, buff1);
 
-    if (std::endian::native == std::endian::little) {
-        REQUIRE(buff1[0] == 0xDEu);
-        REQUIRE(buff1[1] == 0xADu);
-        REQUIRE(buff1[2] == 0xBEu);
-        REQUIRE(buff1[3] == 0xEFu);
-    } else {
-        REQUIRE(buff1[0] == 0xEFu);
-        REQUIRE(buff1[1] == 0xBEu);
-        REQUIRE(buff1[2] == 0xADu);
-        REQUIRE(buff1[3] == 0xDEu);
-    }
+    REQUIRE(buff1[0] == 0xDEu);
+    REQUIRE(buff1[1] == 0xADu);
+    REQUIRE(buff1[2] == 0xBEu);
+    REQUIRE(buff1[3] == 0xEFu);
 
     num1 = 0xAABBCCDDu;
 
     nc_to_big_endian_bytes(num1, buff1);
 
-    if (std::endian::native == std::endian::little) {
-        REQUIRE(buff1[0] == 0xAAu);
-        REQUIRE(buff1[1] == 0xBBu);
-        REQUIRE(buff1[2] == 0xCCu);
-        REQUIRE(buff1[3] == 0xDDu);
-    } else {
-        REQUIRE(buff1[0] == 0xDDu);
-        REQUIRE(buff1[1] == 0xCCu);
-        REQUIRE(buff1[2] == 0xBBu);
-        REQUIRE(buff1[3] == 0xAAu);
-    }
+    REQUIRE(buff1[0] == 0xAAu);
+    REQUIRE(buff1[1] == 0xBBu);
+    REQUIRE(buff1[2] == 0xCCu);
+    REQUIRE(buff1[3] == 0xDDu);
 }
 
 TEST_CASE("Convert a vector to a number", "[message]" ) {
@@ -58,21 +44,13 @@ TEST_CASE("Convert a vector to a number", "[message]" ) {
 
     uint32_t num1 = nc_from_big_endian_bytes(buff1);
 
-    if (std::endian::native == std::endian::little) {
-        REQUIRE(num1 == 0xDEADBEEFu);
-    } else {
-        REQUIRE(num1 == 0xEFBEADDEu);
-    }
+    REQUIRE(num1 == 0xDEADBEEFu);
 
     buff1 = {0xAAu, 0xBBu, 0xCCu, 0xDDu};
 
     num1 = nc_from_big_endian_bytes(buff1);
 
-    if (std::endian::native == std::endian::little) {
-        REQUIRE(num1 == 0xAABBCCDDu);
-    } else {
-        REQUIRE(num1 == 0xDDCCBBAAu);
-    }
+    REQUIRE(num1 == 0xAABBCCDDu);
 }
 
 TEST_CASE("Compress / decompress a message", "[message]" ) {

@@ -1,0 +1,10 @@
+- implement encryption for messages (AES?)
+- implement node
+- implement server
+- add mandelbrot example
+- add logging
+- add documentation
+- add test cases for encryption
+- add test cases for node
+- add test cases for server
+- add test cases for communication (node <-> server)

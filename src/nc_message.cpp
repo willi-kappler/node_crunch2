@@ -26,7 +26,7 @@ void nc_to_big_endian_bytes(uint32_t value, std::vector<uint8_t> &bytes) {
     std::memcpy(bytes.data(), &final_value, sizeof(uint32_t));
 }
 
-uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> &bytes) {
+uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> const& bytes) {
     uint32_t result;
 
     std::memcpy(&result, bytes.data(), sizeof(uint32_t));
@@ -38,7 +38,7 @@ uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> &bytes) {
     return result;
 }
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_compress_message(std::vector<uint8_t> &message) {
+std::expected<std::vector<uint8_t>, NCMessageError> nc_compress_message(std::vector<uint8_t> const& message) {
     const uint32_t original_size = static_cast<uint32_t>(message.size());
     const uint32_t max_compressed_size = LZ4_compressBound(original_size);
     std::vector<uint8_t> compressed_data(max_compressed_size + 4);
@@ -59,7 +59,7 @@ std::expected<std::vector<uint8_t>, NCMessageError> nc_compress_message(std::vec
     }
 }
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_decompress_message(std::vector<uint8_t> &message) {
+std::expected<std::vector<uint8_t>, NCMessageError> nc_decompress_message(std::vector<uint8_t> const& message) {
     const uint32_t original_size = nc_from_big_endian_bytes(message);
     std::vector<uint8_t> decompressed_data(original_size);
     const int32_t decompressed_size = LZ4_decompress_safe(
@@ -76,7 +76,7 @@ std::expected<std::vector<uint8_t>, NCMessageError> nc_decompress_message(std::v
     return decompressed_data;
 }
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_encrypt_message(std::vector<uint8_t> &message, std::string secret_key) {
+std::expected<std::vector<uint8_t>, NCMessageError> nc_encrypt_message(std::vector<uint8_t> const& message, std::string const& secret_key) {
     // TODO
 
     if (secret_key.size() == 0) {
@@ -86,7 +86,7 @@ std::expected<std::vector<uint8_t>, NCMessageError> nc_encrypt_message(std::vect
     return message;
 }
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_decrypt_message(std::vector<uint8_t> &message, std::string secret_key) {
+std::expected<std::vector<uint8_t>, NCMessageError> nc_decrypt_message(std::vector<uint8_t> const& message, std::string const& secret_key) {
     // TODO
 
     if (secret_key.size() == 0) {
@@ -96,7 +96,7 @@ std::expected<std::vector<uint8_t>, NCMessageError> nc_decrypt_message(std::vect
     return message;
 }
 
-std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(std::vector<uint8_t> &message, std::string secret_key) {
+std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(std::vector<uint8_t> const& message, std::string const& secret_key) {
     NCEncodedMessage result;
 
     // 1. Compress message:
@@ -115,7 +115,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(std::vector<ui
     return result;
 }
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_decode_message(NCEncodedMessage &message, std::string secret_key) {
+std::expected<std::vector<uint8_t>, NCMessageError> nc_decode_message(NCEncodedMessage const& message, std::string const& secret_key) {
     // 1. Decrypt message:
     std::expected<std::vector<uint8_t>, NCMessageError> decrypted_message = nc_decrypt_message(message.data, secret_key);
     if (!decrypted_message) {
@@ -123,7 +123,7 @@ std::expected<std::vector<uint8_t>, NCMessageError> nc_decode_message(NCEncodedM
     }
 
     // 2. Decompress message:
-    std::expected<std::vector<uint8_t>, NCMessageError> decompressed_message = nc_compress_message(*decrypted_message);
+    std::expected<std::vector<uint8_t>, NCMessageError> decompressed_message = nc_decompress_message(*decrypted_message);
     if (!decompressed_message) {
         return std::unexpected(decompressed_message.error());
     }

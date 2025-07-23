@@ -15,7 +15,7 @@
 #include <string>
 #include <expected>
 
-enum struct NCMessageType : uint8_t {
+enum struct NCMessageType: uint8_t {
     Heartbeat = 0,
     HeartbeatOK = 1,
     HeartbeatError = 2,
@@ -30,7 +30,7 @@ enum struct NCMessageType : uint8_t {
     Quit = 11
 };
 
-enum struct NCMessageError : uint8_t {
+enum struct NCMessageError: uint8_t {
     NCCompressionError,
     NCDecompressionError,
     NCEncryptionError,
@@ -51,18 +51,18 @@ struct NCServerMessage {
 
 void nc_to_big_endian_bytes(uint32_t value, std::vector<uint8_t> &bytes);
 
-uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> &bytes);
+uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> const& bytes);
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_compress_message(std::vector<uint8_t> &message);
+std::expected<std::vector<uint8_t>, NCMessageError> nc_compress_message(std::vector<uint8_t> const& message);
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_decompress_message(std::vector<uint8_t> &message);
+std::expected<std::vector<uint8_t>, NCMessageError> nc_decompress_message(std::vector<uint8_t> const& message);
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_encrypt_message(std::vector<uint8_t> &message, std::string secret_key);
+std::expected<std::vector<uint8_t>, NCMessageError> nc_encrypt_message(std::vector<uint8_t> const& message, std::string const& secret_key);
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_decrypt_message(std::vector<uint8_t> &message, std::string secret_key);
+std::expected<std::vector<uint8_t>, NCMessageError> nc_decrypt_message(std::vector<uint8_t> const& message, std::string const &secret_key);
 
-std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(std::vector<uint8_t> &message, std::string secret_key);
+std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(std::vector<uint8_t> const& message, std::string const& secret_key);
 
-std::expected<std::vector<uint8_t>, NCMessageError> nc_decode_message(NCEncodedMessage &message, std::string secret_key);
+std::expected<std::vector<uint8_t>, NCMessageError> nc_decode_message(NCEncodedMessage const& message, std::string const& secret_key);
 
 #endif // FILE_NC_MESSAGE_HPP_INCLUDED

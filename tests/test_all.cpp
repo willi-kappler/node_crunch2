@@ -11,5 +11,6 @@
 
 #include "test_config.hpp"
 #include "test_nodeid.hpp"
+#include "test_compression.hpp"
+#include "test_encryption.hpp"
 #include "test_message.hpp"
-

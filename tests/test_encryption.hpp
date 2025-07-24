@@ -16,24 +16,24 @@
 #include <snitch/snitch.hpp>
 
 // Local includes:
-#include "nc_message.hpp"
+#include "nc_encryption.hpp"
 
-TEST_CASE("Encode / decode a message", "[message]" ) {
+TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
     std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
     std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());
 
     std::string key1 = "12345678901234567890123456789012";
 
-    std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encode_message(NCRawMessage(msg1v), key1);
+    std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encrypt_message(NCCompressedMessage(msg1v), key1);
     REQUIRE(encoded_message1.has_value() == true);
 
-    REQUIRE(encoded_message1->data.size() == 99);
+    REQUIRE(encoded_message1->data.size() == 125);
 
-    std::expected<NCDecodedMessage, NCMessageError> decoded_message1 = nc_decode_message(*encoded_message1, key1);
-    REQUIRE(decoded_message1.has_value() == true);
+    std::expected<NCCompressedMessage, NCMessageError> compressed_message1 = nc_decrypt_message(*encoded_message1, key1);
+    REQUIRE(compressed_message1.has_value() == true);
 
-    REQUIRE(decoded_message1->data.size() == 125);
+    REQUIRE(compressed_message1->data.size() == 125);
 
-    std::string msg2(decoded_message1->data.begin(), decoded_message1->data.end());
+    std::string msg2(compressed_message1->data.begin(), compressed_message1->data.end());
     REQUIRE(msg2 == msg1);
 }

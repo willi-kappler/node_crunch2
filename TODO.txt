@@ -8,3 +8,4 @@
 - add test cases for node
 - add test cases for server
 - add test cases for communication (node <-> server)
+- use #pragma once instead of guards

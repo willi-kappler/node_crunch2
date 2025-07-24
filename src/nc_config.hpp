@@ -12,7 +12,6 @@
 // STD includes:
 #include <string>
 #include <cstdint>
-#include <iostream>
 #include <expected>
 #include <filesystem>
 #include <string_view>
@@ -35,21 +34,8 @@ class NCConfiguration {
         uint8_t quit_counter;
         std::string secret_key;
 
-        NCConfiguration(std::string secret_key_user):
-            // Member initialization list:
-            server_address("127.0.0.1"),
-            server_port(3100),
-            heartbeat_timeout(60 * 5), // Seconds
-            quit_counter(10), // Number of rounds to wait before quitting
-            secret_key(secret_key_user)
-        {
-            size_t key_length = secret_key_user.size();
-            if (key_length != 32)
-            {
-                std::cerr << "Secret key must be exactly 32 bytes long, but has " << key_length << " chars.\n";
-                throw NCInvalidKeyException();
-            }
-        }
+        // Constructor:
+        NCConfiguration(std::string secret_key_user);
 
         // Default special member functions:
         NCConfiguration (NCConfiguration&&) = default;

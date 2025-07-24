@@ -8,6 +8,7 @@
 
 // STD includes:
 #include <fstream>
+#include <iostream>
 
 // External includes:
 #include <tao/json.hpp>
@@ -15,6 +16,21 @@
 // Local includes:
 #include "nc_config.hpp"
 
+NCConfiguration::NCConfiguration(std::string secret_key_user):
+    // Member initialization list:
+    server_address("127.0.0.1"),
+    server_port(3100),
+    heartbeat_timeout(60 * 5), // Seconds
+    quit_counter(10), // Number of rounds to wait before quitting
+    secret_key(secret_key_user)
+{
+    size_t key_length = secret_key_user.size();
+    if (key_length != 32)
+    {
+        std::cerr << "Secret key must be exactly 32 bytes long, but has " << key_length << " chars.\n";
+        throw NCInvalidKeyException();
+    }
+}
 
 std::expected<NCConfiguration, NCConfigurationError> nc_config_from_string(std::string_view config_as_string) {
     const tao::json::value json_config = tao::json::from_string(config_as_string);

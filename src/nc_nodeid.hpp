@@ -19,9 +19,9 @@
 
 const size_t NC_ID_LENGTH = 64;
 const std::string NC_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-static std::random_device nc_rd;
-static std::mt19937 nc_gen(nc_rd());
-static std::uniform_int_distribution<> nc_dis(0, static_cast<int>(NC_CHARACTERS.size()) - 1);
+std::random_device nc_rd;
+std::mt19937 nc_gen(nc_rd());
+std::uniform_int_distribution<> nc_dis(0, static_cast<int>(NC_CHARACTERS.size()) - 1);
 
 class NCNodeID {
     public:

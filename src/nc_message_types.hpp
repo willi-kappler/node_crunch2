@@ -28,6 +28,9 @@ enum struct NCMessageType: uint8_t {
     Quit = 11
 };
 
+uint8_t const NC_NONCE_LENGTH = 12;
+uint8_t const NC_GCM_TAG_LENGTH = 16;
+
 struct NCRawMessage {
     std::vector<uint8_t> data = {};
 };
@@ -37,6 +40,8 @@ struct NCCompressedMessage {
 };
 
 struct NCEncodedMessage {
+    std::vector<uint8_t> nonce = std::vector<uint8_t>(NC_NONCE_LENGTH);
+    std::vector<uint8_t> tag = std::vector<uint8_t>(NC_GCM_TAG_LENGTH);
     std::vector<uint8_t> data = {};
 };
 

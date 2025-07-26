@@ -13,6 +13,14 @@
 #include <cstdint>
 
 enum struct NCMessageError: uint8_t {
+    NCCipherContextError,
+    NCEncryptInitError,
+    NCCipherControllError,
+    NCCreateNonceError,
+    NCSetNonceError,
+    NCEncryptUpdateError,
+    NCEncryptFinalError,
+    NCCipherTagError,
     NCCompressionError,
     NCDecompressionError,
     NCEncryptionError,

@@ -3,7 +3,7 @@
     Written by Willi Kappler, MIT License
     https://github.com/willi-kappler/node_crunch2
 
-    This file contains the tests for the message encoding / decoding functions.
+    This file contains the tests for the message encrypting / decrypting functions.
 
     Run only configuration tests:
     xmake run -w ./ nc_test [message]
@@ -19,7 +19,7 @@
 #include "nc_encryption.hpp"
 
 TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
-    std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
+    std::string msg1 = "Hello world, this is a test for encrypting a message. Add some more content: test, test, test, test, test, test, test, test.";
     std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());
 
     std::string key1 = "12345678901234567890123456789012";
@@ -27,12 +27,12 @@ TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
     std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encrypt_message(NCCompressedMessage(msg1v), key1);
     REQUIRE(encoded_message1.has_value() == true);
 
-    REQUIRE(encoded_message1->data.size() == 125);
+    REQUIRE(encoded_message1->data.size() == 124);
 
     std::expected<NCCompressedMessage, NCMessageError> compressed_message1 = nc_decrypt_message(*encoded_message1, key1);
     REQUIRE(compressed_message1.has_value() == true);
 
-    REQUIRE(compressed_message1->data.size() == 125);
+    REQUIRE(compressed_message1->data.size() == 124);
 
     std::string msg2(compressed_message1->data.begin(), compressed_message1->data.end());
     REQUIRE(msg2 == msg1);

@@ -7,7 +7,7 @@
 */
 
 // STD includes:
-
+// # include <iostream>
 
 // External includes:
 #include <openssl/evp.h>
@@ -32,7 +32,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encrypt_message(NCCompressedM
     }
 
     // Set the nonce (IV) length. ChaCha20-Poly1305 uses 12-byte nonce:
-    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_IVLEN, 12, nullptr)) {
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_IVLEN, NC_NONCE_LENGTH, nullptr)) {
         EVP_CIPHER_CTX_free(ctx);
         return std::unexpected(NCMessageError::NCCipherControllError);
     }
@@ -46,23 +46,35 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encrypt_message(NCCompressedM
         return std::unexpected(NCMessageError::NCCreateNonceError);
     }
 
+    /*
+    std::cout << "Nonce: " << std::endl;
+    for (auto v: result.nonce) {
+        std::cout << std::hex << static_cast<uint16_t>(v) << ":";
+    }
+    std::cout << std::endl;
+    */
+
     // Set the nonce (IV):
     if (1 != EVP_EncryptInit_ex(ctx, nullptr, nullptr, nullptr, result.nonce.data())) {
         EVP_CIPHER_CTX_free(ctx);
         return std::unexpected(NCMessageError::NCSetNonceError);
     }
 
+    int32_t block_size = EVP_CIPHER_get_block_size(EVP_chacha20_poly1305());
+    // std::cout << "Block size: " << std::dec << block_size << std::endl;
+
     // Provide the message data to be encrypted:
     int32_t len = 0;
-    uint32_t ciphertext_len = 0;
-    uint32_t const message_len = message.data.size();
+    uint32_t const message_len = static_cast<uint32_t>(message.data.size());
+    // std::cout << "Message length: " << message_len << std::endl;
     // Ciphertext will be same size as message:
-    result.data.resize(message_len);
+    result.data.resize(message_len + block_size);
     if (1 != EVP_EncryptUpdate(ctx, result.data.data(), &len, message.data.data(), message_len)) {
         EVP_CIPHER_CTX_free(ctx);
         return std::unexpected(NCMessageError::NCEncryptUpdateError);
     }
-    ciphertext_len = len;
+    uint32_t ciphertext_len = len;
+    // std::cout << "Ciphertext length 1: " << ciphertext_len << std::endl;
 
     // Finalize the encryption. This also generates the authentication tag:
     if (1 != EVP_EncryptFinal_ex(ctx, result.data.data() + len, &len)) {
@@ -71,12 +83,13 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encrypt_message(NCCompressedM
     }
     // Adjust size in case of any padding (though AEAD stream ciphers generally don't pad):
     ciphertext_len += len;
+    // std::cout << "Ciphertext length 2: " << ciphertext_len << std::endl;
     result.data.resize(ciphertext_len);
 
     // Get the authentication tag. Poly1305 tag is 16 bytes:
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_GET_TAG, NC_GCM_TAG_LENGTH, result.tag.data())) {
         EVP_CIPHER_CTX_free(ctx);
-        return std::unexpected(NCMessageError::NCCipherTagError);
+        return std::unexpected(NCMessageError::NCCipherGetTagError);
     }
 
     EVP_CIPHER_CTX_free(ctx);
@@ -84,11 +97,61 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encrypt_message(NCCompressedM
 }
 
 std::expected<NCCompressedMessage, NCMessageError> nc_decrypt_message(NCEncodedMessage const& message, std::string const& secret_key) {
-    // TODO
+    EVP_CIPHER_CTX* ctx = nullptr;
 
-    if (secret_key.size() == 0) {
-
+    // Create and initialize context:
+    if (!(ctx = EVP_CIPHER_CTX_new())) {
+        return std::unexpected(NCMessageError::NCCipherContextError);
     }
 
-    return NCCompressedMessage(message.data);
+    // Initialize the decryption operation
+    if (1 != EVP_DecryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr, reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return std::unexpected(NCMessageError::NCDencryptInitError);
+    }
+
+    // Set the nonce (IV) length. ChaCha20-Poly1305 uses 12-byte nonce:
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_IVLEN, NC_NONCE_LENGTH, nullptr)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return std::unexpected(NCMessageError::NCCipherControllError);
+    }
+
+    // Set the nonce (IV):
+    if (1 != EVP_DecryptInit_ex(ctx, nullptr, nullptr, nullptr, message.nonce.data())) {
+        EVP_CIPHER_CTX_free(ctx);
+        return std::unexpected(NCMessageError::NCSetNonceError);
+    }
+
+    // Set the expected authentication tag. This must be done BEFORE processing ciphertext:
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_TAG, NC_GCM_TAG_LENGTH, (void*) (message.tag.data()))) {
+        EVP_CIPHER_CTX_free(ctx);
+        return std::unexpected(NCMessageError::NCCipherSetTagError);
+    }
+
+    int32_t block_size = EVP_CIPHER_get_block_size(EVP_chacha20_poly1305());
+
+    // Provide the ciphertext data to be decrypted:
+    NCCompressedMessage result;
+    uint32_t const ciphertext_len = static_cast<uint32_t>(message.data.size());
+     // Plaintext will be same size as ciphertext:
+    result.data.resize(ciphertext_len + block_size);
+    int32_t len = 0;
+    if (1 != EVP_DecryptUpdate(ctx, result.data.data(), &len, message.data.data(), ciphertext_len)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return std::unexpected(NCMessageError::NCDecryptUpdateError);
+    }
+    uint32_t plaintext_len = len;
+
+    // Finalize the decryption. This performs the tag verification.
+    // If the tag is incorrect, this function will return 0:
+    if (1 != EVP_DecryptFinal_ex(ctx, result.data.data() + len, &len)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return std::unexpected(NCMessageError::NCDecryptFinalError);
+    }
+    plaintext_len += len;
+    // Adjust size:
+    result.data.resize(plaintext_len);
+    EVP_CIPHER_CTX_free(ctx);
+
+    return result;
 }

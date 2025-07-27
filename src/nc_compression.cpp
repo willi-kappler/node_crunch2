@@ -16,7 +16,7 @@
 // Local includes:
 #include "nc_compression.hpp"
 
-void nc_to_big_endian_bytes(uint32_t const value, std::vector<uint8_t> &bytes) {
+void nc_to_big_endian_bytes(uint32_t const value, std::vector<uint8_t> &bytes) noexcept {
     uint32_t final_value = value;
 
     if (std::endian::native == std::endian::little) {

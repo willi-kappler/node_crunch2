@@ -12,7 +12,7 @@ add_requires("taocpp-json")
 add_requires("snitch")
 add_requires("lz4")
 add_requires("openssl3")
--- add_requires("botan", {configs = {minimal = false}})
+add_requires("asio")
 
 
 target("node_crunch2")
@@ -21,6 +21,7 @@ target("node_crunch2")
     add_packages("taocpp-json")
     add_packages("lz4")
     add_packages("openssl3")
+    add_packages("asio")
 
 target("nc_test")
     set_kind("binary")

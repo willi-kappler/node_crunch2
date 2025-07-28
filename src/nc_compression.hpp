@@ -25,6 +25,6 @@ void nc_to_big_endian_bytes(uint32_t const value, std::vector<uint8_t> &bytes) n
 
 [[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCRawMessage const& message);
 
-[[nodiscard]] std::expected<NCDecodedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message);
+[[nodiscard]] std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message);
 
 #endif // FILE_NC_COMPRESSION_HPP_INCLUDED

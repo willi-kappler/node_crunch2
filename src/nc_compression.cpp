@@ -59,7 +59,7 @@ std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCRawMess
     }
 }
 
-std::expected<NCDecodedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message) {
+std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message) {
     const uint32_t original_size = nc_from_big_endian_bytes(message.data);
     std::vector<uint8_t> decompressed_data(original_size);
     const int32_t decompressed_size = LZ4_decompress_safe(
@@ -73,5 +73,5 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decompress_message(NCCompress
         return std::unexpected(NCMessageError::NCDecompressionError);
     }
 
-    return NCDecodedMessage(decompressed_data);
+    return NCDecompressedMessage(decompressed_data);
 }

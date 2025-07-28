@@ -20,11 +20,12 @@
 
 TEST_CASE("Encode / decode a message", "[message]" ) {
     std::string msg1 = "Hello world, this is a test for encoding a message. Add some more content: test, test, test, test, test, test, test, test.";
-    std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());
+    NCRawMessage msg1r;
+    msg1r.data.assign(msg1.begin(), msg1.end());
 
     std::string key1 = "12345678901234567890123456789012";
 
-    std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encode_message(NCRawMessage(msg1v), key1);
+    std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encode_message(msg1r, key1);
     REQUIRE(encoded_message1.has_value() == true);
 
     REQUIRE(encoded_message1->data.size() == 93);

@@ -55,9 +55,10 @@ TEST_CASE("Convert a vector to a number", "[compression]" ) {
 
 TEST_CASE("Compress / decompress a message", "[compression]" ) {
     std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
-    std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());
+    NCRawMessage msg1r;
+    msg1r.data.assign(msg1.begin(), msg1.end());
 
-    std::expected<NCCompressedMessage, NCMessageError> compressed_message1 = nc_compress_message(NCRawMessage(msg1v));
+    std::expected<NCCompressedMessage, NCMessageError> compressed_message1 = nc_compress_message(msg1r);
     REQUIRE(compressed_message1.has_value() == true);
 
     REQUIRE(compressed_message1->data.size() == 99);
@@ -65,7 +66,7 @@ TEST_CASE("Compress / decompress a message", "[compression]" ) {
     uint32_t msg_size = nc_from_big_endian_bytes(compressed_message1->data);
     REQUIRE(msg_size == 125);
 
-    std::expected<NCDecodedMessage, NCMessageError> decompressed_message1 = nc_decompress_message(NCCompressedMessage(compressed_message1->data));
+    std::expected<NCDecompressedMessage, NCMessageError> decompressed_message1 = nc_decompress_message(NCCompressedMessage(compressed_message1->data));
     REQUIRE(decompressed_message1.has_value() == true);
 
     REQUIRE(decompressed_message1->data.size() == 125);

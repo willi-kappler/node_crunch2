@@ -14,28 +14,35 @@
 #include <vector>
 
 enum struct NCMessageType: uint8_t {
-    Heartbeat = 0,
-    HeartbeatOK = 1,
-    HeartbeatError = 2,
-    Init = 3,
-    InitOK = 4,
-    InitError = 5,
-    NewDataFromServer = 6,
-    NewResultFromNode = 7,
-    NodeNeedsMoreData = 8,
-    ResultOK = 9,
-    ConnectionError = 10,
-    Quit = 11
+    Unknown = 0,
+    Heartbeat,
+    HeartbeatOK,
+    HeartbeatError,
+    Init,
+    InitOK,
+    InitError,
+    NewDataFromServer,
+    NewResultFromNode,
+    NodeNeedsMoreData,
+    ResultOK,
+    ConnectionError,
+    Quit
 };
 
 uint8_t const NC_NONCE_LENGTH = 12;
 uint8_t const NC_GCM_TAG_LENGTH = 16;
 
 struct NCRawMessage {
+    NCMessageType msg_type = NCMessageType::Unknown;
+    std::string node_id = "";
     std::vector<uint8_t> data = {};
 };
 
 struct NCCompressedMessage {
+    std::vector<uint8_t> data = {};
+};
+
+struct NCDecompressedMessage {
     std::vector<uint8_t> data = {};
 };
 
@@ -46,6 +53,8 @@ struct NCEncodedMessage {
 };
 
 struct NCDecodedMessage {
+    NCMessageType msg_type = NCMessageType::Unknown;
+    std::string node_id = "";
     std::vector<uint8_t> data = {};
 };
 

@@ -38,10 +38,59 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     }
 
     // 2. Decompress message:
-    std::expected<NCDecodedMessage, NCMessageError> decompressed_message = nc_decompress_message(*decrypted_message);
+    std::expected<NCDecompressedMessage, NCMessageError> decompressed_message = nc_decompress_message(*decrypted_message);
     if (!decompressed_message) {
         return std::unexpected(decompressed_message.error());
     }
 
-    return *decompressed_message;
+    NCDecodedMessage result;
+    result.data = decompressed_message->data;
+
+    return result;
 }
+
+/*
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message(NCNodeID node_id, std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message_ok(std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message_error(std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message(NCNodeID node_id, std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_ok(std::vector<uint8_t>, std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_error(std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_message(NCNodeID node_id, std::string secret_key, std::vector<uint8_t> new_data) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_need_more_data_message(NCNodeID node_id, std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_new_data_message(std::vector<uint8_t> new_data, std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_ok_message(std::string secret_key) {
+
+}
+
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_quit_message(std::string secret_key) {
+
+}
+*/

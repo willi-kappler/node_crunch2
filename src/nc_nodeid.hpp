@@ -18,29 +18,15 @@
 #include <random>
 
 const size_t NC_ID_LENGTH = 64;
-const std::string NC_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-std::random_device nc_rd;
-std::mt19937 nc_gen(nc_rd());
-std::uniform_int_distribution nc_dis(0, static_cast<int>(NC_CHARACTERS.size()) - 1);
 
 class NCNodeID {
     public:
         std::string id;
-
-        NCNodeID(): id(gen_id()) {}
-
+        NCNodeID();
         bool operator==(const NCNodeID&) const = default;
 
     private:
-        std::string gen_id() {
-            std::string result;
-
-            for (size_t i = 0; i < NC_ID_LENGTH; i++) {
-                result += NC_CHARACTERS[nc_dis(nc_gen)];
-            }
-
-            return result;
-        }
+        std::string gen_id();
 };
 
 // From cpp ref: https://en.cppreference.com/w/cpp/utility/hash.html

@@ -13,6 +13,9 @@
 #include <cstdint>
 #include <vector>
 
+// Local includes:
+#include "nc_nodeid.hpp"
+
 enum struct NCMessageType: uint8_t {
     Unknown = 0,
     Heartbeat,
@@ -32,12 +35,6 @@ enum struct NCMessageType: uint8_t {
 uint8_t const NC_NONCE_LENGTH = 12;
 uint8_t const NC_GCM_TAG_LENGTH = 16;
 
-struct NCRawMessage {
-    NCMessageType msg_type = NCMessageType::Unknown;
-    std::string node_id = "";
-    std::vector<uint8_t> data = {};
-};
-
 struct NCCompressedMessage {
     std::vector<uint8_t> data = {};
 };
@@ -46,15 +43,23 @@ struct NCDecompressedMessage {
     std::vector<uint8_t> data = {};
 };
 
-struct NCEncodedMessage {
+struct NCEncryptedMessage {
     std::vector<uint8_t> nonce = std::vector<uint8_t>(NC_NONCE_LENGTH);
     std::vector<uint8_t> tag = std::vector<uint8_t>(NC_GCM_TAG_LENGTH);
     std::vector<uint8_t> data = {};
 };
 
+struct NCDecryptedMessage {
+    std::vector<uint8_t> data = {};
+};
+
+struct NCEncodedMessage {
+    std::vector<uint8_t> data = {};
+};
+
 struct NCDecodedMessage {
     NCMessageType msg_type = NCMessageType::Unknown;
-    std::string node_id = "";
+    NCNodeID node_id = NCNodeID();
     std::vector<uint8_t> data = {};
 };
 

@@ -9,9 +9,6 @@
     xmake run -w ./ nc_test [message]
 */
 
-// STD includes:
-#include <bit>
-
 // External includes:
 #include <snitch/snitch.hpp>
 
@@ -24,12 +21,12 @@ TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
 
     std::string key1 = "12345678901234567890123456789012";
 
-    std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encrypt_message(NCCompressedMessage(msg1v), key1);
+    std::expected<NCEncryptedMessage, NCMessageError> encoded_message1 = nc_encrypt_message(NCDecryptedMessage(msg1v), key1);
     REQUIRE(encoded_message1.has_value() == true);
 
     REQUIRE(encoded_message1->data.size() == 124);
 
-    std::expected<NCCompressedMessage, NCMessageError> compressed_message1 = nc_decrypt_message(*encoded_message1, key1);
+    std::expected<NCDecryptedMessage, NCMessageError> compressed_message1 = nc_decrypt_message(*encoded_message1, key1);
     REQUIRE(compressed_message1.has_value() == true);
 
     REQUIRE(compressed_message1->data.size() == 124);

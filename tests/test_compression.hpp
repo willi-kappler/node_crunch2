@@ -55,7 +55,7 @@ TEST_CASE("Convert a vector to a number", "[compression]" ) {
 
 TEST_CASE("Compress / decompress a message", "[compression]" ) {
     std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
-    NCRawMessage msg1r;
+    NCDecompressedMessage msg1r;
     msg1r.data.assign(msg1.begin(), msg1.end());
 
     std::expected<NCCompressedMessage, NCMessageError> compressed_message1 = nc_compress_message(msg1r);

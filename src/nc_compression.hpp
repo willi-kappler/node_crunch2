@@ -23,7 +23,7 @@ void nc_to_big_endian_bytes(uint32_t const value, std::vector<uint8_t> &bytes) n
 
 [[nodiscard]] uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> const& bytes);
 
-[[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCRawMessage const& message);
+[[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompressedMessage const& message);
 
 [[nodiscard]] std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message);
 

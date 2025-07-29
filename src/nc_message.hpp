@@ -20,7 +20,7 @@
 #include "nc_message_types.hpp"
 #include "nc_nodeid.hpp"
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCRawMessage const& message, std::string const& secret_key);
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType const msg_type, std::string const& node_id, std::vector<uint8_t> const& data, std::string const& secret_key);
 [[nodiscard]] std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessage const& message, std::string const& secret_key);
 /*
 [[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message(NCNodeID node_id, std::string secret_key);

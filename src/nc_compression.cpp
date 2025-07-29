@@ -38,7 +38,7 @@ uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> const& bytes) {
     return result;
 }
 
-std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCRawMessage const& message) {
+std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompressedMessage const& message) {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());
     const uint32_t max_compressed_size = LZ4_compressBound(original_size);
     std::vector<uint8_t> compressed_data(max_compressed_size + 4);

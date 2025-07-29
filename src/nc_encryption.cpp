@@ -17,7 +17,7 @@
 // Local includes:
 #include "nc_encryption.hpp"
 
-std::expected<NCEncodedMessage, NCMessageError> nc_encrypt_message(NCCompressedMessage const& message, std::string const& secret_key) {
+std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecryptedMessage const& message, std::string const& secret_key) {
     EVP_CIPHER_CTX* ctx = nullptr;
 
     // Create and initialize context:
@@ -38,7 +38,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encrypt_message(NCCompressedM
     }
 
     // The encoded message:
-    NCEncodedMessage result;
+    NCEncryptedMessage result;
 
     // 96-bit (12 bytes) nonce (IV) - MUST be unique for each encryption with the same key:
     if (1 != RAND_bytes(result.nonce.data(), NC_NONCE_LENGTH)) {
@@ -96,7 +96,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encrypt_message(NCCompressedM
     return result;
 }
 
-std::expected<NCCompressedMessage, NCMessageError> nc_decrypt_message(NCEncodedMessage const& message, std::string const& secret_key) {
+std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncryptedMessage const& message, std::string const& secret_key) {
     EVP_CIPHER_CTX* ctx = nullptr;
 
     // Create and initialize context:
@@ -131,7 +131,7 @@ std::expected<NCCompressedMessage, NCMessageError> nc_decrypt_message(NCEncodedM
     int32_t block_size = EVP_CIPHER_get_block_size(EVP_chacha20_poly1305());
 
     // Provide the ciphertext data to be decrypted:
-    NCCompressedMessage result;
+    NCDecryptedMessage result;
     uint32_t const ciphertext_len = static_cast<uint32_t>(message.data.size());
      // Plaintext will be same size as ciphertext:
     result.data.resize(ciphertext_len + block_size);

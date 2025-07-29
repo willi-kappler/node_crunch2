@@ -25,7 +25,7 @@ NCNodeID::NCNodeID(): id(gen_id()) {}
 std::string NCNodeID::gen_id() {
     std::string result;
 
-    for (size_t i = 0; i < NC_ID_LENGTH; i++) {
+    for (size_t i = 0; i < NC_NODEID_LENGTH; i++) {
         result += NC_CHARACTERS[nc_dis(nc_gen)];
     }
 

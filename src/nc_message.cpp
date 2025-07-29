@@ -22,7 +22,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     // Encode message type (1 byte)
     decompressed_message.data.push_back(static_cast<uint8_t>(msg_type));
 
-    // Encode node id, if present (NC_ID_LENGTH bytes):
+    // Encode node id, if present (NC_NODEID_LENGTH bytes):
     if (node_id.size() > 0) {
         decompressed_message.data.push_back(1);
         for (uint8_t const v: node_id) {
@@ -46,7 +46,6 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     }
 
     // 3. Encrypt message:
-    // NCDecryptedMessage decr_message{compressed_message->data};
     std::expected<NCEncryptedMessage, NCMessageError> encrypted_message = nc_encrypt_message(NCDecryptedMessage{compressed_message->data}, secret_key);
     if (!encrypted_message) {
         return std::unexpected(encrypted_message.error());
@@ -77,15 +76,11 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     for (uint8_t &v: encrypted_message.nonce) {
         v = message.data[source_index++];
     }
-    // auto nonce_start = message.data.cbegin();
-    // std::copy_n(nonce_start, NC_NONCE_LENGTH, encrypted_message.nonce.begin());
 
     // Get tag:
     for (uint8_t &v: encrypted_message.tag) {
         v = message.data[source_index++];
     }
-    // auto tag_start = nonce_start + NC_NONCE_LENGTH;
-    // std::copy_n(tag_start, NC_GCM_TAG_LENGTH, encrypted_message.tag.begin());
 
     // Get the rest of the data, if any:
     if (source_index < source_end) {
@@ -94,8 +89,6 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
             encrypted_message.data.push_back(message.data[source_index++]);
         }
     }
-    // auto data_start = tag_start + NC_GCM_TAG_LENGTH;
-    // encrypted_message.data.assign(data_start, message.data.cend());
 
     std::expected<NCDecryptedMessage, NCMessageError> decrypted_message = nc_decrypt_message(encrypted_message, secret_key);
     if (!decrypted_message) {
@@ -103,7 +96,6 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     }
 
     // 2. Decompress message:
-    // NCCompressedMessage comp_message{decrypted_message->data};
     std::expected<NCDecompressedMessage, NCMessageError> decompressed_message = nc_decompress_message(NCCompressedMessage{decrypted_message->data});
     if (!decompressed_message) {
         return std::unexpected(decompressed_message.error());
@@ -131,21 +123,6 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
             result.data.push_back(decompressed_message->data[source_index++]);
         }
     }
-
-    /*
-    auto data_start = decompressed_message->data.cbegin() + 2;
-
-    // Decode node id if it hase one:
-    if (has_node_id == 1) {
-        // Does have a node id:
-        auto id_start = decompressed_message->data.cbegin() + 2;
-        std::copy_n(id_start, NC_ID_LENGTH, result.node_id.id.begin());
-        data_start = id_start + NC_ID_LENGTH;
-    }
-
-    // Decode the actual data:
-    result.data.assign(data_start, decompressed_message->data.cend());
-    */
 
     return result;
 }

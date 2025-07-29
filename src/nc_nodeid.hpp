@@ -17,7 +17,7 @@
 #include <string>
 #include <random>
 
-const size_t NC_ID_LENGTH = 64;
+const size_t NC_NODEID_LENGTH = 64;
 
 class NCNodeID {
     public:

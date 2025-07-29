@@ -24,7 +24,7 @@ TEST_CASE("Create valid nodeid", "[nodeid]" ) {
 
     // std::cout << "NodeId: " << nodeid1.id << std::endl;
 
-    REQUIRE(nodeid1.id.length() == NC_ID_LENGTH);
+    REQUIRE(nodeid1.id.length() == NC_NODEID_LENGTH);
 }
 
 TEST_CASE("Compare nodeid", "[nodeid]" ) {

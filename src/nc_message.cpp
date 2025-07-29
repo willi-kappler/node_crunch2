@@ -8,6 +8,7 @@
 
 // STD includes:
 #include <cstring>
+//#include <iostream>
 
 // Local includes:
 #include "nc_compression.hpp"
@@ -16,7 +17,10 @@
 
 std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType const msg_type, std::string const& node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
     NCDecompressedMessage decompressed_message;
-    decompressed_message.data = std::vector<uint8_t>(2 + node_id.size() + data.size());
+    decompressed_message.data = std::vector<uint8_t>();
+    decompressed_message.data.reserve(2 + node_id.size() + data.size());
+
+    //std::cout << "decompressed_message capacity: " << decompressed_message.data.capacity() << "\n";
 
     // 1. Encode message:
     // Encode message type (1 byte)
@@ -39,11 +43,15 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
         }
     }
 
+    //std::cout << "decompressed_message size: " << decompressed_message.data.size() << "\n";
+
     // 2. Compress message:
     std::expected<NCCompressedMessage, NCMessageError> compressed_message = nc_compress_message(decompressed_message);
     if (!compressed_message) {
         return std::unexpected(compressed_message.error());
     }
+
+    //std::cout << "compressed_message size: " << compressed_message->data.size() << "\n";
 
     // 3. Encrypt message:
     std::expected<NCEncryptedMessage, NCMessageError> encrypted_message = nc_encrypt_message(NCDecryptedMessage{compressed_message->data}, secret_key);
@@ -51,8 +59,14 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
         return std::unexpected(encrypted_message.error());
     }
 
+    //std::cout << "encrypted_message size: " << encrypted_message->data.size() << "\n";
+
     NCEncodedMessage result;
-    result.data = std::vector<uint8_t>(NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + encrypted_message->data.size());
+    result.data = std::vector<uint8_t>();
+    result.data.reserve(NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + encrypted_message->data.size());
+
+    //std::cout << "result capacity: " << result.data.capacity() << "\n";
+
     for (uint8_t const v: encrypted_message->nonce) {
         result.data.push_back(v);
     }
@@ -63,6 +77,10 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
         result.data.push_back(v);
     }
 
+    //std::cout << "nonce size: " << static_cast<uint32_t>(NC_NONCE_LENGTH) << "\n";
+    //std::cout << "tag size: " << static_cast<uint32_t>(NC_GCM_TAG_LENGTH) << "\n";
+    //std::cout << "result size: " << result.data.size() << "\n";
+
     return result;
 }
 
@@ -72,23 +90,33 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     uint32_t source_index = 0;
     uint32_t source_end = static_cast<uint32_t>(message.data.size());
 
+    //std::cout << "message size: " << source_end << "\n";
+
     // Get nonce:
     for (uint8_t &v: encrypted_message.nonce) {
         v = message.data[source_index++];
     }
+
+    //std::cout << "source_index: " << source_index << "\n";
 
     // Get tag:
     for (uint8_t &v: encrypted_message.tag) {
         v = message.data[source_index++];
     }
 
+    //std::cout << "source_index: " << source_index << "\n";
+
     // Get the rest of the data, if any:
     if (source_index < source_end) {
-        encrypted_message.data = std::vector<uint8_t>(source_end - source_index);
+        encrypted_message.data = std::vector<uint8_t>();
+        encrypted_message.data.reserve(source_end - source_index);
         while (source_index < source_end) {
             encrypted_message.data.push_back(message.data[source_index++]);
         }
     }
+
+    //std::cout << "source_index: " << source_index << "\n";
+    //std::cout << "encrypted data size: " << encrypted_message.data.size() << "\n";
 
     std::expected<NCDecryptedMessage, NCMessageError> decrypted_message = nc_decrypt_message(encrypted_message, secret_key);
     if (!decrypted_message) {
@@ -118,7 +146,8 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
 
     // Decode the actual data, if any:
     if (source_index < source_end) {
-        result.data = std::vector<uint8_t>(source_end - source_index);
+        result.data = std::vector<uint8_t>();
+        result.data.reserve(source_end - source_index);
         while (source_index < source_end) {
             result.data.push_back(decompressed_message->data[source_index++]);
         }

@@ -7,7 +7,7 @@
 */
 
 // STD includes:
-// # include <iostream>
+# include <iostream>
 
 // External includes:
 #include <openssl/evp.h>
@@ -16,6 +16,22 @@
 
 // Local includes:
 #include "nc_encryption.hpp"
+
+void nc_print_tag(std::vector<uint8_t> const& tag) {
+    std::cout << "Tag: " << std::endl;
+    for (auto v: tag) {
+        std::cout << std::hex << static_cast<uint16_t>(v) << ":";
+    }
+    std::cout << std::dec << std::endl;
+}
+
+void nc_print_nonce(std::vector<uint8_t> const& nonce) {
+    std::cout << "Nonce: " << std::endl;
+    for (auto v: nonce) {
+        std::cout << std::hex << static_cast<uint16_t>(v) << ":";
+    }
+    std::cout << std::dec << std::endl;
+}
 
 std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecryptedMessage const& message, std::string const& secret_key) {
     EVP_CIPHER_CTX* ctx = nullptr;
@@ -46,13 +62,7 @@ std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecrypted
         return std::unexpected(NCMessageError::NCCreateNonceError);
     }
 
-    /*
-    std::cout << "Nonce: " << std::endl;
-    for (auto v: result.nonce) {
-        std::cout << std::hex << static_cast<uint16_t>(v) << ":";
-    }
-    std::cout << std::endl;
-    */
+    // nc_print_nonce(result.nonce);
 
     // Set the nonce (IV):
     if (1 != EVP_EncryptInit_ex(ctx, nullptr, nullptr, nullptr, result.nonce.data())) {
@@ -92,6 +102,8 @@ std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecrypted
         return std::unexpected(NCMessageError::NCCipherGetTagError);
     }
 
+    // nc_print_tag(result.tag);
+
     EVP_CIPHER_CTX_free(ctx);
     return result;
 }
@@ -116,11 +128,15 @@ std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncrypted
         return std::unexpected(NCMessageError::NCCipherControllError);
     }
 
+    // nc_print_nonce(message.nonce);
+
     // Set the nonce (IV):
     if (1 != EVP_DecryptInit_ex(ctx, nullptr, nullptr, nullptr, message.nonce.data())) {
         EVP_CIPHER_CTX_free(ctx);
         return std::unexpected(NCMessageError::NCSetNonceError);
     }
+
+    // nc_print_tag(message.tag);
 
     // Set the expected authentication tag. This must be done BEFORE processing ciphertext:
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_TAG, NC_GCM_TAG_LENGTH, (void*) (message.tag.data()))) {
@@ -128,7 +144,9 @@ std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncrypted
         return std::unexpected(NCMessageError::NCCipherSetTagError);
     }
 
-    int32_t block_size = EVP_CIPHER_get_block_size(EVP_chacha20_poly1305());
+    int32_t const block_size = EVP_CIPHER_get_block_size(EVP_chacha20_poly1305());
+
+    // std::cout << "block_size: " << block_size << "\n";
 
     // Provide the ciphertext data to be decrypted:
     NCDecryptedMessage result;
@@ -140,7 +158,11 @@ std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncrypted
         EVP_CIPHER_CTX_free(ctx);
         return std::unexpected(NCMessageError::NCDecryptUpdateError);
     }
+
     uint32_t plaintext_len = len;
+
+    // std::cout << "ciphertext_len: " << ciphertext_len << "\n";
+    // std::cout << "plaintext_len: " << plaintext_len << "\n";
 
     // Finalize the decryption. This performs the tag verification.
     // If the tag is incorrect, this function will return 0:
@@ -149,6 +171,9 @@ std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncrypted
         return std::unexpected(NCMessageError::NCDecryptFinalError);
     }
     plaintext_len += len;
+
+    // std::cout << "plaintext_len: " << plaintext_len << "\n";
+
     // Adjust size:
     result.data.resize(plaintext_len);
     EVP_CIPHER_CTX_free(ctx);

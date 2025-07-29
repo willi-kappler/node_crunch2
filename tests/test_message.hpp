@@ -29,10 +29,9 @@ TEST_CASE("Encode / decode a message", "[message]" ) {
     std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encode_message(message_type, node_id, data, key1);
     REQUIRE(encoded_message1.has_value() == true);
 
-    REQUIRE(encoded_message1->data.size() == 256);
+    REQUIRE(encoded_message1->data.size() == 123);
 
     std::expected<NCDecodedMessage, NCMessageError> decoded_message1 = nc_decode_message(*encoded_message1, key1);
-    std::cout << "Error: " << static_cast<uint32_t>(decoded_message1.error()) << std::endl;
     REQUIRE(decoded_message1.has_value() == true);
 
     REQUIRE(decoded_message1->data.size() == 122);

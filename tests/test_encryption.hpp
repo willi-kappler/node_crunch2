@@ -21,16 +21,16 @@ TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
 
     std::string key1 = "12345678901234567890123456789012";
 
-    std::expected<NCEncryptedMessage, NCMessageError> encoded_message1 = nc_encrypt_message(NCDecryptedMessage(msg1v), key1);
-    REQUIRE(encoded_message1.has_value() == true);
+    std::expected<NCEncryptedMessage, NCMessageError> encrypted_message1 = nc_encrypt_message(NCDecryptedMessage(msg1v), key1);
+    REQUIRE(encrypted_message1.has_value() == true);
 
-    REQUIRE(encoded_message1->data.size() == 124);
+    REQUIRE(encrypted_message1->data.size() == msg1.size());
 
-    std::expected<NCDecryptedMessage, NCMessageError> compressed_message1 = nc_decrypt_message(*encoded_message1, key1);
-    REQUIRE(compressed_message1.has_value() == true);
+    std::expected<NCDecryptedMessage, NCMessageError> decrypted_message1 = nc_decrypt_message(*encrypted_message1, key1);
+    REQUIRE(decrypted_message1.has_value() == true);
 
-    REQUIRE(compressed_message1->data.size() == 124);
+    REQUIRE(decrypted_message1->data.size() == msg1.size());
 
-    std::string msg2(compressed_message1->data.begin(), compressed_message1->data.end());
+    std::string msg2(decrypted_message1->data.begin(), decrypted_message1->data.end());
     REQUIRE(msg2 == msg1);
 }

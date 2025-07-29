@@ -64,12 +64,12 @@ TEST_CASE("Compress / decompress a message", "[compression]" ) {
     REQUIRE(compressed_message1->data.size() == 99);
 
     uint32_t msg_size = nc_from_big_endian_bytes(compressed_message1->data);
-    REQUIRE(msg_size == 125);
+    REQUIRE(msg_size == msg1.size());
 
     std::expected<NCDecompressedMessage, NCMessageError> decompressed_message1 = nc_decompress_message(NCCompressedMessage(compressed_message1->data));
     REQUIRE(decompressed_message1.has_value() == true);
 
-    REQUIRE(decompressed_message1->data.size() == 125);
+    REQUIRE(decompressed_message1->data.size() == msg1.size());
 
     std::string msg2(decompressed_message1->data.begin(), decompressed_message1->data.end());
     REQUIRE(msg2 == msg1);

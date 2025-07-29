@@ -63,3 +63,22 @@ TEST_CASE("Encode / decode a message, empty node id", "[message]" ) {
     std::string msg2(decoded_message1->data.begin(), decoded_message1->data.end());
     REQUIRE(msg2 == msg1);
 }
+
+TEST_CASE("Encode / decode a message, empty node id, empty data", "[message]" ) {
+    NCMessageType message_type = NCMessageType::Init;
+    std::string node_id = "";
+    std::vector<uint8_t> data = std::vector<uint8_t>();
+
+    std::string key1 = "12345678901234567890123456789012";
+
+    std::expected<NCEncodedMessage, NCMessageError> encoded_message1 = nc_encode_message(message_type, node_id, data, key1);
+    REQUIRE(encoded_message1.has_value() == true);
+
+    REQUIRE(encoded_message1->data.size() == 35);
+
+    std::expected<NCDecodedMessage, NCMessageError> decoded_message1 = nc_decode_message(*encoded_message1, key1);
+    REQUIRE(decoded_message1.has_value() == true);
+
+    REQUIRE(decoded_message1->data.size() == 0);
+    REQUIRE(decoded_message1->msg_type == message_type);
+}

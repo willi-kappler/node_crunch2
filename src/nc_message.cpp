@@ -52,7 +52,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     //std::cout << "decompressed_message size: " << decompressed_message.data.size() << "\n";
 
     // 2. Compress message:
-    std::expected<NCCompressedMessage, NCMessageError> compressed_message = nc_compress_message(decompressed_message);
+    auto compressed_message = nc_compress_message(decompressed_message);
     if (!compressed_message) {
         return std::unexpected(compressed_message.error());
     }
@@ -60,7 +60,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     //std::cout << "compressed_message size: " << compressed_message->data.size() << "\n";
 
     // 3. Encrypt message:
-    std::expected<NCEncryptedMessage, NCMessageError> encrypted_message = nc_encrypt_message(NCDecryptedMessage{compressed_message->data}, secret_key);
+    auto encrypted_message = nc_encrypt_message(NCDecryptedMessage{compressed_message->data}, secret_key);
     if (!encrypted_message) {
         return std::unexpected(encrypted_message.error());
     }
@@ -133,13 +133,13 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     //std::cout << "source_index: " << source_index << "\n";
     //std::cout << "encrypted data size: " << encrypted_message.data.size() << "\n";
 
-    std::expected<NCDecryptedMessage, NCMessageError> decrypted_message = nc_decrypt_message(encrypted_message, secret_key);
+    auto decrypted_message = nc_decrypt_message(encrypted_message, secret_key);
     if (!decrypted_message) {
         return std::unexpected(decrypted_message.error());
     }
 
     // 2. Decompress message:
-    std::expected<NCDecompressedMessage, NCMessageError> decompressed_message = nc_decompress_message(NCCompressedMessage{decrypted_message->data});
+    auto decompressed_message = nc_decompress_message(NCCompressedMessage{decrypted_message->data});
     if (!decompressed_message) {
         return std::unexpected(decompressed_message.error());
     }

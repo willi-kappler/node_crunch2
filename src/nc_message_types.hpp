@@ -53,21 +53,22 @@ struct NCDecryptedMessage {
     std::vector<uint8_t> data = {};
 };
 
-struct NCEncodedMessage {
+struct NCEncodedMessageToServer {
     std::vector<uint8_t> data = {};
 };
 
-struct NCDecodedMessage {
+struct NCEncodedMessageToNode {
+    std::vector<uint8_t> data = {};
+};
+
+struct NCDecodedMessageFromNode {
     NCMessageType msg_type = NCMessageType::Unknown;
     NCNodeID node_id = NCNodeID();
     std::vector<uint8_t> data = {};
 };
 
-struct NCNodeMessage {
-    std::vector<uint8_t> data = {};
-};
-
-struct NCServerMessage {
+struct NCDecodedMessageFromServer {
+    NCMessageType msg_type = NCMessageType::Unknown;
     std::vector<uint8_t> data = {};
 };
 

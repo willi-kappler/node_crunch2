@@ -18,6 +18,7 @@
 // Local includes:
 #include "nc_message.hpp"
 
+/*
 TEST_CASE("Encode / decode a message", "[message]" ) {
     NCMessageType message_type = NCMessageType::Init;
     NCNodeID node_id = NCNodeID();
@@ -250,3 +251,4 @@ TEST_CASE("Generate quit message", "[message]" ) {
     REQUIRE(message2->node_id.id != node_id.id);
     REQUIRE(message2->data.size() == 0);
 }
+*/

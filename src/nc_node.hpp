@@ -15,9 +15,7 @@
 
 // Local includes:
 #include "nc_config.hpp"
-#include "nc_nodeid.hpp"
-#include "nc_message_errors.hpp"
-#include "nc_message_types.hpp"
+#include "nc_message.hpp"
 
 class NCNode {
     public:
@@ -28,9 +26,9 @@ class NCNode {
         virtual ~NCNode();
 
         // Default special member functions:
-        
+
         // Disable all other special member functions:
-        NCNode (NCNode&&) = default;
+        NCNode (NCNode&&) = delete;
         NCNode() = delete;
         NCNode(const NCNode&) = delete;
         NCNode& operator=(const NCNode&) = delete;
@@ -47,11 +45,11 @@ class NCNode {
         NCNodeID node_id;
         std::atomic_bool quit;
 
-        void nc_send_msg_return_answer(std::vector<uint8_t>);
+        NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message);
         void nc_send_heartbeat();
 
         // Must be implemented by the user:
         // (pure virtual functions)
         virtual void nc_init(std::vector<uint8_t> data) = 0;
-        virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t>) = 0;
+        virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) = 0;
 };

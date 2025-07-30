@@ -28,7 +28,8 @@ enum struct NCMessageError: uint8_t {
     NCCompressionError,
     NCDecompressionError,
     NCEncryptionError,
-    NCDecryptionError
+    NCDecryptionError,
+    NCSizeMissmatch
 };
 
 #endif // FILE_NC_MESSAGE_ERRORS_HPP_INCLUDED

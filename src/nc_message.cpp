@@ -17,30 +17,36 @@
 
 std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType const msg_type, std::string const& node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
     NCDecompressedMessage decompressed_message;
-    decompressed_message.data = std::vector<uint8_t>();
-    decompressed_message.data.reserve(2 + node_id.size() + data.size());
+    uint32_t expected_size = static_cast<uint32_t>(2 + node_id.size() + data.size());
+    decompressed_message.data = std::vector<uint8_t>(expected_size);
+    //decompressed_message.data.reserve(expected_size);
+    uint32_t data_index = 0;
 
     //std::cout << "decompressed_message capacity: " << decompressed_message.data.capacity() << "\n";
 
     // 1. Encode message:
     // Encode message type (1 byte)
-    decompressed_message.data.push_back(static_cast<uint8_t>(msg_type));
+    decompressed_message.data[data_index++] = static_cast<uint8_t>(msg_type);
 
     // Encode node id, if present (NC_NODEID_LENGTH bytes):
     if (node_id.size() > 0) {
-        decompressed_message.data.push_back(1);
+        decompressed_message.data[data_index++] = 1;
         for (uint8_t const v: node_id) {
-            decompressed_message.data.push_back(v);
+            decompressed_message.data[data_index++] = v;
         }
     } else {
-        decompressed_message.data.push_back(0);
+        decompressed_message.data[data_index++] = 0;
     }
 
     // Encode the actual data:
     if (data.size() > 0) {
         for (uint8_t const v: data) {
-            decompressed_message.data.push_back(v);
+            decompressed_message.data[data_index++] = v;
         }
+    }
+
+    if (expected_size != decompressed_message.data.size()) {
+        return std::unexpected(NCMessageError::NCSizeMissmatch);
     }
 
     //std::cout << "decompressed_message size: " << decompressed_message.data.size() << "\n";
@@ -62,8 +68,9 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     //std::cout << "encrypted_message size: " << encrypted_message->data.size() << "\n";
 
     NCEncodedMessage result;
-    result.data = std::vector<uint8_t>();
-    result.data.reserve(NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + encrypted_message->data.size());
+    // result.data = std::vector<uint8_t>();
+    expected_size = static_cast<uint32_t>(NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + encrypted_message->data.size());
+    result.data.reserve(expected_size);
 
     //std::cout << "result capacity: " << result.data.capacity() << "\n";
 
@@ -80,6 +87,10 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     //std::cout << "nonce size: " << static_cast<uint32_t>(NC_NONCE_LENGTH) << "\n";
     //std::cout << "tag size: " << static_cast<uint32_t>(NC_GCM_TAG_LENGTH) << "\n";
     //std::cout << "result size: " << result.data.size() << "\n";
+
+    if (result.data.size() != expected_size) {
+        return std::unexpected(NCMessageError::NCSizeMissmatch);
+    }
 
     return result;
 }

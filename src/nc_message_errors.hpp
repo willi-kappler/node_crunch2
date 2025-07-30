@@ -13,23 +13,23 @@
 #include <cstdint>
 
 enum struct NCMessageError: uint8_t {
-    NCCipherContextError,
-    NCEncryptInitError,
-    NCDencryptInitError,
-    NCCipherControllError,
-    NCCreateNonceError,
-    NCSetNonceError,
-    NCEncryptUpdateError,
-    NCDecryptUpdateError,
-    NCEncryptFinalError,
-    NCDecryptFinalError,
-    NCCipherGetTagError,
-    NCCipherSetTagError,
-    NCCompressionError,
-    NCDecompressionError,
-    NCEncryptionError,
-    NCDecryptionError,
-    NCSizeMissmatch
+    CipherContextError = 0,
+    EncryptInitError,
+    DencryptInitError,
+    CipherControllError,
+    CreateNonceError,
+    SetNonceError,
+    EncryptUpdateError,
+    DecryptUpdateError,
+    EncryptFinalError,
+    DecryptFinalError,
+    CipherGetTagError,
+    CipherSetTagError,
+    CompressionError,
+    DecompressionError,
+    EncryptionError,
+    DecryptionError,
+    SizeMissmatch
 };
 
 #endif // FILE_NC_MESSAGE_ERRORS_HPP_INCLUDED

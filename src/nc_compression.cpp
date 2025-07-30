@@ -51,7 +51,7 @@ std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompr
     );
 
     if (compressed_size <= 0) {
-        return std::unexpected(NCMessageError::NCCompressionError);
+        return std::unexpected(NCMessageError::CompressionError);
     } else {
         compressed_data.resize(compressed_size + 4);
         nc_to_big_endian_bytes(original_size, compressed_data);
@@ -70,7 +70,7 @@ std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message(NCCom
     );
 
     if (decompressed_size <= 0) {
-        return std::unexpected(NCMessageError::NCDecompressionError);
+        return std::unexpected(NCMessageError::DecompressionError);
     }
 
     return NCDecompressedMessage(decompressed_data);

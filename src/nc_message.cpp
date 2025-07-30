@@ -46,7 +46,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     }
 
     if (expected_size != decompressed_message.data.size()) {
-        return std::unexpected(NCMessageError::NCSizeMissmatch);
+        return std::unexpected(NCMessageError::SizeMissmatch);
     }
 
     //std::cout << "decompressed_message size: " << decompressed_message.data.size() << "\n";
@@ -89,7 +89,7 @@ std::expected<NCEncodedMessage, NCMessageError> nc_encode_message(NCMessageType 
     //std::cout << "result size: " << result.data.size() << "\n";
 
     if (result.data.size() != expected_size) {
-        return std::unexpected(NCMessageError::NCSizeMissmatch);
+        return std::unexpected(NCMessageError::SizeMissmatch);
     }
 
     return result;
@@ -127,7 +127,7 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     }
 
     if (source_index != source_end) {
-        return std::unexpected(NCMessageError::NCSizeMissmatch);
+        return std::unexpected(NCMessageError::SizeMissmatch);
     }
 
     //std::cout << "source_index: " << source_index << "\n";
@@ -169,54 +169,139 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     }
 
     if (source_index != source_end) {
-        return std::unexpected(NCMessageError::NCSizeMissmatch);
+        return std::unexpected(NCMessageError::SizeMissmatch);
     }
 
     return result;
 }
 
-/*
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message(NCNodeID node_id, std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message(NCNodeID const node_id, std::string const& secret_key) {
+    /*
+    Generate a heartbeat message to be sent from the node to the server.
 
+    The node sends its node_id that the server will check.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::Heartbeat, node_id.id, {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message_ok(std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message_ok(std::string const& secret_key) {
+    /*
+    Generate a "heartbeat OK" message to be sent from the server to the node.
 
+    This message is only sent if the heartbeat message from the node was
+    sent in the time limit and contained a valid node id.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::HeartbeatOK, "", {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message_error(std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_heartbeat_message_error(std::string const& secret_key) {
+    /*
+    Generate a "heartbeat error" message to be sent from the server to the node.
 
+    This message is only sent if the heartbeat message from the node was
+    sent too late or did not contain a valid node id.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::HeartbeatError, "", {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message(NCNodeID node_id, std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message(NCNodeID const node_id, std::string const& secret_key) {
+    /*
+    Generate an initialisation message to be sent from the node to the server.
 
+    This message is only sent once when the node connects for the first time to the server.
+    The node registers itself to the server given its own node id.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::Init, node_id.id, {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_ok(std::vector<uint8_t>, std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_ok(std::vector<uint8_t> const& init_data, std::string const& secret_key) {
+    /*
+    Generate an "init ok" message to be sent from the server to the node.
 
+    This message is only sent once when the node has registered itself correctly to the server.
+    The server then can send some initial data to the node, if needed.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::InitOK, "", init_data, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_error(std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_error(std::string const& secret_key) {
+    /*
+    Generate an "init error" message to be sent from the server to the node.
 
+    This message is only sent when the registration of the new node has failed.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::InitError, "", {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_message(NCNodeID node_id, std::string secret_key, std::vector<uint8_t> new_data) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_message(NCNodeID const node_id, std::string const& secret_key, std::vector<uint8_t> const& new_data) {
+    /*
+    Generate a result message to be sent from the node to the server.
 
+    This message is only sent when the node has finished processing the data and sends
+    the result back to the server.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::NewResultFromNode, node_id.id, new_data, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_need_more_data_message(NCNodeID node_id, std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_need_more_data_message(NCNodeID const node_id, std::string const& secret_key) {
+    /*
+    Generate a "need more data" message to be sent from the node to the server.
 
+    This message is only sent when the node has finished processing the data and needs
+    more data to be processed from the server.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::NodeNeedsMoreData, node_id.id, {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_new_data_message(std::vector<uint8_t> new_data, std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_new_data_message(std::vector<uint8_t> const& new_data, std::string const& secret_key) {
+    /*
+    Generate a "new data" message to be sent from the server to the node.
 
+    This message is only sent when the node has asked for more data from the server.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::NewDataFromServer, "", new_data, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_ok_message(std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_ok_message(std::string const& secret_key) {
+    /*
+    Generate a "result ok" message to be sent from the server to the node.
 
+    This message is only sent when the node has sent processed data to the server
+    and the server has accepted it.
+    The secret key is used to encode the message.
+    */
+
+    return nc_encode_message(NCMessageType::ResultOK, "", {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_quit_message(std::string secret_key) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_quit_message(std::string const& secret_key) {
+    /*
+    Generate a quit message to be sent from the server to the node.
 
+    This message is only sent when the job is done and no more data has to be
+    processed by the nodes.
+    When receiving this message, the nodes will quit immediately.
+    The server will wait some more time since not all nodes may have received
+    the quit message yet.
+    */
+
+    return nc_encode_message(NCMessageType::Quit, "", {}, secret_key);
 }
-*/

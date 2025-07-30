@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <expected>
+#include <atomic>
 
 // Local includes:
 #include "nc_config.hpp"
@@ -44,11 +45,13 @@ class NCNode {
         uint16_t heartbeat_timeout;
         std::string secret_key;
         NCNodeID node_id;
+        std::atomic_bool quit;
 
         void nc_send_msg_return_answer(std::vector<uint8_t>);
         void nc_send_heartbeat();
 
         // Must be implemented by the user:
-        virtual void nc_init(std::vector<uint8_t> data);
-        virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t>);
+        // (pure virtual functions)
+        virtual void nc_init(std::vector<uint8_t> data) = 0;
+        virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t>) = 0;
 };

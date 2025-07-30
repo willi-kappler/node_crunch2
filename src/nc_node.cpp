@@ -6,6 +6,11 @@
     This file defines the node class
 */
 
+// STD includes:
+#include <thread>
+#include <chrono>
+
+// Local includes:
 #include "nc_node.hpp"
 
 NCNode::NCNode(NCConfiguration config):
@@ -13,7 +18,8 @@ NCNode::NCNode(NCConfiguration config):
     server_port(config.server_port),
     heartbeat_timeout(config.heartbeat_timeout),
     secret_key(config.secret_key),
-    node_id(NCNodeID()) {
+    node_id(NCNodeID()),
+    quit(false) {
 }
 
 NCNode::~NCNode(){
@@ -22,14 +28,14 @@ NCNode::~NCNode(){
 void NCNode::nc_run() {
 }
 
-void NCNode::nc_init(std::vector<uint8_t> data) {
-    if (data.size() > 0) {
+void NCNode::nc_send_msg_return_answer(std::vector<uint8_t>) {
 
-    }
 }
 
-std::vector<uint8_t> NCNode::nc_process_data(std::vector<uint8_t>) {
-    std::vector<uint8_t> result;
+void NCNode::nc_send_heartbeat() {
+    auto sleep_time = std::chrono::seconds(heartbeat_timeout);
 
-    return result;
+    while (!quit.load()) {
+        std::this_thread::sleep_for(sleep_time);
+    }
 }

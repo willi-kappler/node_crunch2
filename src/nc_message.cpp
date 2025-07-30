@@ -126,6 +126,10 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
         }
     }
 
+    if (source_index != source_end) {
+        return std::unexpected(NCMessageError::NCSizeMissmatch);
+    }
+
     //std::cout << "source_index: " << source_index << "\n";
     //std::cout << "encrypted data size: " << encrypted_message.data.size() << "\n";
 
@@ -162,6 +166,10 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
         while (source_index < source_end) {
             result.data.push_back(decompressed_message->data[source_index++]);
         }
+    }
+
+    if (source_index != source_end) {
+        return std::unexpected(NCMessageError::NCSizeMissmatch);
     }
 
     return result;

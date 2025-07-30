@@ -28,7 +28,7 @@
 [[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message(NCNodeID const node_id, std::string const& secret_key);
 [[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_ok(std::vector<uint8_t> const& init_data, std::string const& secret_key);
 [[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_init_message_error(std::string const& secret_key);
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_message(NCNodeID const node_id, std::string const& secret_key, std::vector<uint8_t> const& new_data);
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_message(NCNodeID const node_id, std::vector<uint8_t> const& new_data, std::string const& secret_key);
 [[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_need_more_data_message(NCNodeID node_id, std::string const& secret_key);
 [[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_new_data_message(std::vector<uint8_t> const& new_data, std::string const& secret_key);
 [[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_ok_message(std::string const& secret_key);

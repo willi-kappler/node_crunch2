@@ -245,7 +245,7 @@ std::expected<NCDecodedMessage, NCMessageError> nc_decode_message(NCEncodedMessa
     return nc_encode_message(NCMessageType::InitError, "", {}, secret_key);
 }
 
-[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_message(NCNodeID const node_id, std::string const& secret_key, std::vector<uint8_t> const& new_data) {
+[[nodiscard]] std::expected<NCEncodedMessage, NCMessageError> nc_gen_result_message(NCNodeID const node_id, std::vector<uint8_t> const& new_data, std::string const& secret_key) {
     /*
     Generate a result message to be sent from the node to the server.
 

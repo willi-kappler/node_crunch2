@@ -7,7 +7,7 @@
 */
 
 // STD includes:
-# include <iostream>
+#include <iostream>
 
 // External includes:
 #include <openssl/evp.h>
@@ -33,7 +33,8 @@ void nc_print_nonce(std::vector<uint8_t> const& nonce) {
     std::cout << std::dec << std::endl;
 }
 
-std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecryptedMessage const& message, std::string const& secret_key) {
+std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecryptedMessage const& message,
+        std::string const& secret_key) {
     EVP_CIPHER_CTX* ctx = nullptr;
 
     // Create and initialize context:
@@ -42,7 +43,8 @@ std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecrypted
     }
 
     // Initialize the encryption operation:
-    if (1 != EVP_EncryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr, reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
+    if (1 != EVP_EncryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr,
+        reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
         EVP_CIPHER_CTX_free(ctx);
         return std::unexpected(NCMessageError::EncryptInitError);
     }
@@ -108,7 +110,8 @@ std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecrypted
     return result;
 }
 
-std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncryptedMessage const& message, std::string const& secret_key) {
+std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncryptedMessage const& message,
+        std::string const& secret_key) {
     EVP_CIPHER_CTX* ctx = nullptr;
 
     // Create and initialize context:
@@ -117,7 +120,8 @@ std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncrypted
     }
 
     // Initialize the decryption operation
-    if (1 != EVP_DecryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr, reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
+    if (1 != EVP_DecryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr,
+        reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
         EVP_CIPHER_CTX_free(ctx);
         return std::unexpected(NCMessageError::DencryptInitError);
     }

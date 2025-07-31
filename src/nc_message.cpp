@@ -8,6 +8,7 @@
 
 // STD includes:
 #include <cstring>
+#include <type_traits>
 //#include <iostream>
 
 // Local includes:
@@ -15,6 +16,7 @@
 #include "nc_encryption.hpp"
 #include "nc_message.hpp"
 
+/*
 [[nodiscard]] NCDecompressedMessage nc_encode1(uint32_t expected_size, NCMessageType const msg_type, std::vector<uint8_t> const& data) {
     NCDecompressedMessage decompressed_message;
     decompressed_message.data = std::vector<uint8_t>(expected_size);
@@ -64,7 +66,71 @@
 
     return result;
 }
+*/
 
+template <typename RetType>
+[[nodiscard]] std::expected<RetType, NCMessageError> nc_encode(NCMessageType const msg_type, std::string const& node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
+    // 1. Encode message:
+    NCDecompressedMessage decompressed_message;
+    uint32_t expected_size = static_cast<uint32_t>(1 + data.size());;
+
+    if constexpr (std::is_same_v<RetType, NCEncodedMessageToServer>) {
+        expected_size += NC_NODEID_LENGTH;
+    }
+
+    decompressed_message.data = std::vector<uint8_t>(expected_size);
+    uint32_t data_index = 0;
+
+    // Encode message type (1 byte)
+    decompressed_message.data[data_index++] = static_cast<uint8_t>(msg_type);
+
+    if constexpr (std::is_same_v<RetType, NCEncodedMessageToServer>) {
+        // Node id needed:
+        for (uint8_t const v: node_id) {
+            decompressed_message.data[data_index++] = v;
+        }
+    }
+
+    // Encode the actual data:
+    for (uint8_t const v: data) {
+        decompressed_message.data[data_index++] = v;
+    }
+
+    // 2. Compress message:
+    auto compressed_message = nc_compress_message(decompressed_message);
+    if (!compressed_message) {
+        return std::unexpected(compressed_message.error());
+    }
+
+    // 3. Encrypt compressed message:
+    auto encrypted_message = nc_encrypt_message(NCDecryptedMessage{compressed_message->data}, secret_key);
+    if (!encrypted_message) {
+        return std::unexpected(encrypted_message.error());
+    }
+
+    // 4. Encode encrypted compressed message:
+    RetType result;
+    expected_size = static_cast<uint32_t>(NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + encrypted_message->data.size());
+    result.data.reserve(expected_size);
+
+    for (uint8_t const v: encrypted_message->nonce) {
+        result.data.push_back(v);
+    }
+    for (uint8_t const v: encrypted_message->tag) {
+        result.data.push_back(v);
+    }
+    for (uint8_t const v: encrypted_message->data) {
+        result.data.push_back(v);
+    }
+
+    if (result.data.size() != expected_size) {
+        return std::unexpected(NCMessageError::SizeMissmatch);
+    }
+
+    return result;
+}
+
+/*
 [[nodiscard]] std::expected<NCDecompressedMessage, NCMessageError> nc_decode1(std::vector<uint8_t> const& message, std::string const& secret_key) {
     // 1. Decrypt message:
     NCEncryptedMessage encrypted_message;
@@ -102,8 +168,79 @@
     // 2. Decompress message:
     return nc_decompress_message(NCCompressedMessage{decrypted_message->data});
 }
+*/
+
+template <typename RetType>
+[[nodiscard]] std::expected<RetType, NCMessageError> nc_decode(std::vector<uint8_t> const& message, std::string const& secret_key) {
+    // 1. Decrypt message:
+    NCEncryptedMessage encrypted_message;
+    uint32_t source_index = 0;
+    uint32_t source_end = static_cast<uint32_t>(message.size());
+
+    // Get nonce:
+    for (uint8_t &v: encrypted_message.nonce) {
+        v = message[source_index++];
+    }
+
+    // Get tag:
+    for (uint8_t &v: encrypted_message.tag) {
+        v = message[source_index++];
+    }
+
+    // Get the rest of the data, if any:
+    if (source_index < source_end) {
+        encrypted_message.data = std::vector<uint8_t>();
+        encrypted_message.data.reserve(source_end - source_index);
+        while (source_index < source_end) {
+            encrypted_message.data.push_back(message[source_index++]);
+        }
+    }
+
+    if (source_index != source_end) {
+        return std::unexpected(NCMessageError::SizeMissmatch);
+    }
+
+    auto decrypted_message = nc_decrypt_message(encrypted_message, secret_key);
+    if (!decrypted_message) {
+        return std::unexpected(decrypted_message.error());
+    }
+
+    // 2. Decompress message:
+    auto decompressed_message = nc_decompress_message(NCCompressedMessage{decrypted_message->data});
+
+    if (!decompressed_message) {
+        return std::unexpected(decompressed_message.error());
+    }
+
+    // 3. Decode message:
+    RetType result;
+    // Decode message type:
+    result.msg_type = static_cast<NCMessageType>(decompressed_message->data[0]);
+    source_index = 1;
+    source_end = static_cast<uint32_t>(decompressed_message->data.size());
+
+    if constexpr (std::is_same_v<RetType, NCDecodedMessageFromNode>) {
+        // Decode node id:
+        for (auto &v: result.node_id.id) {
+            v = decompressed_message->data[source_index++];
+        }
+    }
+
+    // Decode the actual data, if any:
+    if (source_index < source_end) {
+        result.data = std::vector<uint8_t>();
+        result.data.reserve(source_end - source_index);
+        while (source_index < source_end) {
+            result.data.push_back(decompressed_message->data[source_index++]);
+        }
+    }
+
+    return result;
+}
 
 [[nodiscard]] NCExpEncToServer nc_encode_message_to_server(NCMessageType const msg_type, NCNodeID const& node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
+    return nc_encode<NCEncodedMessageToServer>(msg_type, node_id.id, data, secret_key);
+    /*
     // 1. Encode message:
     uint32_t expected_size = static_cast<uint32_t>(2 + data.size() + node_id.id.size());
     NCDecompressedMessage decompressed_message = nc_encode1(expected_size, msg_type, data);
@@ -120,9 +257,12 @@
     } else {
         return NCEncodedMessageToServer{*result};
     }
+    */
 }
 
 [[nodiscard]] NCExpEncToNode nc_encode_message_to_node(NCMessageType const msg_type, std::vector<uint8_t> const& data, std::string const& secret_key) {
+    return nc_encode<NCEncodedMessageToNode>(msg_type, "", data, secret_key);
+    /*
     // 1. Encode message:
     uint32_t expected_size = static_cast<uint32_t>(2 + data.size());
     NCDecompressedMessage decompressed_message = nc_encode1(expected_size, msg_type, data);
@@ -134,9 +274,12 @@
     } else {
         return NCEncodedMessageToNode{*result};
     }
+    */
 }
 
-[[nodiscard]] NCExpDecFromServer nc_decode_message_from_server(NCExpEncToNode const& message, std::string const& secret_key) {
+[[nodiscard]] NCExpDecFromServer nc_decode_message_from_server(NCEncodedMessageToNode const& message, std::string const& secret_key) {
+    return nc_decode<NCDecodedMessageFromServer>(message.data, secret_key);
+    /*
     std::expected<NCDecompressedMessage, NCMessageError> decompressed_message = nc_decode1(message->data, secret_key);
 
     if (!decompressed_message) {
@@ -160,9 +303,12 @@
     }
 
     return result;
+    */
 }
 
-[[nodiscard]] NCExpDecFromNode nc_decode_message_from_node(NCExpEncToServer const& message, std::string const& secret_key) {
+[[nodiscard]] NCExpDecFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message, std::string const& secret_key) {
+    return nc_decode<NCDecodedMessageFromNode>(message.data, secret_key);
+    /*
     std::expected<NCDecompressedMessage, NCMessageError> decompressed_message = nc_decode1(message->data, secret_key);
 
     if (!decompressed_message) {
@@ -191,6 +337,7 @@
     }
 
     return result;
+    */
 }
 
 [[nodiscard]] NCExpEncToServer nc_gen_heartbeat_message(NCNodeID const& node_id, std::string const& secret_key) {

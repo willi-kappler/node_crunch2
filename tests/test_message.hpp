@@ -57,7 +57,7 @@ TEST_CASE("Encode / decode an empty message to the server", "[message]" ) {
 }
 
 TEST_CASE("Encode / decode a message to the node", "[message]" ) {
-    NCMessageType const message_type = NCMessageType::Init;
+    NCMessageType const message_type = NCMessageType::Quit;
     std::string_view const node_id = "";
     std::string const msg1 = "Hello world, this is a test for encoding a message. Add some more content: test, test, test, test, test, test, test, test.";
     std::vector<uint8_t> const data(msg1.begin(), msg1.end());

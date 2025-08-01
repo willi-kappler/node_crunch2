@@ -21,62 +21,76 @@ template <typename RetType>
         std::string_view node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
     // 1. Encode message:
     NCDecompressedMessage decompressed_message;
-    uint32_t expected_size = static_cast<uint32_t>(1 + data.size());;
 
     if constexpr (std::is_same_v<RetType, NCEncodedMessageToServer>) {
-        expected_size += NC_NODEID_LENGTH;
+        uint32_t const dc_size = static_cast<uint32_t>(1 + NC_NODEID_LENGTH + data.size());
+        decompressed_message.data = std::vector<uint8_t>(dc_size);
+    } else {
+        uint32_t const dc_size = static_cast<uint32_t>(1 + data.size());
+        decompressed_message.data = std::vector<uint8_t>(dc_size);
     }
 
-    decompressed_message.data = std::vector<uint8_t>(expected_size);
-    uint32_t data_index = 0;
-
     // Encode message type (1 byte)
-    decompressed_message.data[data_index++] = static_cast<uint8_t>(msg_type);
+    decompressed_message.data[0] = static_cast<uint8_t>(msg_type);
+    auto dm_begin = decompressed_message.data.begin() + 1;
 
     if constexpr (std::is_same_v<RetType, NCEncodedMessageToServer>) {
-        // Node id needed:
-        for (uint8_t const v: node_id) {
-            decompressed_message.data[data_index++] = v;
-        }
+        // Node id is needed:
+        std::copy(node_id.cbegin(), node_id.cend(), dm_begin);
+        dm_begin += NC_NODEID_LENGTH;
     }
 
     // Encode the actual data, if there is any:
-    for (uint8_t const v: data) {
-        decompressed_message.data[data_index++] = v;
-    }
+    std::copy(data.cbegin(), data.cend(), dm_begin);
 
     // 2. Compress message:
+    return nc_compress_message(decompressed_message).and_then([&secret_key](NCCompressedMessage compressed_message){
+        // 3. Encrypt compressed message:
+        return nc_encrypt_message(NCDecryptedMessage{compressed_message.data}, secret_key);
+    }).transform([](NCEncryptedMessage encrypted_message){
+        // 4. Encode encrypted compressed message:
+        RetType result;
+        uint32_t const result_size = NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + static_cast<uint32_t>(encrypted_message.data.size());
+        result.data = std::vector<uint8_t>(result_size);
+        auto r_begin = result.data.begin();
+
+        std::copy(encrypted_message.nonce.cbegin(), encrypted_message.nonce.cend(), r_begin);
+        r_begin += NC_NONCE_LENGTH;
+
+        std::copy(encrypted_message.tag.cbegin(), encrypted_message.tag.cend(), r_begin);
+        r_begin += NC_GCM_TAG_LENGTH;
+
+        std::copy(encrypted_message.data.cbegin(), encrypted_message.data.cend(), r_begin);
+
+        return result;
+    });
+
+    /*
     auto compressed_message = nc_compress_message(decompressed_message);
     if (!compressed_message) {
         return std::unexpected(compressed_message.error());
     }
 
-    // 3. Encrypt compressed message:
     auto encrypted_message = nc_encrypt_message(NCDecryptedMessage{compressed_message->data}, secret_key);
     if (!encrypted_message) {
         return std::unexpected(encrypted_message.error());
     }
 
-    // 4. Encode encrypted compressed message:
     RetType result;
-    expected_size = static_cast<uint32_t>(NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + encrypted_message->data.size());
-    result.data.reserve(expected_size);
+    uint32_t const result_size = NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + static_cast<uint32_t>(encrypted_message->data.size());
+    result.data = std::vector<uint8_t>(result_size);
+    auto r_begin = result.data.begin();
 
-    for (uint8_t const v: encrypted_message->nonce) {
-        result.data.push_back(v);
-    }
-    for (uint8_t const v: encrypted_message->tag) {
-        result.data.push_back(v);
-    }
-    for (uint8_t const v: encrypted_message->data) {
-        result.data.push_back(v);
-    }
+    std::copy(encrypted_message->nonce.cbegin(), encrypted_message->nonce.cend(), r_begin);
+    r_begin += NC_NONCE_LENGTH;
 
-    if (result.data.size() != expected_size) {
-        return std::unexpected(NCMessageError::SizeMissmatch);
-    }
+    std::copy(encrypted_message->tag.cbegin(), encrypted_message->tag.cend(), r_begin);
+    r_begin += NC_GCM_TAG_LENGTH;
+
+    std::copy(encrypted_message->data.cbegin(), encrypted_message->data.cend(), r_begin);
 
     return result;
+    */
 }
 
 template <typename RetType>
@@ -84,32 +98,43 @@ template <typename RetType>
         std::string const& secret_key) {
     // 1. Decrypt message:
     NCEncryptedMessage encrypted_message;
-    uint32_t source_index = 0;
-    uint32_t source_end = static_cast<uint32_t>(message.size());
+    auto const m_begin1 = message.cbegin();
+    auto const m_begin2 = m_begin1 + NC_NONCE_LENGTH;
+    auto const m_begin3 = m_begin2 + NC_GCM_TAG_LENGTH;
 
     // Get nonce:
-    for (uint8_t &v: encrypted_message.nonce) {
-        v = message[source_index++];
-    }
+    std::copy(m_begin1, m_begin2, encrypted_message.nonce.begin());
 
     // Get tag:
-    for (uint8_t &v: encrypted_message.tag) {
-        v = message[source_index++];
-    }
+    std::copy(m_begin2, m_begin3, encrypted_message.tag.begin());
 
     // Get the rest of the data, if any:
-    if (source_index < source_end) {
-        encrypted_message.data = std::vector<uint8_t>();
-        encrypted_message.data.reserve(source_end - source_index);
-        while (source_index < source_end) {
-            encrypted_message.data.push_back(message[source_index++]);
+    encrypted_message.data = std::vector<uint8_t>(m_begin3, message.cend());
+
+    // 2. Decrypt message:
+    return nc_decrypt_message(encrypted_message, secret_key).and_then([](NCDecryptedMessage decrypted_message){
+        // 3. Decompress decrpted message:
+        return nc_decompress_message(NCCompressedMessage{decrypted_message.data});
+    }).transform([](NCDecompressedMessage decompressed_message){
+        // 4. Decode message:
+        RetType result;
+        // Decode message type:
+        result.msg_type = static_cast<NCMessageType>(decompressed_message.data[0]);
+        auto m_begin = decompressed_message.data.cbegin() + 1;
+
+        if constexpr (std::is_same_v<RetType, NCDecodedMessageFromNode>) {
+            // Decode node id:
+            std::copy(m_begin, m_begin + NC_NODEID_LENGTH, result.node_id.id.begin());
+            m_begin += NC_NODEID_LENGTH;
         }
-    }
 
-    if (source_index != source_end) {
-        return std::unexpected(NCMessageError::SizeMissmatch);
-    }
+        // Decode the actual data, if any:
+        result.data = std::vector<uint8_t>(m_begin, decompressed_message.data.cend());
 
+        return result;
+    });
+
+    /*
     auto decrypted_message = nc_decrypt_message(encrypted_message, secret_key);
     if (!decrypted_message) {
         return std::unexpected(decrypted_message.error());
@@ -145,6 +170,7 @@ template <typename RetType>
     }
 
     return result;
+    */
 }
 
 // Explicit Instantiations, so that the linker can find the functions:

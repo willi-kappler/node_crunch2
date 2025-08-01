@@ -33,7 +33,7 @@ template <typename RetType>
     auto dm_begin = decompressed_message.data.begin() + 1;
 
     if constexpr (std::is_same_v<RetType, NCEncodedMessageToServer>) {
-        // Node id is needed:
+        // Node id has to be encoded here:
         std::copy(node_id.cbegin(), node_id.cend(), dm_begin);
         dm_begin += NC_NODEID_LENGTH;
     }
@@ -50,15 +50,16 @@ template <typename RetType>
         RetType result;
         uint32_t const result_size = NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + static_cast<uint32_t>(encrypted_message.data.size());
         result.data = std::vector<uint8_t>(result_size);
-        auto r_begin = result.data.begin();
+        auto const r_begin1 = result.data.begin();
+        auto const r_begin2 = r_begin1 + NC_NONCE_LENGTH;
+        auto const r_begin3 = r_begin2 + NC_GCM_TAG_LENGTH;
 
-        std::copy(encrypted_message.nonce.cbegin(), encrypted_message.nonce.cend(), r_begin);
-        r_begin += NC_NONCE_LENGTH;
-
-        std::copy(encrypted_message.tag.cbegin(), encrypted_message.tag.cend(), r_begin);
-        r_begin += NC_GCM_TAG_LENGTH;
-
-        std::copy(encrypted_message.data.cbegin(), encrypted_message.data.cend(), r_begin);
+        // Encode nonce:
+        std::copy(encrypted_message.nonce.cbegin(), encrypted_message.nonce.cend(), r_begin1);
+        // Encode tag:
+        std::copy(encrypted_message.tag.cbegin(), encrypted_message.tag.cend(), r_begin2);
+        // Encode rest of message, if any:
+        std::copy(encrypted_message.data.cbegin(), encrypted_message.data.cend(), r_begin3);
 
         return result;
     });
@@ -73,13 +74,11 @@ template <typename RetType>
     auto const m_begin2 = m_begin1 + NC_NONCE_LENGTH;
     auto const m_begin3 = m_begin2 + NC_GCM_TAG_LENGTH;
 
-    // Get nonce:
+    // Decode nonce:
     std::copy(m_begin1, m_begin2, encrypted_message.nonce.begin());
-
-    // Get tag:
+    // Decode tag:
     std::copy(m_begin2, m_begin3, encrypted_message.tag.begin());
-
-    // Get the rest of the data, if any:
+    // Decode the rest of the data, if any:
     encrypted_message.data = std::vector<uint8_t>(m_begin3, message.cend());
 
     // 2. Decrypt message:

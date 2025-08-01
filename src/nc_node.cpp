@@ -19,18 +19,38 @@ NCNode::NCNode(NCConfiguration config):
     heartbeat_timeout(config.heartbeat_timeout),
     secret_key(config.secret_key),
     node_id(NCNodeID()),
-    quit(false) {
-}
-
-NCNode::~NCNode(){
+    quit(false),
+    io_context(),
+    resolver(io_context),
+    endpoints(),
+    socket(io_context)
+    {
 }
 
 void NCNode::nc_run() {
+    endpoints = resolver.resolve(server_address, std::to_string(server_port));
+
     while (!quit.load()) {
     }
 }
 
 NCExpDecFromServer NCNode::nc_send_msg_return_answer(NCExpEncToServer const& message) {
+    return message.and_then([this](NCEncodedMessageToServer message2) mutable -> NCExpDecFromServer {
+        // Connect to the server
+        asio::connect(socket, endpoints);
+
+        NCDecodedMessageFromServer result;
+
+        if (result.msg_type == NCMessageType::Init) {
+            if (message2.data.size() > 0) {
+                return std::unexpected(NCMessageError::SizeMissmatch);
+            }
+        }
+
+        return result;
+    });
+
+    /*
     NCDecodedMessageFromServer result;
 
     if (!message) {
@@ -38,6 +58,7 @@ NCExpDecFromServer NCNode::nc_send_msg_return_answer(NCExpEncToServer const& mes
     }
 
     return result;
+    */
 }
 
 void NCNode::nc_send_heartbeat() {

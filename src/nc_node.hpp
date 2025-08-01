@@ -13,6 +13,9 @@
 #include <expected>
 #include <atomic>
 
+// External includes:
+#include <asio.hpp>
+
 // Local includes:
 #include "nc_config.hpp"
 #include "nc_message.hpp"
@@ -23,7 +26,7 @@ class NCNode {
         NCNode(NCConfiguration config);
 
         // Destructor:
-        virtual ~NCNode();
+        virtual ~NCNode() = default;
 
         // Default special member functions:
 
@@ -44,6 +47,10 @@ class NCNode {
         std::string secret_key;
         NCNodeID node_id;
         std::atomic_bool quit;
+        asio::io_context io_context;
+        asio::ip::tcp::resolver resolver;
+        asio::ip::tcp::resolver::results_type endpoints;
+        asio::ip::tcp::socket socket;
 
         NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message);
         void nc_send_heartbeat();

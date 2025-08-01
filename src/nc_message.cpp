@@ -106,19 +106,19 @@ template <typename RetType>
     });
 }
 
-// Explicit Instantiations, so that the linker can find the functions:
-template [[nodiscard]] std::expected<NCEncodedMessageToNode, NCMessageError> nc_encode<NCEncodedMessageToNode>(
+// Explicit instantiations, so that the linker can find the functions:
+template [[nodiscard]] NCExpEncToNode nc_encode<NCEncodedMessageToNode>(
     NCMessageType const msg_type, std::string_view node_id,
     std::vector<uint8_t> const& data, std::string const& secret_key);
 
-template [[nodiscard]] std::expected<NCEncodedMessageToServer, NCMessageError> nc_encode<NCEncodedMessageToServer>(
+template [[nodiscard]] NCExpEncToServer nc_encode<NCEncodedMessageToServer>(
     NCMessageType const msg_type, std::string_view node_id,
     std::vector<uint8_t> const& data, std::string const& secret_key);
 
-template [[nodiscard]] std::expected<NCDecodedMessageFromNode, NCMessageError> nc_decode<NCDecodedMessageFromNode>(
+template [[nodiscard]] NCExpDecFromNode nc_decode<NCDecodedMessageFromNode>(
     std::vector<uint8_t> const& message, std::string const& secret_key);
 
-template [[nodiscard]] std::expected<NCDecodedMessageFromServer, NCMessageError> nc_decode<NCDecodedMessageFromServer>(
+template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     std::vector<uint8_t> const& message, std::string const& secret_key);
 
 // Helper functions:

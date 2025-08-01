@@ -7,8 +7,6 @@
 */
 
 // STD includes:
-// #include <cstring>
-// #include <iostream>
 #include <type_traits>
 
 // Local includes:
@@ -64,33 +62,6 @@ template <typename RetType>
 
         return result;
     });
-
-    /*
-    auto compressed_message = nc_compress_message(decompressed_message);
-    if (!compressed_message) {
-        return std::unexpected(compressed_message.error());
-    }
-
-    auto encrypted_message = nc_encrypt_message(NCDecryptedMessage{compressed_message->data}, secret_key);
-    if (!encrypted_message) {
-        return std::unexpected(encrypted_message.error());
-    }
-
-    RetType result;
-    uint32_t const result_size = NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + static_cast<uint32_t>(encrypted_message->data.size());
-    result.data = std::vector<uint8_t>(result_size);
-    auto r_begin = result.data.begin();
-
-    std::copy(encrypted_message->nonce.cbegin(), encrypted_message->nonce.cend(), r_begin);
-    r_begin += NC_NONCE_LENGTH;
-
-    std::copy(encrypted_message->tag.cbegin(), encrypted_message->tag.cend(), r_begin);
-    r_begin += NC_GCM_TAG_LENGTH;
-
-    std::copy(encrypted_message->data.cbegin(), encrypted_message->data.cend(), r_begin);
-
-    return result;
-    */
 }
 
 template <typename RetType>
@@ -133,44 +104,6 @@ template <typename RetType>
 
         return result;
     });
-
-    /*
-    auto decrypted_message = nc_decrypt_message(encrypted_message, secret_key);
-    if (!decrypted_message) {
-        return std::unexpected(decrypted_message.error());
-    }
-
-    // 2. Decompress message:
-    auto decompressed_message = nc_decompress_message(NCCompressedMessage{decrypted_message->data});
-    if (!decompressed_message) {
-        return std::unexpected(decompressed_message.error());
-    }
-
-    // 3. Decode message:
-    RetType result;
-    // Decode message type:
-    result.msg_type = static_cast<NCMessageType>(decompressed_message->data[0]);
-    source_index = 1;
-    source_end = static_cast<uint32_t>(decompressed_message->data.size());
-
-    if constexpr (std::is_same_v<RetType, NCDecodedMessageFromNode>) {
-        // Decode node id:
-        for (auto &v: result.node_id.id) {
-            v = decompressed_message->data[source_index++];
-        }
-    }
-
-    // Decode the actual data, if any:
-    if (source_index < source_end) {
-        result.data = std::vector<uint8_t>();
-        result.data.reserve(source_end - source_index);
-        while (source_index < source_end) {
-            result.data.push_back(decompressed_message->data[source_index++]);
-        }
-    }
-
-    return result;
-    */
 }
 
 // Explicit Instantiations, so that the linker can find the functions:
@@ -188,7 +121,7 @@ template [[nodiscard]] std::expected<NCDecodedMessageFromNode, NCMessageError> n
 template [[nodiscard]] std::expected<NCDecodedMessageFromServer, NCMessageError> nc_decode<NCDecodedMessageFromServer>(
     std::vector<uint8_t> const& message, std::string const& secret_key);
 
-
+// Helper functions:
 [[nodiscard]] NCExpEncToServer nc_encode_message_to_server(NCMessageType const msg_type,
         NCNodeID const& node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
     return nc_encode<NCEncodedMessageToServer>(msg_type, node_id.id, data, secret_key);

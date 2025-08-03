@@ -20,6 +20,8 @@
 #include "nc_config.hpp"
 #include "nc_message.hpp"
 
+using asio::ip::tcp;
+
 class NCNode {
     public:
         // Constructor:
@@ -47,12 +49,9 @@ class NCNode {
         std::string secret_key;
         NCNodeID node_id;
         std::atomic_bool quit;
-        asio::io_context io_context;
-        asio::ip::tcp::resolver resolver;
-        asio::ip::tcp::resolver::results_type endpoints;
-        asio::ip::tcp::socket socket;
 
-        NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message);
+        NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message,
+            tcp::socket &socket, tcp::resolver::results_type &endpoints);
         void nc_send_heartbeat();
 
         // Must be implemented by the user:

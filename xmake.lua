@@ -13,7 +13,7 @@ add_requires("snitch")
 add_requires("lz4")
 add_requires("openssl3")
 add_requires("asio")
-
+add_requires("spdlog")
 
 target("node_crunch2")
     set_kind("shared")
@@ -22,6 +22,7 @@ target("node_crunch2")
     add_packages("lz4")
     add_packages("openssl3")
     add_packages("asio")
+    add_packages("spdlog")
 
 target("nc_test")
     set_kind("binary")

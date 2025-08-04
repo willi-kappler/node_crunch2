@@ -6,37 +6,11 @@
     This file defines compresseion of messages
 */
 
-// STD includes:
-#include <cstring>
-#include <bit>
-
 // External includes:
 #include <lz4.h>
 
 // Local includes:
 #include "nc_compression.hpp"
-
-void nc_to_big_endian_bytes(uint32_t const value, std::vector<uint8_t> &bytes) noexcept {
-    uint32_t final_value = value;
-
-    if (std::endian::native == std::endian::little) {
-        final_value = std::byteswap(value);
-    }
-
-    std::memcpy(bytes.data(), &final_value, sizeof(uint32_t));
-}
-
-uint32_t nc_from_big_endian_bytes(std::vector<uint8_t> const& bytes) {
-    uint32_t result;
-
-    std::memcpy(&result, bytes.data(), sizeof(uint32_t));
-
-    if (std::endian::native == std::endian::little) {
-        result = std::byteswap(result);
-    }
-
-    return result;
-}
 
 std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompressedMessage const& message) {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());

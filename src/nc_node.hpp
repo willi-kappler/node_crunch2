@@ -52,12 +52,12 @@ class NCNode {
         // TODO: make this configurable:
         uint8_t max_error_count;
 
-        NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message,
+        [[nodiscard]] NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message,
             tcp::socket &socket, tcp::resolver::results_type &endpoints);
         void nc_send_heartbeat();
 
         // Must be implemented by the user:
         // (pure virtual functions)
         virtual void nc_init(std::vector<uint8_t> data) = 0;
-        virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) = 0;
+        [[nodiscard]] virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) = 0;
 };

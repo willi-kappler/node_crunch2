@@ -10,48 +10,13 @@
 */
 
 // STD includes:
-#include <bit>
+// #include <bit>
 
 // External includes:
 #include <snitch/snitch.hpp>
 
 // Local includes:
 #include "nc_compression.hpp"
-
-TEST_CASE("Convert a number to a vector", "[compression]" ) {
-    uint32_t num1 = 0xDEADBEEFu;
-    std::vector<uint8_t> buff1(4);
-
-    nc_to_big_endian_bytes(num1, buff1);
-
-    REQUIRE(buff1[0] == 0xDEu);
-    REQUIRE(buff1[1] == 0xADu);
-    REQUIRE(buff1[2] == 0xBEu);
-    REQUIRE(buff1[3] == 0xEFu);
-
-    num1 = 0xAABBCCDDu;
-
-    nc_to_big_endian_bytes(num1, buff1);
-
-    REQUIRE(buff1[0] == 0xAAu);
-    REQUIRE(buff1[1] == 0xBBu);
-    REQUIRE(buff1[2] == 0xCCu);
-    REQUIRE(buff1[3] == 0xDDu);
-}
-
-TEST_CASE("Convert a vector to a number", "[compression]" ) {
-    std::vector<uint8_t> buff1 = {0xDEu, 0xADu, 0xBEu, 0xEFu};
-
-    uint32_t num1 = nc_from_big_endian_bytes(buff1);
-
-    REQUIRE(num1 == 0xDEADBEEFu);
-
-    buff1 = {0xAAu, 0xBBu, 0xCCu, 0xDDu};
-
-    num1 = nc_from_big_endian_bytes(buff1);
-
-    REQUIRE(num1 == 0xAABBCCDDu);
-}
 
 TEST_CASE("Compress / decompress a message", "[compression]" ) {
     std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";

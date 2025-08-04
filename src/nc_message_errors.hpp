@@ -13,7 +13,8 @@
 #include <cstdint>
 
 enum struct NCMessageError: uint8_t {
-    CipherContextError = 0,
+    NoError = 0,
+    CipherContextError,
     EncryptInitError,
     DencryptInitError,
     CipherControllError,
@@ -29,7 +30,9 @@ enum struct NCMessageError: uint8_t {
     DecompressionError,
     EncryptionError,
     DecryptionError,
-    SizeMissmatch
+    SizeMissmatch,
+    NetworkWriteError,
+    NetworkReadError
 };
 
 #endif // FILE_NC_MESSAGE_ERRORS_HPP_INCLUDED

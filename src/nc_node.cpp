@@ -129,7 +129,7 @@ void NCNode::nc_run() {
     spdlog::info("Will exit now.");
 }
 
-NCExpDecFromServer NCNode::nc_send_msg_return_answer(NCExpEncToServer const& message,
+[[nodiscard]] NCExpDecFromServer NCNode::nc_send_msg_return_answer(NCExpEncToServer const& message,
         tcp::socket &socket, tcp::resolver::results_type &endpoints) {
     return message.and_then([this, &socket, &endpoints](NCEncodedMessageToServer message2) mutable -> NCExpDecFromServer {
         // Connect to the server

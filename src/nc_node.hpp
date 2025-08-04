@@ -22,12 +22,6 @@
 
 using asio::ip::tcp;
 
-enum struct NCRunState: uint8_t {
-    Init,
-    NeedData,
-    HasData
-};
-
 class NCNode {
     public:
         // Constructor:

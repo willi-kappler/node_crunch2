@@ -10,8 +10,17 @@
 #include <thread>
 #include <chrono>
 
+// External includes:
+#include <spdlog/spdlog.h>
+
 // Local includes:
 #include "nc_node.hpp"
+
+enum struct NCRunState: uint8_t {
+    Init,
+    NeedData,
+    HasData
+};
 
 NCNode::NCNode(NCConfiguration config):
     server_address(config.server_address),
@@ -24,6 +33,7 @@ NCNode::NCNode(NCConfiguration config):
     {}
 
 void NCNode::nc_run() {
+    spdlog::info("NCNode::nc_run() - starting node");
     NCExpEncToServer const init_message = nc_gen_init_message(node_id, secret_key);
     NCExpEncToServer const need_more_data_message = nc_gen_need_more_data_message(node_id, secret_key);
     // TODO: make this configurable:
@@ -40,73 +50,83 @@ void NCNode::nc_run() {
     NCRunState run_state = NCRunState::Init;
     std::vector<uint8_t> new_data;
 
-    // TODO: start background thread for heartbeats.
+    // Have to use lambda in order to call non-static method:
+    std::thread heartbeat_thread([this](){nc_send_heartbeat();});
 
     while (!quit.load()) {
         switch (run_state) {
             case NCRunState::Init:
+                spdlog::debug("Init state, send init message");
                 result = nc_send_msg_return_answer(init_message, socket, endpoints);
             break;
             case NCRunState::NeedData:
+                spdlog::debug("Need data state, send need more data message");
                 result = nc_send_msg_return_answer(need_more_data_message, socket, endpoints);
             break;
             case NCRunState::HasData:
+                spdlog::debug("Has data state, send result message");
                 result_message = nc_gen_result_message(node_id, new_data, secret_key);
                 result = nc_send_msg_return_answer(result_message, socket, endpoints);
             break;
             default:
                 // Unknown state, should not happen, quit now.
-                // TODO: log error
+                spdlog::error("Unknown state: {}", static_cast<uint8_t>(run_state));
                 quit.store(true);
                 continue;
         }
 
         if (!result.has_value()) {
-            // TODO: log error message with error value.
             error_counter++;
+            spdlog::error("Result error: {}, error counter: {}", static_cast<uint8_t>(result.error()), error_counter);
             std::this_thread::sleep_for(sleep_time);
         } else {
             switch (result->msg_type) {
                 case NCMessageType::InitOK:
-                    // TODO: log init ok
+                    spdlog::debug("InitOK from server.");
                     nc_init(result->data);
                     run_state = NCRunState::NeedData;
                 break;
                 case NCMessageType::InitError:
                     // Error at initialisation.
-                    // TODO log error
                     error_counter++;
+                    spdlog::error("InitError from server, error counter: {}", error_counter);
                     std::this_thread::sleep_for(sleep_time);
                 break;
                 case NCMessageType::NewDataFromServer:
                     // Received new data from server.
-                    // TODO: log message.
+                    spdlog::debug("New data from server.");
                     new_data = nc_process_data(result->data);
                     run_state = NCRunState::HasData;
                 break;
                 case NCMessageType::ResultOK:
                     // Result was accepted by server.
                     // Request more data.
+                    spdlog::debug("ResultOK from server.");
                     run_state = NCRunState::NeedData;
                 break;
                 case NCMessageType::Quit:
                     // Job is done.
-                    // TODO: log message.
+                    spdlog::info("Quit from server, will exit now.");
                     quit.store(true);
                 break;
                 default:
-                    // Unknown message, TODO: log error
+                    // Unknown message
                     error_counter++;
+                    spdlog::error("Unknown message: {}, error counter: {}", static_cast<uint8_t>(result->msg_type), error_counter);
                     std::this_thread::sleep_for(sleep_time);
             }
         }
 
         if (error_counter >= max_error_count) {
-            // TODO: log error counter.
             // Too many errors, quit now.
+            spdlog::error("Too many errors: {}, will exit now.", error_counter);
             quit.store(true);
         }
     }
+
+    spdlog::debug("Waiting for heartbeat thread...");
+    heartbeat_thread.join();
+    spdlog::info("Will exit now.");
 }
 
 NCExpDecFromServer NCNode::nc_send_msg_return_answer(NCExpEncToServer const& message,
@@ -128,6 +148,7 @@ NCExpDecFromServer NCNode::nc_send_msg_return_answer(NCExpEncToServer const& mes
 }
 
 void NCNode::nc_send_heartbeat() {
+    spdlog::info("NCNode::nc_send_heartbeat() - starting heartbeat thread.");
     auto const sleep_time = std::chrono::seconds(heartbeat_timeout);
     auto const heartbeat_message = nc_gen_heartbeat_message(node_id, secret_key);
     uint8_t error_counter = 0;
@@ -143,35 +164,37 @@ void NCNode::nc_send_heartbeat() {
         result = nc_send_msg_return_answer(heartbeat_message, socket, endpoints);
 
         if (!result.has_value()) {
-            // Log error and continue.
             error_counter++;
+            spdlog::error("Result error: {}, error counter: {}", static_cast<uint8_t>(result.error()), error_counter);
         } else {
             switch (result->msg_type) {
                 case NCMessageType::HeartbeatOK:
+                    spdlog::debug("HeartbeatOK from server.");
                     // Everything OK, nothing to do.
                 break;
                 case NCMessageType::HeartbeatError:
                     // Heartbeat was not sent in time.
-                    // Log error and increase error_counter.
                     error_counter++;
+                    spdlog::error("HeartbetaError from server, error counter: {}", error_counter);
                 break;
                 case NCMessageType::Quit:
                     // Job is done, so we can quit.
+                    spdlog::info("Quit from server, will exit now.");
                     quit.store(true);
                 break;
                 default:
-                    // Log error: unknown message type.
                     // Increase error_counter.
                     error_counter++;
+                    spdlog::error("Unknown messager: {}, error counter: {}", static_cast<uint8_t>(result->msg_type), error_counter);
             }
         }
 
         if (error_counter >= max_error_count) {
             // Too many errors, quit now.
-            // TODO: log error counter.
+            spdlog::error("Too many errors: {}, will exit now.", error_counter);
             quit.store(true);
         }
     }
 
-    // Log that job is done.
+    spdlog::info("Will exit now.");
 }

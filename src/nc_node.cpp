@@ -19,99 +19,89 @@ NCNode::NCNode(NCConfiguration config):
     heartbeat_timeout(config.heartbeat_timeout),
     secret_key(config.secret_key),
     node_id(NCNodeID()),
-    quit(false)
+    quit(false),
+    max_error_count(5)
     {}
 
 void NCNode::nc_run() {
-    auto const init_message = nc_gen_init_message(node_id, secret_key);
-    auto const need_more_data_message = nc_gen_need_more_data_message(node_id, secret_key);
-    // nc_gen_result_message(node_id, new_data, secret_key);
+    NCExpEncToServer const init_message = nc_gen_init_message(node_id, secret_key);
+    NCExpEncToServer const need_more_data_message = nc_gen_need_more_data_message(node_id, secret_key);
+    // TODO: make this configurable:
+    auto const sleep_time = std::chrono::seconds(60);
 
     asio::io_context io_context;
     tcp::resolver resolver(io_context);
     tcp::socket socket(io_context);
     tcp::resolver::results_type endpoints = resolver.resolve(server_address, std::to_string(server_port));
 
-    bool init_ok = false;
     uint8_t error_counter = 0;
     NCExpDecFromServer result;
-    // TODO: make this configurable:
-    auto const sleep_time = std::chrono::seconds(60);
-
-    while (true) {
-        result = nc_send_msg_return_answer(init_message, socket, endpoints);
-
-        if (!result.has_value()) {
-            // TODO: log error message with error value.
-            error_counter++;
-        } else {
-            switch (result->msg_type) {
-                case NCMessageType::InitOK:
-                    // TODO: log sucess message.
-                    nc_init(result->data);
-                    init_ok = true;
-                break;
-                case NCMessageType::InitError:
-                    // TODO: log error message.
-                    error_counter++;
-                break;
-                default:
-                    // Log error: unknown message type.
-                    error_counter++;
-            }
-        }
-
-        if (init_ok) {
-            break; // while loop
-        } else {
-            if (error_counter >= 5) {
-                // TODO: log error counter.
-                // Too many errors, quit now.
-                return;
-            } else {
-                // Give it some more tries after a specific time:
-                std::this_thread::sleep_for(sleep_time);
-            }
-        }
-    }
+    NCExpEncToServer result_message;
+    NCRunState run_state = NCRunState::Init;
+    std::vector<uint8_t> new_data;
 
     // TODO: start background thread for heartbeats.
 
-    std::vector<uint8_t> new_data;
-    NCExpEncToServer result_message;
-    // Reset error counter:
-    error_counter = 0;
-
     while (!quit.load()) {
-        result = nc_send_msg_return_answer(need_more_data_message, socket, endpoints);
+        switch (run_state) {
+            case NCRunState::Init:
+                result = nc_send_msg_return_answer(init_message, socket, endpoints);
+            break;
+            case NCRunState::NeedData:
+                result = nc_send_msg_return_answer(need_more_data_message, socket, endpoints);
+            break;
+            case NCRunState::HasData:
+                result_message = nc_gen_result_message(node_id, new_data, secret_key);
+                result = nc_send_msg_return_answer(result_message, socket, endpoints);
+            break;
+            default:
+                // Unknown state, should not happen, quit now.
+                // TODO: log error
+                quit.store(true);
+                continue;
+        }
 
         if (!result.has_value()) {
             // TODO: log error message with error value.
             error_counter++;
-            // Wait some time before retrying:
             std::this_thread::sleep_for(sleep_time);
         } else {
             switch (result->msg_type) {
+                case NCMessageType::InitOK:
+                    // TODO: log init ok
+                    nc_init(result->data);
+                    run_state = NCRunState::NeedData;
+                break;
+                case NCMessageType::InitError:
+                    // Error at initialisation.
+                    // TODO log error
+                    error_counter++;
+                    std::this_thread::sleep_for(sleep_time);
+                break;
                 case NCMessageType::NewDataFromServer:
-                    // TODO: log new data from server.
+                    // Received new data from server.
+                    // TODO: log message.
                     new_data = nc_process_data(result->data);
-                    result_message = nc_gen_result_message(node_id, new_data, secret_key);
-                    result = nc_send_msg_return_answer(result_message, socket, endpoints);
-                    // TODO: Check result.
+                    run_state = NCRunState::HasData;
+                break;
+                case NCMessageType::ResultOK:
+                    // Result was accepted by server.
+                    // Request more data.
+                    run_state = NCRunState::NeedData;
                 break;
                 case NCMessageType::Quit:
-                    // TODO: log quit message.
+                    // Job is done.
+                    // TODO: log message.
                     quit.store(true);
                 break;
                 default:
-                    // Log error: unknown message type.
+                    // Unknown message, TODO: log error
                     error_counter++;
-                    // Wait some time before retrying:
                     std::this_thread::sleep_for(sleep_time);
             }
         }
 
-        if (error_counter >=5) {
+        if (error_counter >= max_error_count) {
             // TODO: log error counter.
             // Too many errors, quit now.
             quit.store(true);
@@ -176,7 +166,7 @@ void NCNode::nc_send_heartbeat() {
             }
         }
 
-        if (error_counter >=5) {
+        if (error_counter >= max_error_count) {
             // Too many errors, quit now.
             // TODO: log error counter.
             quit.store(true);

@@ -22,6 +22,12 @@
 
 using asio::ip::tcp;
 
+enum struct NCRunState: uint8_t {
+    Init,
+    NeedData,
+    HasData
+};
+
 class NCNode {
     public:
         // Constructor:
@@ -49,6 +55,8 @@ class NCNode {
         std::string secret_key;
         NCNodeID node_id;
         std::atomic_bool quit;
+        // TODO: make this configurable:
+        uint8_t max_error_count;
 
         NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message,
             tcp::socket &socket, tcp::resolver::results_type &endpoints);

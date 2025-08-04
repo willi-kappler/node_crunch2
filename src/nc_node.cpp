@@ -15,6 +15,7 @@
 
 // Local includes:
 #include "nc_node.hpp"
+#include "nc_network.hpp"
 
 enum struct NCRunState: uint8_t {
     Init,
@@ -133,17 +134,18 @@ void NCNode::nc_run() {
         tcp::socket &socket, tcp::resolver::results_type &endpoints) {
     return message.and_then([this, &socket, &endpoints](NCEncodedMessageToServer message2) mutable -> NCExpDecFromServer {
         // Connect to the server
+        // tcp::endpoint ep = asio::connect(socket, endpoints);
         asio::connect(socket, endpoints);
+        NCMessageError msg_error = nc_send_data(message2.data, socket);
 
-        NCDecodedMessageFromServer result;
-
-        if (result.msg_type == NCMessageType::Init) {
-            if (message2.data.size() > 0) {
-                return std::unexpected(NCMessageError::SizeMissmatch);
-            }
+        if (msg_error != NCMessageError::NoError) {
+            spdlog::error("Error while sending a message: {}", static_cast<uint8_t>(msg_error));
+            return std::unexpected(msg_error);
         }
 
-        return result;
+        return nc_receive_data(socket).and_then([this](std::vector<uint8_t> raw_data){
+            return nc_decode_message_from_server(NCEncodedMessageToNode(raw_data), secret_key);
+        });
     });
 }
 

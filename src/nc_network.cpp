@@ -12,7 +12,7 @@
 // Local includes:
 #include "nc_network.hpp"
 
-[[nodiscard]] NCMessageError nc_send_data(std::vector<uint8_t> const data, tcp::socket socket) {
+[[nodiscard]] NCMessageError nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket) {
     uint32_t data_size = static_cast<uint32_t>(data.size());
     std::array<uint8_t, 4> size_bytes;
     nc_to_big_endian_bytes(data_size, size_bytes);
@@ -35,7 +35,7 @@
     return NCMessageError::NoError;
 }
 
-[[nodiscard]] std::expected<std::vector<uint8_t>, NCMessageError> nc_receive_data(tcp::socket socket) {
+[[nodiscard]] std::expected<std::vector<uint8_t>, NCMessageError> nc_receive_data(tcp::socket& socket) {
     std::array<uint8_t, 4> size_bytes;
     asio::error_code asio_error;
 

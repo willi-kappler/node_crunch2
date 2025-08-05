@@ -6,6 +6,9 @@
     This file defines the node class
 */
 
+#ifndef FILE_NC_NODE_HPP_INCLUDED
+#define FILE_NC_NODE_HPP_INCLUDED
+
 // STD includes:
 #include <cstdint>
 #include <vector>
@@ -61,3 +64,5 @@ class NCNode {
         virtual void nc_init(std::vector<uint8_t> data) = 0;
         [[nodiscard]] virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) = 0;
 };
+
+#endif // FILE_NC_NODE_HPP_INCLUDED

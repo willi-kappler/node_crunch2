@@ -6,6 +6,9 @@
     This file defines some helper functions for networking.
 */
 
+#ifndef FILE_NC_NETWORK_HPP_INCLUDED
+#define FILE_NC_NETWORK_HPP_INCLUDED
+
 // STD includes:
 #include <cstdint>
 #include <vector>
@@ -23,3 +26,5 @@ using asio::ip::tcp;
 [[nodiscard]] NCMessageError nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket);
 
 [[nodiscard]] std::expected<std::vector<uint8_t>, NCMessageError> nc_receive_data(tcp::socket& socket);
+
+#endif // FILE_NC_NETWORK_HPP_INCLUDED

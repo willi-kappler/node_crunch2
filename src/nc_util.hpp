@@ -20,4 +20,4 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
 
 [[nodiscard]] uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes);
 
-#endif
+#endif // FILE_NC_UTIL_HPP_INCLUDED

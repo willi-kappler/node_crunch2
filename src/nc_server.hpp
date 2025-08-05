@@ -53,7 +53,6 @@ class NCServer {
         uint16_t heartbeat_timeout;
         std::string secret_key;
         std::atomic_bool quit;
-        uint8_t quit_counter;
         std::unordered_map<NCNodeID, std::chrono::time_point<std::chrono::steady_clock>> all_nodes;
         // In code use: const std::lock_guard<std::mutex> lock(server_mutex);
         std::mutex server_mutex;

@@ -134,8 +134,14 @@ void NCNode::nc_run() {
         tcp::socket &socket, tcp::resolver::results_type &endpoints) {
     return message.and_then([this, &socket, &endpoints](NCEncodedMessageToServer message2) mutable -> NCExpDecFromServer {
         // Connect to the server
-        // tcp::endpoint ep = asio::connect(socket, endpoints);
-        asio::connect(socket, endpoints);
+        try {
+            // tcp::endpoint ep = asio::connect(socket, endpoints);
+            asio::connect(socket, endpoints);
+        } catch (const std::exception& e) {
+            spdlog::error("ASIO connect exception: {}", e.what());
+            return std::unexpected(NCMessageError::NetworkConnectError);
+        }
+
         NCMessageError msg_error = nc_send_data(message2.data, socket);
 
         if (msg_error != NCMessageError::NoError) {

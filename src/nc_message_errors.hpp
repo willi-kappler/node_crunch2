@@ -31,6 +31,7 @@ enum struct NCMessageError: uint8_t {
     EncryptionError,
     DecryptionError,
     SizeMissmatch,
+    NetworkConnectError,
     NetworkWriteError,
     NetworkReadError
 };

@@ -6,8 +6,8 @@
     This file defines the server class
 */
 
-#ifndef FILE_NC_MESSAGE_HPP_INCLUDED
-#define FILE_NC_MESSAGE_HPP_INCLUDED
+#ifndef FILE_NC_SERVER_HPP_INCLUDED
+#define FILE_NC_SERVER_HPP_INCLUDED
 
 // STD includes:
 #include <cstdint>
@@ -59,8 +59,8 @@ class NCServer {
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);
-        void nc_handle_node();
-        void check_heartbeat();
+        void nc_handle_node(tcp::socket& sock);
+        void nc_check_heartbeat();
 
         // Must be implemented by the user:
         // (pure virtual functions)

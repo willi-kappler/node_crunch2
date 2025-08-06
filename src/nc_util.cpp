@@ -30,3 +30,123 @@ uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes) {
 
     return result;
 }
+
+[[nodiscard]] std::string nc_type_to_string(NCMessageType const& msg_type) {
+    std::string result = "Unknown type";
+
+    switch (msg_type) {
+        case NCMessageType::Unknown:
+            result = "Unknown";
+        break;
+        case NCMessageType::Heartbeat:
+            result = "Heartbeat";
+        break;
+        case NCMessageType::HeartbeatOK:
+            result = "HeartbeatOK";
+        break;
+        case NCMessageType::HeartbeatError:
+            result = "HeartbeatError";
+        break;
+        case NCMessageType::Init:
+            result = "Init";
+        break;
+        case NCMessageType::InitOK:
+            result = "InitOK";
+        break;
+        case NCMessageType::InitError:
+            result = "InitError";
+        break;
+        case NCMessageType::NewDataFromServer:
+            result = "NewDataFromServer";
+        break;
+        case NCMessageType::NewResultFromNode:
+            result = "NewResultFromNode";
+        break;
+        case NCMessageType::NodeNeedsMoreData:
+            result = "NodeNeedsMoreData";
+        break;
+        case NCMessageType::ResultOK:
+            result = "ResultOK";
+        break;
+        case NCMessageType::ConnectionError:
+            result = "ConnectionError";
+        break;
+        case NCMessageType::Quit:
+            result = "Quit";
+        break;
+    }
+
+    return result;
+}
+
+[[nodiscard]] std::string nc_error_to_str(NCMessageError const& msg_error) {
+    std::string result = "Unknown error";
+
+    switch (msg_error) {
+        case NCMessageError::NoError:
+            result = "NoError";
+        break;
+        case NCMessageError::CipherContextError:
+            result = "";
+        break;
+        case NCMessageError::EncryptInitError:
+            result = "";
+        break;
+        case NCMessageError::DecryptInitError:
+            result = "";
+        break;
+        case NCMessageError::CipherControllError:
+            result = "";
+        break;
+        case NCMessageError::CreateNonceError:
+            result = "";
+        break;
+        case NCMessageError::SetNonceError:
+            result = "";
+        break;
+        case NCMessageError::EncryptUpdateError:
+            result = "";
+        break;
+        case NCMessageError::DecryptUpdateError:
+            result = "";
+        break;
+        case NCMessageError::EncryptFinalError:
+            result = "";
+        break;
+        case NCMessageError::DecryptFinalError:
+            result = "";
+        break;
+        case NCMessageError::CipherGetTagError:
+            result = "";
+        break;
+        case NCMessageError::CipherSetTagError:
+            result = "";
+        break;
+        case NCMessageError::CompressionError:
+            result = "";
+        break;
+        case NCMessageError::DecompressionError:
+            result = "";
+        break;
+        case NCMessageError::EncryptionError:
+            result = "";
+        break;
+        case NCMessageError::DecryptionError:
+            result = "";
+        break;
+        case NCMessageError::SizeMissmatch:
+            result = "";
+        break;
+        case NCMessageError::NetworkConnectError:
+            result = "";
+        break;
+        case NCMessageError::NetworkWriteError:
+            result = "";
+        break;
+        case NCMessageError::NetworkReadError:
+            result = "";
+        break;
+    }
+
+    return result;
+}

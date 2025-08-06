@@ -78,7 +78,7 @@ void NCNode::nc_run() {
 
         if (!result.has_value()) {
             error_counter++;
-            spdlog::error("Result error: {}, error counter: {}", static_cast<uint8_t>(result.error()), error_counter);
+            spdlog::error("Result error: {}, error counter: {}", nc_error_to_str(result.error()), error_counter);
             std::this_thread::sleep_for(sleep_time);
         } else {
             switch (result->msg_type) {
@@ -113,7 +113,7 @@ void NCNode::nc_run() {
                 default:
                     // Unknown message
                     error_counter++;
-                    spdlog::error("Unknown message: {}, error counter: {}", static_cast<uint8_t>(result->msg_type), error_counter);
+                    spdlog::error("Unknown message: {}, error counter: {}", nc_type_to_string(result->msg_type), error_counter);
                     std::this_thread::sleep_for(sleep_time);
             }
         }
@@ -145,7 +145,7 @@ void NCNode::nc_run() {
         NCMessageError msg_error = nc_send_data(message2.data, socket);
 
         if (msg_error != NCMessageError::NoError) {
-            spdlog::error("Error while sending a message: {}", static_cast<uint8_t>(msg_error));
+            spdlog::error("Error while sending a message: {}", nc_error_to_str(msg_error));
             return std::unexpected(msg_error);
         }
 
@@ -173,7 +173,7 @@ void NCNode::nc_send_heartbeat() {
 
         if (!result.has_value()) {
             error_counter++;
-            spdlog::error("Result error: {}, error counter: {}", static_cast<uint8_t>(result.error()), error_counter);
+            spdlog::error("Result error: {}, error counter: {}", nc_error_to_str(result.error()), error_counter);
         } else {
             switch (result->msg_type) {
                 case NCMessageType::HeartbeatOK:
@@ -193,7 +193,7 @@ void NCNode::nc_send_heartbeat() {
                 default:
                     // Increase error_counter.
                     error_counter++;
-                    spdlog::error("Unknown messager: {}, error counter: {}", static_cast<uint8_t>(result->msg_type), error_counter);
+                    spdlog::error("Unknown message: {}, error counter: {}", nc_type_to_string(result->msg_type), error_counter);
             }
         }
 

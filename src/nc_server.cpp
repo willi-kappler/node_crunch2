@@ -9,6 +9,7 @@
 // STD includes:
 #include <thread>
 #include <chrono>
+#include <queue>
 
 // External includes:
 #include <spdlog/spdlog.h>
@@ -16,6 +17,7 @@
 
 // Local includes:
 #include "nc_network.hpp"
+#include "nc_message.hpp"
 #include "nc_server.hpp"
 
 using asio::ip::tcp;
@@ -31,14 +33,51 @@ NCServer::NCServer(NCConfiguration config):
 {}
 
 void NCServer::nc_run() {
+    spdlog::info("NCServer::nc_run() - starting server");
 
+    // Make threahsold configurable
+    const uint32_t max_thread_count = 10;
+
+    asio::io_context io_context;
+    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), server_port));
+    tcp::socket sock(io_context);
+
+    // Have to use lambda in order to call non-static method:
+    std::thread heartbeat_thread([this](){nc_check_heartbeat();});
+
+    // Keep track of client threads
+    std::queue<std::thread> client_threads;
+
+    while (!quit.load()) {
+        // Wait for a client to connect
+        acceptor.accept(sock); // Can throw exception!
+        client_threads.emplace([this](auto sock2){nc_handle_node(sock2);}, std::move(sock));
+
+        if (client_threads.size() > max_thread_count) {
+            client_threads.front().join();
+            client_threads.pop();
+        }
+    }
+
+    spdlog::debug("Waiting for heartbeat thread...");
+    heartbeat_thread.join();
+
+    spdlog::debug("Waiting for client threads...");
+    while (client_threads.size() > 0) {
+        client_threads.front().join();
+        client_threads.pop();
+    }
+
+    spdlog::info("Will exit now.");
 }
 
 void NCServer::nc_register_new_node(NCNodeID node_id) {
+    spdlog::info("NCServer::nc_register_new_node(), node_id: {}", node_id.id);
+
     std::chrono::steady_clock clock;
     std::chrono::time_point node_time = clock.now();
-    const std::lock_guard<std::mutex> lock(server_mutex);
 
+    const std::lock_guard<std::mutex> lock(server_mutex);
     if (all_nodes.contains(node_id)) {
         spdlog::debug("Node already registered: {}", node_id.id);
     }
@@ -47,19 +86,32 @@ void NCServer::nc_register_new_node(NCNodeID node_id) {
 }
 
 void NCServer::nc_update_node_time(NCNodeID node_id) {
+    spdlog::info("NCServer::nc_update_node_time(), node_id: {}", node_id.id);
+
     std::chrono::steady_clock clock;
     std::chrono::time_point node_time = clock.now();
-    const std::lock_guard<std::mutex> lock(server_mutex);
 
+    const std::lock_guard<std::mutex> lock(server_mutex);
     all_nodes[node_id] = node_time;
 }
 
-void NCServer::nc_handle_node() {
+void NCServer::nc_handle_node(tcp::socket& sock) {
+    spdlog::info("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
     //uint8_t quit_counter;
+
+    std::expected<std::vector<uint8_t>, NCMessageError> message = nc_receive_data(sock);
+    if (!message.has_value()) {
+        spdlog::error("Error while receiving a message from a node: {}", nc_error_to_str(message.error()));
+        return;
+    }
+
+    // [[nodiscard]] NCExpDecFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message, std::string const& secret_key);
+
+    NCExpDecFromNode node_message = nc_decode_message_from_node(NCEncodedMessageToServer(*message), secret_key);
 
 }
 
-void NCServer::check_heartbeat() {
+void NCServer::nc_check_heartbeat() {
     std::chrono::steady_clock clock;
     std::chrono::time_point current_time = clock.now();
     auto const sleep_time = std::chrono::seconds(heartbeat_timeout);

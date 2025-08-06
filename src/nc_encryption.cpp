@@ -123,7 +123,7 @@ std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncrypted
     if (1 != EVP_DecryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr,
         reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
         EVP_CIPHER_CTX_free(ctx);
-        return std::unexpected(NCMessageError::DencryptInitError);
+        return std::unexpected(NCMessageError::DecryptInitError);
     }
 
     // Set the nonce (IV) length. ChaCha20-Poly1305 uses 12-byte nonce:

@@ -50,7 +50,7 @@ void NCServer::nc_run() {
 
     while (!quit.load()) {
         // Wait for a client to connect
-        acceptor.accept(sock); // Can throw exception!
+        acceptor.accept(sock); // TODO: Can throw exception!
         client_threads.emplace([this](auto sock2){nc_handle_node(sock2);}, std::move(sock));
 
         if (client_threads.size() > max_thread_count) {
@@ -99,6 +99,28 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
     spdlog::info("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
     //uint8_t quit_counter;
 
+    nc_receive_data(sock).and_then([this](std::vector<uint8_t> message){
+        return nc_decode_message_from_node(NCEncodedMessageToServer(message), secret_key);
+    }).and_then([this](NCDecodedMessageFromNode node_message){
+        switch (node_message.msg_type) {
+            case NCMessageType::Init:
+                nc_register_new_node(node_message.node_id);
+            break;
+            case NCMessageType::Heartbeat:
+                nc_update_node_time(node_message.node_id);
+            break;
+            case NCMessageType::NodeNeedsMoreData:
+                // TODO
+            break;
+            case NCMessageType::NewResultFromNode:
+                // TODO
+            break;
+            default:
+                spdlog::error("Unexpected message from node:");
+        }
+    });
+
+    /*
     std::expected<std::vector<uint8_t>, NCMessageError> message = nc_receive_data(sock);
     if (!message.has_value()) {
         spdlog::error("Error while receiving a message from a node: {}", nc_error_to_str(message.error()));
@@ -108,7 +130,7 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
     // [[nodiscard]] NCExpDecFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message, std::string const& secret_key);
 
     NCExpDecFromNode node_message = nc_decode_message_from_node(NCEncodedMessageToServer(*message), secret_key);
-
+    */
 }
 
 void NCServer::nc_check_heartbeat() {

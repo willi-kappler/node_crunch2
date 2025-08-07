@@ -61,6 +61,7 @@ class NCServer {
         void nc_update_node_time(NCNodeID node_id);
         void nc_handle_node(tcp::socket& sock);
         void nc_check_heartbeat();
+        bool nc_valid_node_id(NCNodeID node_id);
 
         // Must be implemented by the user:
         // (pure virtual functions)

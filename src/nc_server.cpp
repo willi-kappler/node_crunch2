@@ -50,7 +50,14 @@ void NCServer::nc_run() {
 
     while (!quit.load()) {
         // Wait for a client to connect
-        acceptor.accept(sock); // TODO: Can throw exception!
+        try {
+            acceptor.accept(sock); // TODO: Can throw exception!
+        } catch (asio::system_error &e) {
+            spdlog::error("Could not accept connection from socket: {}", e.what());
+            quit.store(true);
+            continue;
+        }
+
         client_threads.emplace([this](auto sock2){nc_handle_node(sock2);}, std::move(sock));
 
         if (client_threads.size() > max_thread_count) {
@@ -69,6 +76,16 @@ void NCServer::nc_run() {
     }
 
     spdlog::info("Will exit now.");
+}
+
+bool NCServer::nc_valid_node_id(NCNodeID node_id) {
+    const std::lock_guard<std::mutex> lock(server_mutex);
+    if (all_nodes.contains(node_id)) {
+        return true;
+    } else {
+        spdlog::error("Unknown node id: {}", node_id.id);
+        return false;
+    }
 }
 
 void NCServer::nc_register_new_node(NCNodeID node_id) {
@@ -102,24 +119,38 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
     nc_receive_data(sock).and_then([this, &sock](std::vector<uint8_t> message){
         return nc_decode_message_from_node(NCEncodedMessageToServer(message), secret_key);
     }).and_then([this, &sock](NCDecodedMessageFromNode node_message){
+        NCNodeID const node_id = node_message.node_id;
+
         switch (node_message.msg_type) {
             case NCMessageType::Init:
-                nc_register_new_node(node_message.node_id);
+                nc_register_new_node(node_id);
             break;
             case NCMessageType::Heartbeat:
-                nc_update_node_time(node_message.node_id);
+                if (nc_valid_node_id(node_id)) {
+                    nc_update_node_time(node_id);
+                }
             break;
             case NCMessageType::NodeNeedsMoreData:
-                nc_gen_new_data_message(nc_get_new_data(node_message.node_id),
-                    secret_key).and_then([&sock](NCEncodedMessageToNode msg_to_node) {
-                    return nc_send_data(msg_to_node.data, sock);
-                }).or_else([](NCMessageError msg_error){
-                    spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
-                    return std::expected<uint8_t, NCMessageError>(0);
-                });
+                if (nc_valid_node_id(node_id)) {
+                    nc_gen_new_data_message(nc_get_new_data(node_id),
+                        secret_key).and_then([&sock](NCEncodedMessageToNode msg_to_node) {
+                        return nc_send_data(msg_to_node.data, sock);
+                    }).or_else([](NCMessageError msg_error){
+                        spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
+                        return std::expected<uint8_t, NCMessageError>(0);
+                    });
+                }
             break;
             case NCMessageType::NewResultFromNode:
-                // TODO
+                if (nc_valid_node_id(node_id)) {
+                    nc_process_result(node_id, node_message.data);
+                    nc_gen_result_ok_message(secret_key).and_then([&sock](NCEncodedMessageToNode msg_to_node){
+                        return nc_send_data(msg_to_node.data, sock);
+                    }).or_else([](NCMessageError msg_error){
+                        spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
+                        return std::expected<uint8_t, NCMessageError>(0);
+                    });
+                }
             break;
             default:
                 spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
@@ -143,8 +174,8 @@ void NCServer::nc_check_heartbeat() {
 
         const std::lock_guard<std::mutex> lock(server_mutex);
         for (const auto& [node_id, node_time] : all_nodes) {
-            auto const time_diff2 = std::chrono::duration_cast<std::chrono::seconds>(current_time - node_time);
-            if (time_diff2 > sleep_time) {
+            auto const time_diff = std::chrono::duration_cast<std::chrono::seconds>(current_time - node_time);
+            if (time_diff > sleep_time) {
                 nc_node_timeout(node_id);
             }
         }

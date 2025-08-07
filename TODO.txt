@@ -1,7 +1,4 @@
-- implement node
-- implement server
 - add mandelbrot example
-- add logging (spdlog: https://github.com/gabime/spdlog)
 - add documentation
 - add test cases for node
 - add test cases for server
@@ -12,4 +9,7 @@
 Done:
 - implement encryption for messages (openssl chacha20 poly1305)
 - add test cases for encryption
+- implement node
+- implement server
+- add logging (spdlog: https://github.com/gabime/spdlog)
 

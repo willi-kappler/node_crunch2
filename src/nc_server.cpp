@@ -111,15 +111,8 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
             break;
             case NCMessageType::NodeNeedsMoreData:
                 nc_gen_new_data_message(nc_get_new_data(node_message.node_id),
-                    secret_key).and_then([&sock](NCEncodedMessageToNode msg_to_node)
-                        -> std::expected<uint8_t, NCMessageError> {
-                    NCMessageError const error_code = nc_send_data(msg_to_node.data, sock);
-
-                    if (error_code == NCMessageError::NoError) {
-                        return std::expected<uint8_t, NCMessageError>(0);
-                    } else {
-                        return std::unexpected(error_code);
-                    }
+                    secret_key).and_then([&sock](NCEncodedMessageToNode msg_to_node) {
+                    return nc_send_data(msg_to_node.data, sock);
                 }).or_else([](NCMessageError msg_error){
                     spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
                     return std::expected<uint8_t, NCMessageError>(0);

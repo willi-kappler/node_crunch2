@@ -23,7 +23,7 @@
 
 using asio::ip::tcp;
 
-[[nodiscard]] NCMessageError nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket);
+[[nodiscard]] std::expected<uint8_t, NCMessageError> nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket);
 
 [[nodiscard]] std::expected<std::vector<uint8_t>, NCMessageError> nc_receive_data(tcp::socket& socket);
 

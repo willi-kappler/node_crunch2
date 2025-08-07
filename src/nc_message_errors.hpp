@@ -13,8 +13,7 @@
 #include <cstdint>
 
 enum struct NCMessageError: uint8_t {
-    NoError = 0,
-    CipherContextError,
+    CipherContextError = 0,
     EncryptInitError,
     DecryptInitError,
     CipherControllError,

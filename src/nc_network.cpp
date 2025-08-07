@@ -12,7 +12,7 @@
 // Local includes:
 #include "nc_network.hpp"
 
-[[nodiscard]] NCMessageError nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket) {
+[[nodiscard]] std::expected<uint8_t, NCMessageError> nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket) {
     uint32_t data_size = static_cast<uint32_t>(data.size());
     std::array<uint8_t, 4> size_bytes;
     nc_to_big_endian_bytes(data_size, size_bytes);
@@ -22,17 +22,17 @@
     asio::write(socket, asio::buffer(size_bytes), asio_error);
     if (asio_error) {
         spdlog::error("Error while writing data size: {}", asio_error.message());
-        return NCMessageError::NetworkWriteError;
+        return std::unexpected(NCMessageError::NetworkWriteError);
     }
 
     asio::write(socket, asio::buffer(data), asio_error);
 
     if (asio_error) {
         spdlog::error("Error while writing data: {}", asio_error.message());
-        return NCMessageError::NetworkWriteError;
+        return std::unexpected(NCMessageError::NetworkWriteError);
     }
 
-    return NCMessageError::NoError;
+    return 0;
 }
 
 [[nodiscard]] std::expected<std::vector<uint8_t>, NCMessageError> nc_receive_data(tcp::socket& socket) {

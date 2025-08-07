@@ -83,9 +83,6 @@ uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes) {
     std::string result = "Unknown error";
 
     switch (msg_error) {
-        case NCMessageError::NoError:
-            result = "NoError";
-        break;
         case NCMessageError::CipherContextError:
             result = "";
         break;

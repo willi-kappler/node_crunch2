@@ -9,6 +9,7 @@
 // STD includes:
 #include <thread>
 #include <chrono>
+#include <tuple>
 
 // External includes:
 #include <spdlog/spdlog.h>
@@ -142,14 +143,10 @@ void NCNode::nc_run() {
             return std::unexpected(NCMessageError::NetworkConnectError);
         }
 
-        NCMessageError msg_error = nc_send_data(message2.data, socket);
-
-        if (msg_error != NCMessageError::NoError) {
-            spdlog::error("Error while sending a message: {}", nc_error_to_str(msg_error));
-            return std::unexpected(msg_error);
-        }
-
-        return nc_receive_data(socket).and_then([this](std::vector<uint8_t> raw_data){
+        return nc_send_data(message2.data, socket).and_then([this, &socket](uint8_t v){
+            std::ignore = v;
+            return nc_receive_data(socket);
+        }).and_then([this](std::vector<uint8_t> raw_data){
             return nc_decode_message_from_server(NCEncodedMessageToNode(raw_data), secret_key);
         });
     });

@@ -99,9 +99,9 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
     spdlog::info("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
     //uint8_t quit_counter;
 
-    nc_receive_data(sock).and_then([this](std::vector<uint8_t> message){
+    nc_receive_data(sock).and_then([this, &sock](std::vector<uint8_t> message){
         return nc_decode_message_from_node(NCEncodedMessageToServer(message), secret_key);
-    }).and_then([this](NCDecodedMessageFromNode node_message){
+    }).and_then([this, &sock](NCDecodedMessageFromNode node_message){
         switch (node_message.msg_type) {
             case NCMessageType::Init:
                 nc_register_new_node(node_message.node_id);
@@ -110,27 +110,33 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
                 nc_update_node_time(node_message.node_id);
             break;
             case NCMessageType::NodeNeedsMoreData:
-                // TODO
+                nc_gen_new_data_message(nc_get_new_data(node_message.node_id),
+                    secret_key).and_then([&sock](NCEncodedMessageToNode msg_to_node)
+                        -> std::expected<uint8_t, NCMessageError> {
+                    NCMessageError const error_code = nc_send_data(msg_to_node.data, sock);
+
+                    if (error_code == NCMessageError::NoError) {
+                        return std::expected<uint8_t, NCMessageError>(0);
+                    } else {
+                        return std::unexpected(error_code);
+                    }
+                }).or_else([](NCMessageError msg_error){
+                    spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
+                    return std::expected<uint8_t, NCMessageError>(0);
+                });
             break;
             case NCMessageType::NewResultFromNode:
                 // TODO
             break;
             default:
-                spdlog::error("Unexpected message from node:");
+                spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
         }
+
+        return std::expected<uint8_t, NCMessageError>(0);
+    }).or_else([](NCMessageError msg_error){
+        spdlog::error("Error while handleing node: {}", nc_error_to_str(msg_error));
+        return std::expected<uint8_t, NCMessageError>(0);
     });
-
-    /*
-    std::expected<std::vector<uint8_t>, NCMessageError> message = nc_receive_data(sock);
-    if (!message.has_value()) {
-        spdlog::error("Error while receiving a message from a node: {}", nc_error_to_str(message.error()));
-        return;
-    }
-
-    // [[nodiscard]] NCExpDecFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message, std::string const& secret_key);
-
-    NCExpDecFromNode node_message = nc_decode_message_from_node(NCEncodedMessageToServer(*message), secret_key);
-    */
 }
 
 void NCServer::nc_check_heartbeat() {

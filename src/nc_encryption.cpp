@@ -33,7 +33,7 @@ void nc_print_nonce(std::vector<uint8_t> const& nonce) {
     std::cout << std::dec << std::endl;
 }
 
-std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecryptedMessage const& message,
+[[nodiscard]] std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecryptedMessage const& message,
         std::string const& secret_key) {
     EVP_CIPHER_CTX* ctx = nullptr;
 
@@ -110,7 +110,7 @@ std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecrypted
     return result;
 }
 
-std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncryptedMessage const& message,
+[[nodiscard]] std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncryptedMessage const& message,
         std::string const& secret_key) {
     EVP_CIPHER_CTX* ctx = nullptr;
 

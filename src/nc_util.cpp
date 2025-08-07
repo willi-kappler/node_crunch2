@@ -19,7 +19,7 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     std::memcpy(bytes.data(), &final_value, sizeof(uint32_t));
 }
 
-uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes) {
+[[nodiscard]] uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes) {
     uint32_t result;
 
     std::memcpy(&result, bytes.data(), sizeof(uint32_t));
@@ -84,64 +84,64 @@ uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes) {
 
     switch (msg_error) {
         case NCMessageError::CipherContextError:
-            result = "";
+            result = "CipherContextError";
         break;
         case NCMessageError::EncryptInitError:
-            result = "";
+            result = "EncryptInitError";
         break;
         case NCMessageError::DecryptInitError:
-            result = "";
+            result = "DecryptInitError";
         break;
         case NCMessageError::CipherControllError:
-            result = "";
+            result = "CipherControllError";
         break;
         case NCMessageError::CreateNonceError:
-            result = "";
+            result = "CreateNonceError";
         break;
         case NCMessageError::SetNonceError:
-            result = "";
+            result = "SetNonceError";
         break;
         case NCMessageError::EncryptUpdateError:
-            result = "";
+            result = "EncryptUpdateError";
         break;
         case NCMessageError::DecryptUpdateError:
-            result = "";
+            result = "DecryptUpdateError";
         break;
         case NCMessageError::EncryptFinalError:
-            result = "";
+            result = "EncryptFinalError";
         break;
         case NCMessageError::DecryptFinalError:
-            result = "";
+            result = "DecryptFinalError";
         break;
         case NCMessageError::CipherGetTagError:
-            result = "";
+            result = "CipherGetTagError";
         break;
         case NCMessageError::CipherSetTagError:
-            result = "";
+            result = "CipherSetTagError";
         break;
         case NCMessageError::CompressionError:
-            result = "";
+            result = "CompressionError";
         break;
         case NCMessageError::DecompressionError:
-            result = "";
+            result = "DecompressionError";
         break;
         case NCMessageError::EncryptionError:
-            result = "";
+            result = "EncryptionError";
         break;
         case NCMessageError::DecryptionError:
-            result = "";
+            result = "DecryptionError";
         break;
         case NCMessageError::SizeMissmatch:
-            result = "";
+            result = "SizeMissmatch";
         break;
         case NCMessageError::NetworkConnectError:
-            result = "";
+            result = "NetworkConnectError";
         break;
         case NCMessageError::NetworkWriteError:
-            result = "";
+            result = "NetworkWriteError";
         break;
         case NCMessageError::NetworkReadError:
-            result = "";
+            result = "NetworkReadError";
         break;
     }
 

@@ -32,7 +32,7 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
     }
 }
 
-std::expected<NCConfiguration, NCConfigurationError> nc_config_from_string(std::string_view config_as_string) {
+[[nodiscard]] std::expected<NCConfiguration, NCConfigurationError> nc_config_from_string(std::string_view config_as_string) {
     const tao::json::value json_config = tao::json::from_string(config_as_string);
 
     // Secret key must always be present.
@@ -70,7 +70,7 @@ std::expected<NCConfiguration, NCConfigurationError> nc_config_from_string(std::
     return config;
 }
 
-std::expected<NCConfiguration, NCConfigurationError> nc_config_from_file(std::filesystem::path file_path) {
+[[nodiscard]] std::expected<NCConfiguration, NCConfigurationError> nc_config_from_file(std::filesystem::path file_path) {
     std::ifstream in_file {file_path};
 
     if (in_file.is_open()) {

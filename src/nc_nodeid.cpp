@@ -22,7 +22,7 @@ std::uniform_int_distribution nc_dis(0, static_cast<int>(NC_CHARACTERS.size()) -
 
 NCNodeID::NCNodeID(): id(gen_id()) {}
 
-std::string NCNodeID::gen_id() {
+[[nodiscard]] std::string NCNodeID::gen_id() {
     std::string result;
 
     for (size_t i = 0; i < NC_NODEID_LENGTH; i++) {

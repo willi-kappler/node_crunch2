@@ -32,63 +32,6 @@ enum struct NCMessageType: uint8_t {
     Quit
 };
 
-/*
-template <>
-struct fmt::formatter<NCMessageType> {
-    constexpr auto parse(fmt::format_parse_context& ctx) {
-        return ctx.begin();
-    }
-
-    template <typename Context>
-    auto format(const NCMessageType& msg_error, Context& ctx) {
-        std::string_view name = "Unknown message";
-        switch (msg_error) {
-            case NCMessageType::Unknown:
-                name = "Unknown";
-                break;
-            case NCMessageType::Heartbeat:
-                name = "Heartbeat";
-                break;
-            case NCMessageType::HeartbeatOK:
-                name = "HeartbeatOK";
-                break;
-            case NCMessageType::HeartbeatError:
-                name = "HeartbeatError";
-                break;
-            case NCMessageType::Init:
-                name = "Init";
-                break;
-            case NCMessageType::InitOK:
-                name = "InitOK";
-                break;
-            case NCMessageType::InitError:
-                name = "InitError";
-                break;
-            case NCMessageType::NewDataFromServer:
-                name = "NewDataFromServer";
-                break;
-            case NCMessageType::NewResultFromNode:
-                name = "NewResultFromNode";
-                break;
-            case NCMessageType::NodeNeedsMoreData:
-                name = "NodeNeedsMoreData";
-                break;
-            case NCMessageType::ResultOK:
-                name = "ResultOK";
-                break;
-            case NCMessageType::ConnectionError:
-                name = "ConnectionError";
-                break;
-            case NCMessageType::Quit:
-                name = "Quit";
-                break;
-        }
-
-        return fmt::format_to(ctx.out(), "{}", name);
-    }
-};
-*/
-
 uint8_t const NC_NONCE_LENGTH = 12;
 uint8_t const NC_GCM_TAG_LENGTH = 16;
 

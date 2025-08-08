@@ -143,7 +143,7 @@ void NCNode::nc_run() {
             return std::unexpected(NCMessageError::NetworkConnectError);
         }
 
-        return nc_send_data(message2.data, socket).and_then([this, &socket](uint8_t v){
+        return nc_send_data(message2.data, socket).and_then([this, &socket] (uint8_t v) {
             std::ignore = v;
             return nc_receive_data(socket);
         }).and_then([this](std::vector<uint8_t> raw_data){

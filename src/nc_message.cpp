@@ -42,10 +42,10 @@ template <typename RetType>
     std::copy(data.cbegin(), data.cend(), dm_begin);
 
     // 2. Compress message:
-    return nc_compress_message(decompressed_message).and_then([&secret_key](NCCompressedMessage compressed_message){
+    return nc_compress_message(decompressed_message).and_then([&secret_key] (NCCompressedMessage compressed_message) {
         // 3. Encrypt compressed message:
         return nc_encrypt_message(NCDecryptedMessage{compressed_message.data}, secret_key);
-    }).transform([](NCEncryptedMessage encrypted_message){
+    }).transform([] (NCEncryptedMessage encrypted_message) {
         // 4. Encode encrypted compressed message:
         RetType result;
         uint32_t const result_size = NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + static_cast<uint32_t>(encrypted_message.data.size());
@@ -82,10 +82,10 @@ template <typename RetType>
     encrypted_message.data = std::vector<uint8_t>(m_begin3, message.cend());
 
     // 2. Decrypt message:
-    return nc_decrypt_message(encrypted_message, secret_key).and_then([](NCDecryptedMessage decrypted_message){
+    return nc_decrypt_message(encrypted_message, secret_key).and_then([] (NCDecryptedMessage decrypted_message) {
         // 3. Decompress decrpted message:
         return nc_decompress_message(NCCompressedMessage{decrypted_message.data});
-    }).transform([](NCDecompressedMessage decompressed_message){
+    }).transform([] (NCDecompressedMessage decompressed_message) {
         // 4. Decode message:
         RetType result;
         // Decode message type:

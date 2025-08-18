@@ -1,5 +1,11 @@
 add_rules("mode.debug", "mode.release")
 
+-- Set clang:
+-- xmake f --toolchain=clang --runtimes=c++_shared
+-- xmake f --toolchain=clang --runtimes=stdc++_shared
+--  
+
+
 set_warnings("error", "everything", "extra", "pedantic")
 add_cxxflags("-Wconversion", "-Wshadow")
 -- -Wdouble-promotion

@@ -176,7 +176,7 @@ void NCServer::nc_check_heartbeat() {
         for (const auto& [node_id, node_time]: all_nodes) {
             auto const time_diff = std::chrono::duration_cast<std::chrono::seconds>(current_time - node_time);
             if (time_diff > sleep_time) {
-                spdlog::debug("Node timeout: {}", node_id);
+                spdlog::debug("Node timeout: {}", node_id.id);
                 nc_node_timeout(node_id);
             }
         }

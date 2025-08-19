@@ -5,15 +5,5 @@
       cmake
       xmake
       gcc15
-
-      #llvmPackages_21.libcxx
-      #llvmPackages_21.clangUseLLVM
-      #llvmPackages_21.clang-tools
-
-      #llvmPackages.libcxxClang
-      #llvmPackages.libcxxStdenv
-      #clang-tools
-      #libcxx
-      #clang
     ];
 }

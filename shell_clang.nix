@@ -4,8 +4,9 @@
     name = "cpp-shell";
     # nativeBuildInputs is usually what you want -- tools you need to run
     nativeBuildInputs = with pkgs.buildPackages; [
-      cmake
-      xmake
+      #cmake
+      #xmake
+      meson
       #libcxx
       #libllvm
       #clang-tools

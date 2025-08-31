@@ -5,6 +5,6 @@
       cmake
       xmake
       meson
-      gcc15
+      clang
     ];
 }

@@ -6,6 +6,8 @@
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
 - add namespace node_crunch2
+- use dependency injection for server class and node class
+- refactor compression and encryption into separate classes.
 
 
 Done:

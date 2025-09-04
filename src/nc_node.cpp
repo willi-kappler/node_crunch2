@@ -133,7 +133,7 @@ void NCNode::nc_run() {
 }
 
 [[nodiscard]] NCExpDecFromServer NCNode::nc_send_msg_return_answer(NCExpEncToServer const& message,
-        tcp::socket &socket, tcp::resolver::results_type &endpoints) {
+        tcp::socket &socket, tcp::resolver::results_type &endpoints) const {
     return message.and_then([this, &socket, &endpoints](NCEncodedMessageToServer message2) mutable -> NCExpDecFromServer {
         // Connect to the server
         try {

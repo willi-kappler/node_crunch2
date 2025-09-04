@@ -57,7 +57,7 @@ class NCNode {
         uint8_t max_error_count;
 
         [[nodiscard]] NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message,
-            tcp::socket &socket, tcp::resolver::results_type &endpoints);
+            tcp::socket &socket, tcp::resolver::results_type &endpoints) const;
         void nc_send_heartbeat();
 
         // Must be implemented by the user:

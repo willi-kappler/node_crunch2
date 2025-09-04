@@ -16,6 +16,8 @@
 #include "nc_config.hpp"
 #include "nc_exceptions.hpp"
 
+using namespace NodeCrunch2;
+
 TEST_CASE("Create valid default configuration", "[configuration]" ) {
     NCConfiguration config1 = NCConfiguration("12345678901234567890123456789012");
 

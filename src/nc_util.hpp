@@ -20,6 +20,7 @@
 #include "nc_message_errors.hpp"
 #include "nc_message_types.hpp"
 
+namespace NodeCrunch2 {
 void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noexcept;
 
 [[nodiscard]] uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes);
@@ -27,5 +28,6 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
 [[nodiscard]] std::string nc_type_to_string(NCMessageType const& msg_type);
 
 [[nodiscard]] std::string nc_error_to_str(NCMessageError const& msg_error);
+}
 
 #endif // FILE_NC_UTIL_HPP_INCLUDED

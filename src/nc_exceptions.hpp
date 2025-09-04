@@ -11,9 +11,11 @@
 
 #include <stdexcept>
 
+namespace NodeCrunch2 {
 class NCInvalidKeyException: public std::invalid_argument {
 public:
   NCInvalidKeyException(): std::invalid_argument("Size of secret key must be 32 bytes.") { }
 };
+}
 
 #endif // FILE_NC_EXCEPTIONS_HPP_INCLUDED

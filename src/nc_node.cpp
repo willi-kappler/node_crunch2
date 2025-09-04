@@ -18,6 +18,7 @@
 #include "nc_node.hpp"
 #include "nc_network.hpp"
 
+namespace NodeCrunch2 {
 enum struct NCRunState: uint8_t {
     Init,
     NeedData,
@@ -202,4 +203,5 @@ void NCNode::nc_send_heartbeat() {
     }
 
     spdlog::info("Will exit now.");
+}
 }

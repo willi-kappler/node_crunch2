@@ -14,6 +14,7 @@
 #include "nc_encryption.hpp"
 #include "nc_message.hpp"
 
+namespace NodeCrunch2 {
 template <typename RetType>
 [[nodiscard]] std::expected<RetType, NCMessageError> nc_encode(NCMessageType const msg_type,
         std::string_view node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
@@ -272,4 +273,5 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     */
 
     return nc_encode_message_to_node(NCMessageType::Quit, {}, secret_key);
+}
 }

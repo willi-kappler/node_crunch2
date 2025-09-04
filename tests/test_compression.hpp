@@ -18,6 +18,8 @@
 // Local includes:
 #include "nc_compression.hpp"
 
+using namespace NodeCrunch2;
+
 TEST_CASE("Compress / decompress a message", "[compression]" ) {
     std::string msg1 = "Hello world, this is a test for compressing a message. Add some more content: test, test, test, test, test, test, test, test.";
     NCDecompressedMessage msg1r;

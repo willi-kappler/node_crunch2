@@ -16,6 +16,7 @@
 // Local includes:
 #include "nc_config.hpp"
 
+namespace NodeCrunch2 {
 NCConfiguration::NCConfiguration(std::string secret_key_user):
     // Member initialization list:
     server_address("127.0.0.1"),
@@ -79,4 +80,5 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
     } else {
         return std::unexpected(NCConfigurationError::NCFileOpenError);
     }
+}
 }

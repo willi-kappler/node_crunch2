@@ -9,6 +9,7 @@
 // Local includes:
 #include "nc_util.hpp"
 
+namespace NodeCrunch2 {
 void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noexcept {
     uint32_t final_value = value;
 
@@ -146,4 +147,5 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     }
 
     return result;
+}
 }

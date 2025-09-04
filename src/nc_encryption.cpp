@@ -17,6 +17,7 @@
 // Local includes:
 #include "nc_encryption.hpp"
 
+namespace NodeCrunch2 {
 void nc_print_tag(std::vector<uint8_t> const& tag) {
     std::cout << "Tag: " << std::endl;
     for (auto v: tag) {
@@ -183,4 +184,5 @@ void nc_print_nonce(std::vector<uint8_t> const& nonce) {
     EVP_CIPHER_CTX_free(ctx);
 
     return result;
+}
 }

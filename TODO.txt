@@ -5,7 +5,6 @@
 - add test cases for communication (node <-> server)
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
-- add namespace node_crunch2
 - use dependency injection for server class and node class
 - refactor compression and encryption into separate classes.
 
@@ -16,4 +15,5 @@ Done:
 # implement node
 # implement server
 # add logging (spdlog: https://github.com/gabime/spdlog)
+# add namespace NodeCrunch2
 

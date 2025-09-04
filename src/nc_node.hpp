@@ -23,6 +23,7 @@
 #include "nc_config.hpp"
 #include "nc_message.hpp"
 
+namespace NodeCrunch2 {
 using asio::ip::tcp;
 
 class NCNode {
@@ -64,5 +65,6 @@ class NCNode {
         virtual void nc_init(std::vector<uint8_t> data) = 0;
         [[nodiscard]] virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) = 0;
 };
+}
 
 #endif // FILE_NC_NODE_HPP_INCLUDED

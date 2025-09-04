@@ -20,6 +20,7 @@
 #include "nc_message.hpp"
 #include "nc_server.hpp"
 
+namespace NodeCrunch2 {
 using asio::ip::tcp;
 
 NCServer::NCServer(NCConfiguration config):
@@ -181,4 +182,5 @@ void NCServer::nc_check_heartbeat() {
             }
         }
     }
+}
 }

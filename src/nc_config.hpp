@@ -19,6 +19,7 @@
 // Local includes:
 #include "nc_exceptions.hpp"
 
+namespace NodeCrunch2 {
 enum struct NCConfigurationError: uint8_t {
     NCFileOpenError,
     NCMissingSecretKey,
@@ -50,5 +51,6 @@ class NCConfiguration {
 [[nodiscard]] std::expected<NCConfiguration, NCConfigurationError> nc_config_from_string(std::string_view);
 
 [[nodiscard]] std::expected<NCConfiguration, NCConfigurationError> nc_config_from_file(std::filesystem::path);
+}
 
 #endif // FILE_NC_CONFIG_HPP_INCLUDED

@@ -28,6 +28,7 @@
 
 //using asio::ip::tcp;
 
+namespace NodeCrunch2 {
 class NCServer {
         // Constructor:
         NCServer(NCConfiguration config);
@@ -72,5 +73,6 @@ class NCServer {
         [[nodiscard]] virtual std::vector<uint8_t> nc_get_new_data(NCNodeID node_id) = 0;
         virtual void nc_process_result(NCNodeID node_id, std::vector<uint8_t> result) = 0;
 };
+}
 
 #endif // FILE_NC_SERVER_HPP_INCLUDED

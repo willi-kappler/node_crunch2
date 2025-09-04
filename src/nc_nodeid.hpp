@@ -17,6 +17,7 @@
 #include <string>
 #include <random>
 
+namespace NodeCrunch2 {
 const size_t NC_NODEID_LENGTH = 64;
 
 class NCNodeID {
@@ -28,10 +29,11 @@ class NCNodeID {
     private:
         std::string gen_id();
 };
+}
 
 // From cpp ref: https://en.cppreference.com/w/cpp/utility/hash.html
-template<> struct std::hash<NCNodeID> {
-    std::size_t operator()(NCNodeID const& node) const noexcept {
+template<> struct std::hash<NodeCrunch2::NCNodeID> {
+    std::size_t operator()(NodeCrunch2::NCNodeID const& node) const noexcept {
         return std::hash<std::string>{}(node.id);
     }
 };

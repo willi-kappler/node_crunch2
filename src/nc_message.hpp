@@ -21,6 +21,7 @@
 #include "nc_message_types.hpp"
 #include "nc_nodeid.hpp"
 
+namespace NodeCrunch2 {
 using NCExpEncToServer = std::expected<NCEncodedMessageToServer, NCMessageError>;
 using NCExpEncToNode = std::expected<NCEncodedMessageToNode, NCMessageError>;
 using NCExpDecFromServer = std::expected<NCDecodedMessageFromServer, NCMessageError>;
@@ -56,5 +57,6 @@ template <typename RetType>
 [[nodiscard]] NCExpEncToNode nc_gen_new_data_message(std::vector<uint8_t> const& new_data, std::string const& secret_key);
 [[nodiscard]] NCExpEncToNode nc_gen_result_ok_message(std::string const& secret_key);
 [[nodiscard]] NCExpEncToNode nc_gen_quit_message(std::string const& secret_key);
+}
 
 #endif // FILE_NC_MESSAGE_HPP_INCLUDED

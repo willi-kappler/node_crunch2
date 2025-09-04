@@ -15,6 +15,7 @@
 // Local includes:
 #include "nc_nodeid.hpp"
 
+namespace NodeCrunch2 {
 const std::string NC_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 std::random_device nc_rd;
 std::mt19937 nc_gen(nc_rd());
@@ -30,4 +31,5 @@ NCNodeID::NCNodeID(): id(gen_id()) {}
     }
 
     return result;
+}
 }

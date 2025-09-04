@@ -19,6 +19,8 @@
 // Local includes:
 #include "nc_nodeid.hpp"
 
+using namespace NodeCrunch2;
+
 TEST_CASE("Create valid nodeid", "[nodeid]" ) {
     NCNodeID nodeid1;
 

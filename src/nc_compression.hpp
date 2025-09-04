@@ -20,8 +20,10 @@
 #include "nc_message_errors.hpp"
 #include "nc_message_types.hpp"
 
+namespace NodeCrunch2 {
 [[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompressedMessage const& message);
 
 [[nodiscard]] std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message);
+}
 
 #endif // FILE_NC_COMPRESSION_HPP_INCLUDED

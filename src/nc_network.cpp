@@ -12,6 +12,7 @@
 // Local includes:
 #include "nc_network.hpp"
 
+namespace NodeCrunch2 {
 [[nodiscard]] std::expected<uint8_t, NCMessageError> nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket) {
     uint32_t data_size = static_cast<uint32_t>(data.size());
     std::array<uint8_t, 4> size_bytes;
@@ -62,4 +63,5 @@
     }
 
     return result;
+}
 }

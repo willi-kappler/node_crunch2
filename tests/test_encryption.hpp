@@ -15,6 +15,8 @@
 // Local includes:
 #include "nc_encryption.hpp"
 
+using namespace NodeCrunch2;
+
 TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
     std::string msg1 = "Hello world, this is a test for encrypting a message. Add some more content: test, test, test, test, test, test, test, test.";
     std::vector<uint8_t> msg1v(msg1.begin(), msg1.end());

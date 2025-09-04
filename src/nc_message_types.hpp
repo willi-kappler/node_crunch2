@@ -16,6 +16,7 @@
 // Local includes:
 #include "nc_nodeid.hpp"
 
+namespace NodeCrunch2 {
 enum struct NCMessageType: uint8_t {
     Unknown = 0,
     Heartbeat,
@@ -71,5 +72,6 @@ struct NCDecodedMessageFromServer {
     NCMessageType msg_type = NCMessageType::Unknown;
     std::vector<uint8_t> data = {};
 };
+}
 
 #endif // FILE_NC_MESSAGE_TYPES_HPP_INCLUDED

@@ -11,8 +11,21 @@
 
 // Local includes:
 #include "nc_compression.hpp"
+#include "nc_util.hpp"
 
 namespace NodeCrunch2 {
+[[nodiscard]] NCCompressedMessage NCCompressor::nc_compress_message(NCDecompressedMessage const& message) {
+    [[maybe_unused]] const uint32_t original_size = static_cast<uint32_t>(message.data.size());
+    std::vector<uint8_t> compressed_data(0);
+    return NCCompressedMessage(compressed_data);
+}
+
+[[nodiscard]] NCDecompressedMessage NCCompressor::nc_decompress_message(NCCompressedMessage const& message) {
+    [[maybe_unused]] const uint32_t original_size = nc_from_big_endian_bytes(message.data);
+    std::vector<uint8_t> decompressed_data(0);
+    return NCDecompressedMessage(decompressed_data);
+}
+
 [[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompressedMessage const& message) {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());
     const uint32_t max_compressed_size = LZ4_compressBound(original_size);

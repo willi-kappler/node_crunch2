@@ -16,11 +16,28 @@
 #include <expected>
 
 // Local includes:
-#include "nc_util.hpp"
 #include "nc_message_errors.hpp"
 #include "nc_message_types.hpp"
 
 namespace NodeCrunch2 {
+class NCCompressor {
+    public:
+        [[nodiscard]] NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message);
+
+        [[nodiscard]] NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message);
+
+        // Constructor:
+        NCCompressor();
+
+        // Default special member functions:
+        NCCompressor (NCCompressor&&) = default;
+
+        // Disable all other special member functions:
+        NCCompressor(const NCCompressor&) = delete;
+        NCCompressor& operator=(const NCCompressor&) = delete;
+        NCCompressor& operator=(NCCompressor&&) = delete;
+};
+
 [[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompressedMessage const& message);
 
 [[nodiscard]] std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message);

@@ -66,6 +66,72 @@ NCMessageCodecBase::NCMessageCodecBase(NCCompressor nc_compressor2, NCEncryption
     return decompressed_message;
 }
 
+NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id2, std::string const secret_key):
+    NCMessageCodecBase(secret_key),
+    node_id(node_id2) {}
+
+NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id2, NCCompressor nc_compressor, NCEncryption nc_encryption):
+    NCMessageCodecBase(nc_compressor, nc_encryption),
+    node_id(node_id2) {}
+
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_encode_message_to_server(
+    NCMessageType const msg_type, std::vector<uint8_t> const& data) {
+
+    // 1. Encode message:
+    NCDecompressedMessage decompressed_message;
+
+    uint32_t const dc_size = static_cast<uint32_t>(1 + NC_NODEID_LENGTH + data.size());
+    decompressed_message.data = std::vector<uint8_t>(dc_size);
+
+    // Encode message type (1 byte)
+    decompressed_message.data[0] = static_cast<uint8_t>(msg_type);
+    auto dm_begin = decompressed_message.data.begin() + 1;
+
+    // Node id has to be encoded here:
+    std::copy(node_id.id.cbegin(), node_id.id.cend(), dm_begin);
+    dm_begin += NC_NODEID_LENGTH;
+
+    // Encode the actual data, if there is any:
+    std::copy(data.cbegin(), data.cend(), dm_begin);
+
+    std::vector<uint8_t> encoded = nc_encode(decompressed_message);
+    return NCEncodedMessageToServer{encoded};
+}
+
+[[nodiscard]] NCDecodedMessageFromServer NCMessageCodecNode::nc_decode_message_from_server(NCEncodedMessageToNode const& message) {
+    NCDecompressedMessage decompressed_message = nc_decode(message.data);
+
+    // 4. Decode message:
+    NCDecodedMessageFromServer result;
+    // Decode message type:
+    result.msg_type = static_cast<NCMessageType>(decompressed_message.data[0]);
+    auto m_begin = decompressed_message.data.cbegin() + 1;
+
+    // Decode the actual data, if any:
+    result.data = std::vector<uint8_t>(m_begin, decompressed_message.data.cend());
+
+    return result;
+}
+
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_heartbeat_message() {
+
+}
+
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_init_message() {
+
+}
+
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_result_message(std::vector<uint8_t> const& new_data) {
+
+}
+
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_need_more_data_message() {
+
+}
+
+
+
+
 template <typename RetType>
 [[nodiscard]] std::expected<RetType, NCMessageError> nc_encode2(NCMessageType const msg_type,
         std::string_view node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {

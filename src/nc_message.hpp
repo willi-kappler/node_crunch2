@@ -62,8 +62,8 @@ class NCMessageCodecNode : NCMessageCodecBase {
         [[nodiscard]] NCEncodedMessageToServer nc_gen_need_more_data_message();
 
         // Constructor:
-        NCMessageCodecNode(NCNodeID const node_id, std::string const secret_key);
-        NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_compressor, NCEncryption nc_encryption);
+        NCMessageCodecNode(NCNodeID const node_id2, std::string const secret_key);
+        NCMessageCodecNode(NCNodeID const node_id2, NCCompressor nc_compressor, NCEncryption nc_encryption);
 
         // Default special member functions:
         NCMessageCodecNode (NCMessageCodecNode&&) = default;

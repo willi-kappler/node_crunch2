@@ -10,13 +10,64 @@
 #include <type_traits>
 
 // Local includes:
-#include "nc_compression.hpp"
-#include "nc_encryption.hpp"
 #include "nc_message.hpp"
 
 namespace NodeCrunch2 {
+NCMessageCodecBase::NCMessageCodecBase(std::string const secret_key):
+    nc_compressor(),
+    nc_encryption(NCEncryption(secret_key)) {}
+
+NCMessageCodecBase::NCMessageCodecBase(NCCompressor nc_compressor2, NCEncryption nc_encryption2):
+    nc_compressor(nc_compressor2),
+    nc_encryption(nc_encryption2) {}
+
+[[nodiscard]] std::vector<uint8_t> NCMessageCodecBase::nc_encode(NCDecompressedMessage decompressed_message) {
+        // 2. Compress message:
+        NCCompressedMessage compressed_message = nc_compressor.nc_compress_message(decompressed_message);
+        // 3. Encrypt compressed message:
+        NCEncryptedMessage encrypted_message = nc_encryption.nc_encrypt_message(NCDecryptedMessage{compressed_message.data});
+        // 4. Encode encrypted compressed message:
+        std::vector<uint8_t> result;
+        uint32_t const result_size = NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + static_cast<uint32_t>(encrypted_message.data.size());
+        result = std::vector<uint8_t>(result_size);
+        auto const r_begin1 = result.begin();
+        auto const r_begin2 = r_begin1 + NC_NONCE_LENGTH;
+        auto const r_begin3 = r_begin2 + NC_GCM_TAG_LENGTH;
+
+        // Encode nonce:
+        std::copy(encrypted_message.nonce.cbegin(), encrypted_message.nonce.cend(), r_begin1);
+        // Encode tag:
+        std::copy(encrypted_message.tag.cbegin(), encrypted_message.tag.cend(), r_begin2);
+        // Encode rest of message, if any:
+        std::copy(encrypted_message.data.cbegin(), encrypted_message.data.cend(), r_begin3);
+
+        return result;
+}
+
+[[nodiscard]] NCDecompressedMessage NCMessageCodecBase::nc_decode(std::vector<uint8_t> const& message) {
+    // 1. Decrypt message:
+    NCEncryptedMessage encrypted_message;
+    auto const m_begin1 = message.cbegin();
+    auto const m_begin2 = m_begin1 + NC_NONCE_LENGTH;
+    auto const m_begin3 = m_begin2 + NC_GCM_TAG_LENGTH;
+
+    // Decode nonce:
+    std::copy(m_begin1, m_begin2, encrypted_message.nonce.begin());
+    // Decode tag:
+    std::copy(m_begin2, m_begin3, encrypted_message.tag.begin());
+    // Decode the rest of the data, if any:
+    encrypted_message.data = std::vector<uint8_t>(m_begin3, message.cend());
+
+    // 2. Decrypt message:
+    NCDecryptedMessage decrypted_message = nc_encryption.nc_decrypt_message(encrypted_message);
+    // 3. Decompress decrpted message:
+    NCDecompressedMessage decompressed_message = nc_compressor.nc_decompress_message(NCCompressedMessage{decrypted_message.data});
+
+    return decompressed_message;
+}
+
 template <typename RetType>
-[[nodiscard]] std::expected<RetType, NCMessageError> nc_encode(NCMessageType const msg_type,
+[[nodiscard]] std::expected<RetType, NCMessageError> nc_encode2(NCMessageType const msg_type,
         std::string_view node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
     // 1. Encode message:
     NCDecompressedMessage decompressed_message;
@@ -43,9 +94,9 @@ template <typename RetType>
     std::copy(data.cbegin(), data.cend(), dm_begin);
 
     // 2. Compress message:
-    return nc_compress_message(decompressed_message).and_then([&secret_key] (NCCompressedMessage compressed_message) {
+    return nc_compress_message2(decompressed_message).and_then([&secret_key] (NCCompressedMessage compressed_message) {
         // 3. Encrypt compressed message:
-        return nc_encrypt_message(NCDecryptedMessage{compressed_message.data}, secret_key);
+        return nc_encrypt_message2(NCDecryptedMessage{compressed_message.data}, secret_key);
     }).transform([] (NCEncryptedMessage encrypted_message) {
         // 4. Encode encrypted compressed message:
         RetType result;
@@ -67,7 +118,7 @@ template <typename RetType>
 }
 
 template <typename RetType>
-[[nodiscard]] std::expected<RetType, NCMessageError> nc_decode(std::vector<uint8_t> const& message,
+[[nodiscard]] std::expected<RetType, NCMessageError> nc_decode2(std::vector<uint8_t> const& message,
         std::string const& secret_key) {
     // 1. Decrypt message:
     NCEncryptedMessage encrypted_message;
@@ -83,9 +134,9 @@ template <typename RetType>
     encrypted_message.data = std::vector<uint8_t>(m_begin3, message.cend());
 
     // 2. Decrypt message:
-    return nc_decrypt_message(encrypted_message, secret_key).and_then([] (NCDecryptedMessage decrypted_message) {
+    return nc_decrypt_message2(encrypted_message, secret_key).and_then([] (NCDecryptedMessage decrypted_message) {
         // 3. Decompress decrpted message:
-        return nc_decompress_message(NCCompressedMessage{decrypted_message.data});
+        return nc_decompress_message2(NCCompressedMessage{decrypted_message.data});
     }).transform([] (NCDecompressedMessage decompressed_message) {
         // 4. Decode message:
         RetType result;
@@ -107,42 +158,42 @@ template <typename RetType>
 }
 
 // Explicit instantiations, so that the linker can find the functions:
-template [[nodiscard]] NCExpEncToNode nc_encode<NCEncodedMessageToNode>(
+template [[nodiscard]] NCExpEncToNode nc_encode2<NCEncodedMessageToNode>(
     NCMessageType const msg_type, std::string_view node_id,
     std::vector<uint8_t> const& data, std::string const& secret_key);
 
-template [[nodiscard]] NCExpEncToServer nc_encode<NCEncodedMessageToServer>(
+template [[nodiscard]] NCExpEncToServer nc_encode2<NCEncodedMessageToServer>(
     NCMessageType const msg_type, std::string_view node_id,
     std::vector<uint8_t> const& data, std::string const& secret_key);
 
-template [[nodiscard]] NCExpDecFromNode nc_decode<NCDecodedMessageFromNode>(
+template [[nodiscard]] NCExpDecFromNode nc_decode2<NCDecodedMessageFromNode>(
     std::vector<uint8_t> const& message, std::string const& secret_key);
 
-template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
+template [[nodiscard]] NCExpDecFromServer nc_decode2<NCDecodedMessageFromServer>(
     std::vector<uint8_t> const& message, std::string const& secret_key);
 
 // Helper functions:
-[[nodiscard]] NCExpEncToServer nc_encode_message_to_server(NCMessageType const msg_type,
+[[nodiscard]] NCExpEncToServer nc_encode_message_to_server2(NCMessageType const msg_type,
         NCNodeID const& node_id, std::vector<uint8_t> const& data, std::string const& secret_key) {
-    return nc_encode<NCEncodedMessageToServer>(msg_type, node_id.id, data, secret_key);
+    return nc_encode2<NCEncodedMessageToServer>(msg_type, node_id.id, data, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_encode_message_to_node(NCMessageType const msg_type,
+[[nodiscard]] NCExpEncToNode nc_encode_message_to_node2(NCMessageType const msg_type,
         std::vector<uint8_t> const& data, std::string const& secret_key) {
-    return nc_encode<NCEncodedMessageToNode>(msg_type, "", data, secret_key);
+    return nc_encode2<NCEncodedMessageToNode>(msg_type, "", data, secret_key);
 }
 
-[[nodiscard]] NCExpDecFromServer nc_decode_message_from_server(NCEncodedMessageToNode const& message,
+[[nodiscard]] NCExpDecFromServer nc_decode_message_from_server2(NCEncodedMessageToNode const& message,
         std::string const& secret_key) {
-    return nc_decode<NCDecodedMessageFromServer>(message.data, secret_key);
+    return nc_decode2<NCDecodedMessageFromServer>(message.data, secret_key);
 }
 
-[[nodiscard]] NCExpDecFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message,
+[[nodiscard]] NCExpDecFromNode nc_decode_message_from_node2(NCEncodedMessageToServer const& message,
         std::string const& secret_key) {
-    return nc_decode<NCDecodedMessageFromNode>(message.data, secret_key);
+    return nc_decode2<NCDecodedMessageFromNode>(message.data, secret_key);
 }
 
-[[nodiscard]] NCExpEncToServer nc_gen_heartbeat_message(NCNodeID const& node_id, std::string const& secret_key) {
+[[nodiscard]] NCExpEncToServer nc_gen_heartbeat_message2(NCNodeID const& node_id, std::string const& secret_key) {
     /*
     Generate a heartbeat message to be sent from the node to the server.
 
@@ -150,10 +201,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::Heartbeat, node_id, {}, secret_key);
+    return nc_encode_message_to_server2(NCMessageType::Heartbeat, node_id, {}, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_gen_heartbeat_message_ok(std::string const& secret_key) {
+[[nodiscard]] NCExpEncToNode nc_gen_heartbeat_message_ok2(std::string const& secret_key) {
     /*
     Generate a "heartbeat OK" message to be sent from the server to the node.
 
@@ -162,10 +213,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::HeartbeatOK, {}, secret_key);
+    return nc_encode_message_to_node2(NCMessageType::HeartbeatOK, {}, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_gen_heartbeat_message_error(std::string const& secret_key) {
+[[nodiscard]] NCExpEncToNode nc_gen_heartbeat_message_error2(std::string const& secret_key) {
     /*
     Generate a "heartbeat error" message to be sent from the server to the node.
 
@@ -174,10 +225,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::HeartbeatError, {}, secret_key);
+    return nc_encode_message_to_node2(NCMessageType::HeartbeatError, {}, secret_key);
 }
 
-[[nodiscard]] NCExpEncToServer nc_gen_init_message(NCNodeID const& node_id, std::string const& secret_key) {
+[[nodiscard]] NCExpEncToServer nc_gen_init_message2(NCNodeID const& node_id, std::string const& secret_key) {
     /*
     Generate an initialisation message to be sent from the node to the server.
 
@@ -186,10 +237,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::Init, node_id, {}, secret_key);
+    return nc_encode_message_to_server2(NCMessageType::Init, node_id, {}, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_gen_init_message_ok(std::vector<uint8_t> const& init_data, std::string const& secret_key) {
+[[nodiscard]] NCExpEncToNode nc_gen_init_message_ok2(std::vector<uint8_t> const& init_data, std::string const& secret_key) {
     /*
     Generate an "init ok" message to be sent from the server to the node.
 
@@ -198,10 +249,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::InitOK, init_data, secret_key);
+    return nc_encode_message_to_node2(NCMessageType::InitOK, init_data, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_gen_init_message_error(std::string const& secret_key) {
+[[nodiscard]] NCExpEncToNode nc_gen_init_message_error2(std::string const& secret_key) {
     /*
     Generate an "init error" message to be sent from the server to the node.
 
@@ -209,10 +260,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::InitError, {}, secret_key);
+    return nc_encode_message_to_node2(NCMessageType::InitError, {}, secret_key);
 }
 
-[[nodiscard]] NCExpEncToServer nc_gen_result_message(NCNodeID const& node_id,
+[[nodiscard]] NCExpEncToServer nc_gen_result_message2(NCNodeID const& node_id,
         std::vector<uint8_t> const& new_data, std::string const& secret_key) {
     /*
     Generate a result message to be sent from the node to the server.
@@ -222,10 +273,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::NewResultFromNode, node_id, new_data, secret_key);
+    return nc_encode_message_to_server2(NCMessageType::NewResultFromNode, node_id, new_data, secret_key);
 }
 
-[[nodiscard]] NCExpEncToServer nc_gen_need_more_data_message(NCNodeID const& node_id, std::string const& secret_key) {
+[[nodiscard]] NCExpEncToServer nc_gen_need_more_data_message2(NCNodeID const& node_id, std::string const& secret_key) {
     /*
     Generate a "need more data" message to be sent from the node to the server.
 
@@ -234,10 +285,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::NodeNeedsMoreData, node_id, {}, secret_key);
+    return nc_encode_message_to_server2(NCMessageType::NodeNeedsMoreData, node_id, {}, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_gen_new_data_message(std::vector<uint8_t> const& new_data,
+[[nodiscard]] NCExpEncToNode nc_gen_new_data_message2(std::vector<uint8_t> const& new_data,
         std::string const& secret_key) {
     /*
     Generate a "new data" message to be sent from the server to the node.
@@ -246,10 +297,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::NewDataFromServer, new_data, secret_key);
+    return nc_encode_message_to_node2(NCMessageType::NewDataFromServer, new_data, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_gen_result_ok_message(std::string const& secret_key) {
+[[nodiscard]] NCExpEncToNode nc_gen_result_ok_message2(std::string const& secret_key) {
     /*
     Generate a "result ok" message to be sent from the server to the node.
 
@@ -258,10 +309,10 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::ResultOK, {}, secret_key);
+    return nc_encode_message_to_node2(NCMessageType::ResultOK, {}, secret_key);
 }
 
-[[nodiscard]] NCExpEncToNode nc_gen_quit_message(std::string const& secret_key) {
+[[nodiscard]] NCExpEncToNode nc_gen_quit_message2(std::string const& secret_key) {
     /*
     Generate a quit message to be sent from the server to the node.
 
@@ -272,6 +323,6 @@ template [[nodiscard]] NCExpDecFromServer nc_decode<NCDecodedMessageFromServer>(
     the quit message yet.
     */
 
-    return nc_encode_message_to_node(NCMessageType::Quit, {}, secret_key);
+    return nc_encode_message_to_node2(NCMessageType::Quit, {}, secret_key);
 }
 }

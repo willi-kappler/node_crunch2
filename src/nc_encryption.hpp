@@ -20,9 +20,30 @@
 #include "nc_message_types.hpp"
 
 namespace NodeCrunch2 {
-[[nodiscard]] std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message(NCDecryptedMessage const& message, std::string const& secret_key);
+class NCEncryption {
+    public:
+        [[nodiscard]] NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const;
 
-[[nodiscard]] std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message(NCEncryptedMessage const& message, std::string const &secret_key);
+        [[nodiscard]] NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage const& message) const;
+
+        // Constructor:
+        NCEncryption(std::string const secret_key);
+
+        // Default special member functions:
+        NCEncryption (NCEncryption&&) = default;
+        NCEncryption(const NCEncryption&) = default;
+
+        // Disable all other special member functions:
+        NCEncryption& operator=(const NCEncryption&) = delete;
+        NCEncryption& operator=(NCEncryption&&) = delete;
+
+    private:
+        std::string const secret_key;
+};
+
+[[nodiscard]] std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message2(NCDecryptedMessage const& message, std::string const& secret_key);
+
+[[nodiscard]] std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message2(NCEncryptedMessage const& message, std::string const &secret_key);
 }
 
 #endif // FILE_NC_ENCRYPTION_HPP_INCLUDED

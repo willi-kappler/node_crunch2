@@ -22,25 +22,25 @@
 namespace NodeCrunch2 {
 class NCCompressor {
     public:
-        [[nodiscard]] NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message);
+        [[nodiscard]] NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message) const;
 
-        [[nodiscard]] NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message);
+        [[nodiscard]] NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message) const;
 
         // Constructor:
         NCCompressor();
 
         // Default special member functions:
         NCCompressor (NCCompressor&&) = default;
+        NCCompressor(const NCCompressor&) = default;
 
         // Disable all other special member functions:
-        NCCompressor(const NCCompressor&) = delete;
         NCCompressor& operator=(const NCCompressor&) = delete;
         NCCompressor& operator=(NCCompressor&&) = delete;
 };
 
-[[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message(NCDecompressedMessage const& message);
+[[nodiscard]] std::expected<NCCompressedMessage, NCMessageError> nc_compress_message2(NCDecompressedMessage const& message);
 
-[[nodiscard]] std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message(NCCompressedMessage const& message);
+[[nodiscard]] std::expected<NCDecompressedMessage, NCMessageError> nc_decompress_message2(NCCompressedMessage const& message);
 }
 
 #endif // FILE_NC_COMPRESSION_HPP_INCLUDED

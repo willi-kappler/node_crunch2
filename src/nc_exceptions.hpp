@@ -16,6 +16,27 @@ class NCInvalidKeyException: public std::invalid_argument {
 public:
   NCInvalidKeyException(): std::invalid_argument("Size of secret key must be 32 bytes.") { }
 };
+
+class NCCompressionException: public std::runtime_error {
+public:
+  NCCompressionException(): std::runtime_error("Compression error.") { }
+};
+
+class NCDecompressionException: public std::runtime_error {
+public:
+  NCDecompressionException(): std::runtime_error("Decompression error.") { }
+};
+
+class NCEncryptionException: public std::runtime_error {
+public:
+  NCEncryptionException(const char *msg): std::runtime_error(msg) { }
+};
+
+class NCDencryptionException: public std::runtime_error {
+public:
+  NCDencryptionException(const char *msg): std::runtime_error(msg) { }
+};
+
 }
 
 #endif // FILE_NC_EXCEPTIONS_HPP_INCLUDED

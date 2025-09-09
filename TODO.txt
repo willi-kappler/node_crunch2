@@ -6,10 +6,11 @@
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
 - use dependency injection for server class and node class
-- refactor compression and encryption into separate classes.
+- refactor network into a NCConnector class.
 
 
 Done:
+# refactor compression and encryption into separate classes.
 # implement encryption for messages (openssl chacha20 poly1305)
 # add test cases for encryption
 # implement node

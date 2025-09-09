@@ -16,22 +16,17 @@
 #include <atomic>
 #include <mutex>
 #include <chrono>
-//#include <expected>
-
-// External includes:
-// #include <asio.hpp>
 
 // Local includes:
 #include "nc_config.hpp"
 #include "nc_nodeid.hpp"
 #include "nc_message.hpp"
 
-//using asio::ip::tcp;
-
 namespace NodeCrunch2 {
 class NCServer {
         // Constructor:
         NCServer(NCConfiguration config);
+        // TODO: NCServer(NCConfiguration config, NCMessageCodecServer, nc_server_codec);
 
         // Destructor:
         virtual ~NCServer() = default;
@@ -49,14 +44,12 @@ class NCServer {
         void nc_run();
 
     private:
-        std::string server_address;
-        uint16_t server_port;
-        uint16_t heartbeat_timeout;
-        std::string secret_key;
+        NCConfiguration config_intern;
         std::atomic_bool quit;
         std::unordered_map<NCNodeID, std::chrono::time_point<std::chrono::steady_clock>> all_nodes;
         // In code use: const std::lock_guard<std::mutex> lock(server_mutex);
         std::mutex server_mutex;
+        NCMessageCodecServer server_codec_intern;
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);

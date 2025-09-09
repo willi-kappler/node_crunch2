@@ -38,7 +38,7 @@ class NCEncryption {
         NCEncryption& operator=(NCEncryption&&) = delete;
 
     private:
-        std::string const secret_key;
+        const std::string secret_key;
 };
 
 [[nodiscard]] std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message2(NCDecryptedMessage const& message, std::string const& secret_key);

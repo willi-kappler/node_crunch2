@@ -40,10 +40,10 @@ class NCConfiguration {
 
         // Default special member functions:
         NCConfiguration (NCConfiguration&&) = default;
+        NCConfiguration(const NCConfiguration&) = default;
 
         // Disable all other special member functions:
         NCConfiguration() = delete;
-        NCConfiguration(const NCConfiguration&) = delete;
         NCConfiguration& operator=(const NCConfiguration&) = delete;
         NCConfiguration& operator=(NCConfiguration&&) = delete;
 };

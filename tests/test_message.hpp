@@ -27,11 +27,11 @@ TEST_CASE("Encode / decode a message to the server", "[message]" ) {
     std::vector<uint8_t> const data(msg1.begin(), msg1.end());
     std::string const key1 = "12345678901234567890123456789012";
 
-    auto const encoded_message1 = nc_encode<NCEncodedMessageToServer>(message_type, node_id.id, data, key1);
+    auto const encoded_message1 = nc_encode2<NCEncodedMessageToServer>(message_type, node_id.id, data, key1);
     REQUIRE(encoded_message1.has_value() == true);
     REQUIRE(encoded_message1->data.size() == 186);
 
-    auto const decoded_message1 = nc_decode<NCDecodedMessageFromNode>(encoded_message1->data, key1);
+    auto const decoded_message1 = nc_decode2<NCDecodedMessageFromNode>(encoded_message1->data, key1);
     REQUIRE(decoded_message1.has_value() == true);
     REQUIRE(decoded_message1->data.size() == msg1.size());
     REQUIRE(decoded_message1->msg_type == message_type);
@@ -47,11 +47,11 @@ TEST_CASE("Encode / decode an empty message to the server", "[message]" ) {
     std::vector<uint8_t> const data;
     std::string const key1 = "12345678901234567890123456789012";
 
-    auto const encoded_message1 = nc_encode<NCEncodedMessageToServer>(message_type, node_id.id, data, key1);
+    auto const encoded_message1 = nc_encode2<NCEncodedMessageToServer>(message_type, node_id.id, data, key1);
     REQUIRE(encoded_message1.has_value() == true);
     REQUIRE(encoded_message1->data.size() == 99);
 
-    auto const decoded_message1 = nc_decode<NCDecodedMessageFromNode>(encoded_message1->data, key1);
+    auto const decoded_message1 = nc_decode2<NCDecodedMessageFromNode>(encoded_message1->data, key1);
     REQUIRE(decoded_message1.has_value() == true);
     REQUIRE(decoded_message1->data.size() == 0);
     REQUIRE(decoded_message1->msg_type == message_type);
@@ -65,11 +65,11 @@ TEST_CASE("Encode / decode a message to the node", "[message]" ) {
     std::vector<uint8_t> const data(msg1.begin(), msg1.end());
     std::string const key1 = "12345678901234567890123456789012";
 
-    auto const encoded_message1 = nc_encode<NCEncodedMessageToNode>(message_type, node_id, data, key1);
+    auto const encoded_message1 = nc_encode2<NCEncodedMessageToNode>(message_type, node_id, data, key1);
     REQUIRE(encoded_message1.has_value() == true);
     REQUIRE(encoded_message1->data.size() == 125);
 
-    auto const decoded_message1 = nc_decode<NCDecodedMessageFromServer>(encoded_message1->data, key1);
+    auto const decoded_message1 = nc_decode2<NCDecodedMessageFromServer>(encoded_message1->data, key1);
     REQUIRE(decoded_message1.has_value() == true);
     REQUIRE(decoded_message1->data.size() == msg1.size());
     REQUIRE(decoded_message1->msg_type == message_type);
@@ -84,11 +84,11 @@ TEST_CASE("Encode / decode an empty message to the node", "[message]" ) {
     std::vector<uint8_t> const data;
     std::string const key1 = "12345678901234567890123456789012";
 
-    auto const encoded_message1 = nc_encode<NCEncodedMessageToNode>(message_type, node_id, data, key1);
+    auto const encoded_message1 = nc_encode2<NCEncodedMessageToNode>(message_type, node_id, data, key1);
     REQUIRE(encoded_message1.has_value() == true);
     REQUIRE(encoded_message1->data.size() == 34);
 
-    auto const decoded_message1 = nc_decode<NCDecodedMessageFromServer>(encoded_message1->data, key1);
+    auto const decoded_message1 = nc_decode2<NCDecodedMessageFromServer>(encoded_message1->data, key1);
     REQUIRE(decoded_message1.has_value() == true);
     REQUIRE(decoded_message1->data.size() == 0);
     REQUIRE(decoded_message1->msg_type == message_type);
@@ -98,10 +98,10 @@ TEST_CASE("Generate heartbeat message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
 
-    auto const message1 = nc_gen_heartbeat_message(node_id, key);
+    auto const message1 = nc_gen_heartbeat_message2(node_id, key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_node(*message1, key);
+    auto const message2 = nc_decode_message_from_node2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::Heartbeat);
@@ -112,10 +112,10 @@ TEST_CASE("Generate heartbeat message", "[message]" ) {
 TEST_CASE("Generate heartbeat ok message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
 
-    auto const message1 = nc_gen_heartbeat_message_ok(key);
+    auto const message1 = nc_gen_heartbeat_message_ok2(key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_server(*message1, key);
+    auto const message2 = nc_decode_message_from_server2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::HeartbeatOK);
@@ -125,10 +125,10 @@ TEST_CASE("Generate heartbeat ok message", "[message]" ) {
 TEST_CASE("Generate heartbeat error message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
 
-    auto const message1 = nc_gen_heartbeat_message_error(key);
+    auto const message1 = nc_gen_heartbeat_message_error2(key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_server(*message1, key);
+    auto const message2 = nc_decode_message_from_server2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::HeartbeatError);
@@ -139,10 +139,10 @@ TEST_CASE("Generate init message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
 
-    auto const message1 = nc_gen_init_message(node_id, key);
+    auto const message1 = nc_gen_init_message2(node_id, key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_node(*message1, key);
+    auto const message2 = nc_decode_message_from_node2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::Init);
@@ -154,10 +154,10 @@ TEST_CASE("Generate init ok message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     std::vector<uint8_t> const data = {6, 7, 8, 9};
 
-    auto const message1 = nc_gen_init_message_ok(data, key);
+    auto const message1 = nc_gen_init_message_ok2(data, key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_server(*message1, key);
+    auto const message2 = nc_decode_message_from_server2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::InitOK);
@@ -167,10 +167,10 @@ TEST_CASE("Generate init ok message", "[message]" ) {
 TEST_CASE("Generate init error message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
 
-    auto const message1 = nc_gen_init_message_error(key);
+    auto const message1 = nc_gen_init_message_error2(key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_server(*message1, key);
+    auto const message2 = nc_decode_message_from_server2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::InitError);
@@ -182,10 +182,10 @@ TEST_CASE("Generate result message", "[message]" ) {
     NCNodeID const node_id = NCNodeID();
     std::vector<uint8_t> const data = {6, 7, 8, 9};
 
-    auto const message1 = nc_gen_result_message(node_id, data, key);
+    auto const message1 = nc_gen_result_message2(node_id, data, key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_node(*message1, key);
+    auto const message2 = nc_decode_message_from_node2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::NewResultFromNode);
@@ -197,10 +197,10 @@ TEST_CASE("Generate need more data message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
 
-    auto const message1 = nc_gen_need_more_data_message(node_id, key);
+    auto const message1 = nc_gen_need_more_data_message2(node_id, key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_node(*message1, key);
+    auto const message2 = nc_decode_message_from_node2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::NodeNeedsMoreData);
@@ -212,10 +212,10 @@ TEST_CASE("Generate new data from server message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     std::vector<uint8_t> const data = {6, 7, 8, 9};
 
-    auto const message1 = nc_gen_new_data_message(data, key);
+    auto const message1 = nc_gen_new_data_message2(data, key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_server(*message1, key);
+    auto const message2 = nc_decode_message_from_server2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::NewDataFromServer);
@@ -225,10 +225,10 @@ TEST_CASE("Generate new data from server message", "[message]" ) {
 TEST_CASE("Generate result ok message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
 
-    auto const message1 = nc_gen_result_ok_message(key);
+    auto const message1 = nc_gen_result_ok_message2(key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_server(*message1, key);
+    auto const message2 = nc_decode_message_from_server2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::ResultOK);
@@ -238,10 +238,10 @@ TEST_CASE("Generate result ok message", "[message]" ) {
 TEST_CASE("Generate quit message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
 
-    auto const message1 = nc_gen_quit_message(key);
+    auto const message1 = nc_gen_quit_message2(key);
     REQUIRE(message1.has_value() == true);
 
-    auto const message2 = nc_decode_message_from_server(*message1, key);
+    auto const message2 = nc_decode_message_from_server2(*message1, key);
     REQUIRE(message2.has_value() == true);
 
     REQUIRE(message2->msg_type == NCMessageType::Quit);

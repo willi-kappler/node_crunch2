@@ -25,7 +25,7 @@ TEST_CASE("Compress / decompress a message", "[compression]" ) {
     NCDecompressedMessage msg1r;
     msg1r.data.assign(msg1.begin(), msg1.end());
 
-    auto compressed_message1 = nc_compress_message(msg1r);
+    auto compressed_message1 = nc_compress_message2(msg1r);
     REQUIRE(compressed_message1.has_value() == true);
 
     REQUIRE(compressed_message1->data.size() == 99);
@@ -33,7 +33,7 @@ TEST_CASE("Compress / decompress a message", "[compression]" ) {
     uint32_t msg_size = nc_from_big_endian_bytes(compressed_message1->data);
     REQUIRE(msg_size == msg1.size());
 
-    auto decompressed_message1 = nc_decompress_message(NCCompressedMessage(compressed_message1->data));
+    auto decompressed_message1 = nc_decompress_message2(NCCompressedMessage(compressed_message1->data));
     REQUIRE(decompressed_message1.has_value() == true);
 
     REQUIRE(decompressed_message1->data.size() == msg1.size());

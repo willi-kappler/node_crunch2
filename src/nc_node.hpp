@@ -30,6 +30,7 @@ class NCNode {
     public:
         // Constructor:
         NCNode(NCConfiguration config);
+        // TODO: NCNode(NCConfiguration config, NCMessageCodedNode nc_message_codec);
 
         // Destructor:
         virtual ~NCNode() = default;
@@ -47,16 +48,14 @@ class NCNode {
         void nc_run();
 
     private:
-        std::string server_address;
-        uint16_t server_port;
-        uint16_t heartbeat_timeout;
-        std::string secret_key;
+        NCConfiguration config_intern;
         NCNodeID node_id;
         std::atomic_bool quit;
         // TODO: make this configurable:
         uint8_t max_error_count;
+        NCMessageCodecNode message_codec_intern;
 
-        [[nodiscard]] NCExpDecFromServer nc_send_msg_return_answer(NCExpEncToServer const& message,
+        [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const& message,
             tcp::socket &socket, tcp::resolver::results_type &endpoints) const;
         void nc_send_heartbeat();
 

@@ -16,7 +16,6 @@
 #include <expected>
 
 // Local includes:
-#include "nc_message_errors.hpp"
 #include "nc_message_types.hpp"
 
 namespace NodeCrunch2 {
@@ -40,10 +39,6 @@ class NCEncryption {
     private:
         const std::string secret_key;
 };
-
-[[nodiscard]] std::expected<NCEncryptedMessage, NCMessageError> nc_encrypt_message2(NCDecryptedMessage const& message, std::string const& secret_key);
-
-[[nodiscard]] std::expected<NCDecryptedMessage, NCMessageError> nc_decrypt_message2(NCEncryptedMessage const& message, std::string const &secret_key);
 }
 
 #endif // FILE_NC_ENCRYPTION_HPP_INCLUDED

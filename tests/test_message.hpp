@@ -26,18 +26,18 @@ TEST_CASE("Encode / decode a message to the server", "[message]" ) {
     std::string const msg1 = "Hello world, this is a test for encoding a message. Add some more content: test, test, test, test, test, test, test, test.";
     std::vector<uint8_t> const data(msg1.begin(), msg1.end());
     std::string const key1 = "12345678901234567890123456789012";
+    NCMessageCodecNode node_codec(node_id, key1);
+    NCMessageCodecServer server_codec(key1);
 
-    auto const encoded_message1 = nc_encode2<NCEncodedMessageToServer>(message_type, node_id.id, data, key1);
-    REQUIRE(encoded_message1.has_value() == true);
-    REQUIRE(encoded_message1->data.size() == 186);
+    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data);
+    REQUIRE(encoded_message1.data.size() == 186);
 
-    auto const decoded_message1 = nc_decode2<NCDecodedMessageFromNode>(encoded_message1->data, key1);
-    REQUIRE(decoded_message1.has_value() == true);
-    REQUIRE(decoded_message1->data.size() == msg1.size());
-    REQUIRE(decoded_message1->msg_type == message_type);
-    REQUIRE(decoded_message1->node_id.id == node_id.id);
+    auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
+    REQUIRE(decoded_message1.data.size() == msg1.size());
+    REQUIRE(decoded_message1.msg_type == message_type);
+    REQUIRE(decoded_message1.node_id.id == node_id.id);
 
-    std::string const msg2(decoded_message1->data.begin(), decoded_message1->data.end());
+    std::string const msg2(decoded_message1.data.begin(), decoded_message1.data.end());
     REQUIRE(msg2 == msg1);
 }
 

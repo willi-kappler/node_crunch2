@@ -13,6 +13,7 @@
 #include <cstdint>
 
 namespace NodeCrunch2 {
+/*
 enum struct NCMessageError: uint8_t {
     CipherContextError = 0,
     EncryptInitError,
@@ -35,6 +36,7 @@ enum struct NCMessageError: uint8_t {
     NetworkWriteError,
     NetworkReadError
 };
+*/
 }
 
 #endif // FILE_NC_MESSAGE_ERRORS_HPP_INCLUDED

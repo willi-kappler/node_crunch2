@@ -33,7 +33,7 @@ class NCMessageCodecBase {
         NCMessageCodecBase(NCCompressor compressor, NCEncryption encryption);
 
         // Default special member functions:
-        NCMessageCodecBase (NCMessageCodecBase&&) = default;
+        NCMessageCodecBase(NCMessageCodecBase&&) = default;
 
         // Disable all other special member functions:
         NCMessageCodecBase(const NCMessageCodecBase&) = delete;
@@ -60,7 +60,7 @@ class NCMessageCodecNode : NCMessageCodecBase {
         NCMessageCodecNode(NCNodeID const node_id, NCCompressor compressor, NCEncryption encryption);
 
         // Default special member functions:
-        NCMessageCodecNode (NCMessageCodecNode&&) = default;
+        NCMessageCodecNode(NCMessageCodecNode&&) = default;
 
         // Disable all other special member functions:
         NCMessageCodecNode(const NCMessageCodecNode&) = delete;
@@ -89,7 +89,7 @@ class NCMessageCodecServer : NCMessageCodecBase {
         NCMessageCodecServer(NCCompressor compressor, NCEncryption encryption);
 
         // Default special member functions:
-        NCMessageCodecServer (NCMessageCodecServer&&) = default;
+        NCMessageCodecServer(NCMessageCodecServer&&) = default;
 
         // Disable all other special member functions:
         NCMessageCodecServer(const NCMessageCodecServer&) = delete;

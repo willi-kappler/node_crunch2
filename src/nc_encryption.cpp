@@ -20,7 +20,6 @@
 
 namespace NodeCrunch2 {
 NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secret_key) {}
-NCEncryption::~NCEncryption() {}
 
 [[nodiscard]] NCEncryptedMessage NCEncryption::nc_encrypt_message(NCDecryptedMessage const& message) const {
     EVP_CIPHER_CTX* ctx = nullptr;

@@ -28,10 +28,10 @@ class NCCompressor {
         NCCompressor() = default;
 
         // Destructor:
-        virtual ~NCCompressor();
+        virtual ~NCCompressor() = default;
 
         // Default special member functions:
-        NCCompressor (NCCompressor&&) = default;
+        NCCompressor(NCCompressor&&) = default;
         NCCompressor(const NCCompressor&) = default;
 
         // Disable all other special member functions:
@@ -48,7 +48,7 @@ class NCNonCompressor: NCCompressor {
         NCNonCompressor() = default;
 
         // Default special member functions:
-        NCNonCompressor (NCNonCompressor&&) = default;
+        NCNonCompressor(NCNonCompressor&&) = default;
         NCNonCompressor(const NCNonCompressor&) = default;
 
         // Disable all other special member functions:

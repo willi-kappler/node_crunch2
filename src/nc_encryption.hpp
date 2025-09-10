@@ -28,10 +28,10 @@ class NCEncryption {
         NCEncryption(std::string const secret_key);
 
         // Destructor
-        virtual ~NCEncryption();
+        virtual ~NCEncryption() = default;
 
         // Default special member functions:
-        NCEncryption (NCEncryption&&) = default;
+        NCEncryption(NCEncryption&&) = default;
         NCEncryption(const NCEncryption&) = default;
 
         // Disable all other special member functions:
@@ -51,7 +51,7 @@ class NCNonEncryption: NCEncryption {
         NCNonEncryption(std::string const secret_key);
 
         // Default special member functions:
-        NCNonEncryption (NCNonEncryption&&) = default;
+        NCNonEncryption(NCNonEncryption&&) = default;
         NCNonEncryption(const NCNonEncryption&) = default;
 
         // Disable all other special member functions:

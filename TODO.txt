@@ -5,11 +5,14 @@
 - add test cases for communication (node <-> server)
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
-- use dependency injection for server class and node class
 - refactor network into a NCConnector class.
+- add empty connection class for testing.
+
 
 
 Done:
+# add empty compressor class and encryption class for testing.
+# use dependency injection for server class and node class
 # refactor compression and encryption into separate classes.
 # implement encryption for messages (openssl chacha20 poly1305)
 # add test cases for encryption

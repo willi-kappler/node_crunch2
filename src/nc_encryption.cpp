@@ -19,7 +19,8 @@
 #include "nc_exceptions.hpp"
 
 namespace NodeCrunch2 {
-NCEncryption::NCEncryption(std::string const secret_key2): secret_key(secret_key2) {}
+NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secret_key) {}
+NCEncryption::~NCEncryption() {}
 
 [[nodiscard]] NCEncryptedMessage NCEncryption::nc_encrypt_message(NCDecryptedMessage const& message) const {
     EVP_CIPHER_CTX* ctx = nullptr;
@@ -31,7 +32,7 @@ NCEncryption::NCEncryption(std::string const secret_key2): secret_key(secret_key
 
     // Initialize the encryption operation:
     if (1 != EVP_EncryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr,
-        reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
+        reinterpret_cast<const unsigned char *>(secret_key_intern.c_str()), nullptr)) {
         EVP_CIPHER_CTX_free(ctx);
         throw NCEncryptionException("Encrypt init error.");
     }
@@ -107,7 +108,7 @@ NCEncryption::NCEncryption(std::string const secret_key2): secret_key(secret_key
 
     // Initialize the decryption operation
     if (1 != EVP_DecryptInit_ex(ctx, EVP_chacha20_poly1305(), nullptr,
-        reinterpret_cast<const unsigned char *>(secret_key.c_str()), nullptr)) {
+        reinterpret_cast<const unsigned char *>(secret_key_intern.c_str()), nullptr)) {
         EVP_CIPHER_CTX_free(ctx);
         throw NCEncryptionException("Decrypt init error.");
     }
@@ -170,6 +171,17 @@ NCEncryption::NCEncryption(std::string const secret_key2): secret_key(secret_key
 
     return result;
 }
+
+NCNonEncryption::NCNonEncryption(std::string const secret_key): NCEncryption(secret_key) {}
+
+[[nodiscard]] NCEncryptedMessage NCNonEncryption::nc_encrypt_message(NCDecryptedMessage const& message) const {
+    return NCEncryptedMessage{{}, {}, message.data};
+}
+
+[[nodiscard]] NCDecryptedMessage NCNonEncryption::nc_decrypt_message(NCEncryptedMessage const& message) const {
+    return NCDecryptedMessage{message.data};
+}
+
 
 void nc_print_tag(std::vector<uint8_t> const& tag) {
     std::cout << "Tag: " << std::endl;

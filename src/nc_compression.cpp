@@ -15,7 +15,7 @@
 #include "nc_exceptions.hpp"
 
 namespace NodeCrunch2 {
-NCCompressor::NCCompressor(){}
+NCCompressor::~NCCompressor() {}
 
 [[nodiscard]] NCCompressedMessage NCCompressor::nc_compress_message(NCDecompressedMessage const& message) const {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());
@@ -54,4 +54,20 @@ NCCompressor::NCCompressor(){}
         throw NCDecompressionException();
     }
 }
+
+[[nodiscard]] NCCompressedMessage NCNonCompressor::nc_compress_message(NCDecompressedMessage const& message) const {
+    const uint32_t original_size = static_cast<uint32_t>(message.data.size());
+    std::vector<uint8_t> compressed_data(original_size + 4);
+    std::copy(message.data.cbegin(), message.data.cend(), compressed_data.begin() + 4);
+    nc_to_big_endian_bytes(original_size, compressed_data);
+    return NCCompressedMessage(compressed_data);
+}
+
+[[nodiscard]] NCDecompressedMessage NCNonCompressor::nc_decompress_message(NCCompressedMessage const& message) const {
+    const uint32_t original_size = nc_from_big_endian_bytes(message.data);
+    std::vector<uint8_t> decompressed_data(original_size);
+    std::copy(message.data.cbegin() + 4, message.data.cend(), decompressed_data.begin());
+    return NCDecompressedMessage{decompressed_data};
+}
+
 }

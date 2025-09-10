@@ -21,12 +21,14 @@
 namespace NodeCrunch2 {
 class NCCompressor {
     public:
-        [[nodiscard]] NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message) const;
-
-        [[nodiscard]] NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message) const;
+        [[nodiscard]] virtual NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message) const;
+        [[nodiscard]] virtual NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message) const;
 
         // Constructor:
-        NCCompressor();
+        NCCompressor() = default;
+
+        // Destructor:
+        virtual ~NCCompressor();
 
         // Default special member functions:
         NCCompressor (NCCompressor&&) = default;
@@ -36,6 +38,25 @@ class NCCompressor {
         NCCompressor& operator=(const NCCompressor&) = delete;
         NCCompressor& operator=(NCCompressor&&) = delete;
 };
+
+class NCNonCompressor: NCCompressor {
+    public:
+        [[nodiscard]] NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message) const override;
+        [[nodiscard]] NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message) const override;
+
+        // Constructor:
+        NCNonCompressor() = default;
+
+        // Default special member functions:
+        NCNonCompressor (NCNonCompressor&&) = default;
+        NCNonCompressor(const NCNonCompressor&) = default;
+
+        // Disable all other special member functions:
+        NCNonCompressor& operator=(const NCNonCompressor&) = delete;
+        NCNonCompressor& operator=(NCNonCompressor&&) = delete;
+
+};
+
 }
 
 #endif // FILE_NC_COMPRESSION_HPP_INCLUDED

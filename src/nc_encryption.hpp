@@ -21,12 +21,14 @@
 namespace NodeCrunch2 {
 class NCEncryption {
     public:
-        [[nodiscard]] NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const;
-
-        [[nodiscard]] NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage const& message) const;
+        [[nodiscard]] virtual NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const;
+        [[nodiscard]] virtual NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage const& message) const;
 
         // Constructor:
         NCEncryption(std::string const secret_key);
+
+        // Destructor
+        virtual ~NCEncryption();
 
         // Default special member functions:
         NCEncryption (NCEncryption&&) = default;
@@ -37,7 +39,24 @@ class NCEncryption {
         NCEncryption& operator=(NCEncryption&&) = delete;
 
     private:
-        const std::string secret_key;
+        const std::string secret_key_intern;
+};
+
+class NCNonEncryption: NCEncryption {
+    public:
+        [[nodiscard]] NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const override;
+        [[nodiscard]] NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage const& message) const override;
+
+        // Constructor:
+        NCNonEncryption(std::string const secret_key);
+
+        // Default special member functions:
+        NCNonEncryption (NCNonEncryption&&) = default;
+        NCNonEncryption(const NCNonEncryption&) = default;
+
+        // Disable all other special member functions:
+        NCNonEncryption& operator=(const NCNonEncryption&) = delete;
+        NCNonEncryption& operator=(NCNonEncryption&&) = delete;
 };
 }
 

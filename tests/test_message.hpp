@@ -68,7 +68,7 @@ TEST_CASE("Encode / decode a message to the node", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data);
-    REQUIRE(encoded_message1.data.size() == 125);
+    REQUIRE(encoded_message1.data.size() == 186);
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == msg1.size());
@@ -87,7 +87,7 @@ TEST_CASE("Encode / decode an empty message to the node", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data);
-    REQUIRE(encoded_message1.data.size() == 34);
+    REQUIRE(encoded_message1.data.size() == 99);
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == 0);

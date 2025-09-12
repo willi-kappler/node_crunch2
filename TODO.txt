@@ -7,7 +7,7 @@
 - add [[nodiscard]], noexcept, ... when needed.
 - refactor network into a NCConnector class.
 - add empty connection class for testing.
-
+- split enum NCMessageType into NCNodeMessageType and NCServerMessageType
 
 
 Done:

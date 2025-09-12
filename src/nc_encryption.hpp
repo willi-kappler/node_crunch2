@@ -22,7 +22,7 @@ namespace NodeCrunch2 {
 class NCEncryption {
     public:
         [[nodiscard]] virtual NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const;
-        [[nodiscard]] virtual NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage const& message) const;
+        [[nodiscard]] virtual NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage &message) const;
 
         // Constructor:
         NCEncryption(std::string const secret_key);
@@ -45,7 +45,7 @@ class NCEncryption {
 class NCNonEncryption: NCEncryption {
     public:
         [[nodiscard]] NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const override;
-        [[nodiscard]] NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage const& message) const override;
+        [[nodiscard]] NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage &message) const override;
 
         // Constructor:
         NCNonEncryption(std::string const secret_key);

@@ -17,15 +17,15 @@
 namespace NodeCrunch2 {
 [[nodiscard]] NCCompressedMessage NCCompressor::nc_compress_message(NCDecompressedMessage const& message) const {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());
-    const uint32_t max_compressed_size = LZ4_compressBound(original_size);
+    const size_t max_compressed_size = static_cast<size_t>(LZ4_compressBound(static_cast<int>(original_size)));
     std::vector<uint8_t> compressed_data(max_compressed_size + 4);
 
-    const int32_t compressed_size = LZ4_compress_default(
+    const size_t compressed_size = static_cast<size_t>(LZ4_compress_default(
         reinterpret_cast<const char*>(message.data.data()),
         reinterpret_cast<char*>(compressed_data.data() + 4),
         static_cast<int>(original_size),
-        max_compressed_size
-    );
+        static_cast<int>(max_compressed_size)
+    ));
 
     if (compressed_size > 0) {
         compressed_data.resize(compressed_size + 4);
@@ -43,7 +43,7 @@ namespace NodeCrunch2 {
         reinterpret_cast<const char*>(message.data.data() + 4),
         reinterpret_cast<char*>(decompressed_data.data()),
         static_cast<int>(message.data.size() - 4),
-        original_size
+        static_cast<int>(original_size)
     );
 
     if (decompressed_size > 0) {

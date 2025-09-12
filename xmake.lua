@@ -6,9 +6,20 @@ add_rules("mode.debug", "mode.release")
 --  
 
 
-set_warnings("error", "everything", "extra", "pedantic")
-add_cxxflags("-Wconversion", "-Wshadow")
--- -Wdouble-promotion
+set_warnings("error", "everything", "extra", "pedantic", "all")
+add_cxxflags("-Wconversion", "-Wshadow", "-Wsign-conversion", "-Wdouble-promotion", "-Wformat=2")
+add_cxxflags("-Wundef", "-Wcast-qual", "-Wcast-align=strict", "-Wnon-virtual-dtor", "-Wold-style-cast")
+add_cxxflags("-Woverloaded-virtual", "-Wunused", "-Wuninitialized", "-Winit-self")
+add_cxxflags("-Wredundant-decls", "-Wsuggest-override", "-Wimplicit-fallthrough=5", "-Walloca")
+-- add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
+
+-- -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow
+-- -Wdouble-promotion -Wformat=2 -Wundef -Wcast-qual -Wcast-align=strict
+-- -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual
+-- -Wnull-dereference -Wunused -Wuninitialized -Winit-self -Wswitch-enum -Wredundant-decls
+-- -Wsuggest-override -Wimplicit-fallthrough=5 -Walloca -Werror
+
+
 
 set_languages("c++23")
 set_version("0.1.0")

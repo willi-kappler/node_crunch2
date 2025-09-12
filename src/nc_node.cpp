@@ -136,28 +136,6 @@ void NCNode::nc_run() {
     nc_send_data(message.data, socket);
     NCEncodedMessageToNode message2{nc_receive_data(socket)};
     return message_codec_intern.nc_decode_message_from_server(message2);
-
-
-
-/*
-    return message.and_then([this, &socket, &endpoints](NCEncodedMessageToServer message2) mutable -> NCExpDecFromServer {
-        // Connect to the server
-        try {
-            // tcp::endpoint ep = asio::connect(socket, endpoints);
-            asio::connect(socket, endpoints);
-        } catch (const std::exception& e) {
-            spdlog::error("ASIO connect exception: {}", e.what());
-            return std::unexpected(NCMessageError::NetworkConnectError);
-        }
-
-        return nc_send_data(message2.data, socket).and_then([this, &socket] (uint8_t v) {
-            std::ignore = v;
-            return nc_receive_data(socket);
-        }).and_then([this](std::vector<uint8_t> raw_data){
-            return nc_message_codec.nc_decode_message_from_server(NCEncodedMessageToNode(raw_data));
-        });
-    });
-*/
 }
 
 void NCNode::nc_send_heartbeat() {

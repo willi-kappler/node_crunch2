@@ -11,6 +11,7 @@
 */
 // STD includes:
 #include <random>
+#include <cstdint>
 
 // Local includes:
 #include "nc_nodeid.hpp"
@@ -19,7 +20,7 @@ namespace NodeCrunch2 {
 const std::string NC_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 std::random_device nc_rd;
 std::mt19937 nc_gen(nc_rd());
-std::uniform_int_distribution nc_dis(0, static_cast<int>(NC_CHARACTERS.size()) - 1);
+std::uniform_int_distribution nc_dis(0, static_cast<int32_t>(NC_CHARACTERS.size()) - 1);
 
 NCNodeID::NCNodeID(): id(gen_id()) {}
 
@@ -27,7 +28,7 @@ NCNodeID::NCNodeID(): id(gen_id()) {}
     std::string result;
 
     for (size_t i = 0; i < NC_NODEID_LENGTH; i++) {
-        result += NC_CHARACTERS[nc_dis(nc_gen)];
+        result += NC_CHARACTERS[static_cast<size_t>(nc_dis(nc_gen))];
     }
 
     return result;

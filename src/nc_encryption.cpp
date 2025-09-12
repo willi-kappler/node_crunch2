@@ -59,20 +59,20 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
         throw NCEncryptionException("Set nonce error.");
     }
 
-    int32_t block_size = EVP_CIPHER_get_block_size(EVP_chacha20_poly1305());
+    size_t block_size = static_cast<size_t>(EVP_CIPHER_get_block_size(EVP_chacha20_poly1305()));
     // std::cout << "Block size: " << std::dec << block_size << std::endl;
 
     // Provide the message data to be encrypted:
     int32_t len = 0;
-    uint32_t const message_len = static_cast<uint32_t>(message.data.size());
+    size_t const message_len = message.data.size();
     // std::cout << "Message length: " << message_len << std::endl;
     // Ciphertext will be same size as message:
     result.data.resize(message_len + block_size);
-    if (1 != EVP_EncryptUpdate(ctx, result.data.data(), &len, message.data.data(), message_len)) {
+    if (1 != EVP_EncryptUpdate(ctx, result.data.data(), &len, message.data.data(), static_cast<int>(message_len))) {
         EVP_CIPHER_CTX_free(ctx);
         throw NCEncryptionException("Encrypt update error.");
     }
-    uint32_t ciphertext_len = len;
+    size_t ciphertext_len = static_cast<size_t>(len);
     // std::cout << "Ciphertext length 1: " << ciphertext_len << std::endl;
 
     // Finalize the encryption. This also generates the authentication tag:
@@ -81,7 +81,7 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
         throw NCEncryptionException("Encrypt final error.");
     }
     // Adjust size in case of any padding (though AEAD stream ciphers generally don't pad):
-    ciphertext_len += len;
+    ciphertext_len += static_cast<size_t>(len);
     // std::cout << "Ciphertext length 2: " << ciphertext_len << std::endl;
     result.data.resize(ciphertext_len);
 
@@ -97,7 +97,7 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
     return result;
 }
 
-[[nodiscard]] NCDecryptedMessage NCEncryption::nc_decrypt_message(NCEncryptedMessage const& message) const {
+[[nodiscard]] NCDecryptedMessage NCEncryption::nc_decrypt_message(NCEncryptedMessage &message) const {
     EVP_CIPHER_CTX* ctx = nullptr;
 
     // Create and initialize context:
@@ -129,27 +129,27 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
     // nc_print_tag(message.tag);
 
     // Set the expected authentication tag. This must be done BEFORE processing ciphertext:
-    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_TAG, NC_GCM_TAG_LENGTH, (void*) (message.tag.data()))) {
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_TAG, NC_GCM_TAG_LENGTH, message.tag.data())) {
         EVP_CIPHER_CTX_free(ctx);
         throw NCEncryptionException("Cipher set tag error.");
     }
 
-    int32_t const block_size = EVP_CIPHER_get_block_size(EVP_chacha20_poly1305());
+    size_t const block_size = static_cast<size_t>(EVP_CIPHER_get_block_size(EVP_chacha20_poly1305()));
 
     // std::cout << "block_size: " << block_size << "\n";
 
     // Provide the ciphertext data to be decrypted:
     NCDecryptedMessage result;
-    uint32_t const ciphertext_len = static_cast<uint32_t>(message.data.size());
+    size_t const ciphertext_len = message.data.size();
      // Plaintext will be same size as ciphertext:
     result.data.resize(ciphertext_len + block_size);
     int32_t len = 0;
-    if (1 != EVP_DecryptUpdate(ctx, result.data.data(), &len, message.data.data(), ciphertext_len)) {
+    if (1 != EVP_DecryptUpdate(ctx, result.data.data(), &len, message.data.data(), static_cast<int>(ciphertext_len))) {
         EVP_CIPHER_CTX_free(ctx);
         throw NCEncryptionException("Decrypt update error.");
     }
 
-    uint32_t plaintext_len = len;
+    size_t plaintext_len = static_cast<size_t>(len);
 
     // std::cout << "ciphertext_len: " << ciphertext_len << "\n";
     // std::cout << "plaintext_len: " << plaintext_len << "\n";
@@ -160,7 +160,7 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
         EVP_CIPHER_CTX_free(ctx);
         throw NCEncryptionException("Decrypt final error.");
     }
-    plaintext_len += len;
+    plaintext_len += static_cast<size_t>(len);
 
     // std::cout << "plaintext_len: " << plaintext_len << "\n";
 
@@ -177,7 +177,7 @@ NCNonEncryption::NCNonEncryption(std::string const secret_key): NCEncryption(sec
     return NCEncryptedMessage{{}, {}, message.data};
 }
 
-[[nodiscard]] NCDecryptedMessage NCNonEncryption::nc_decrypt_message(NCEncryptedMessage const& message) const {
+[[nodiscard]] NCDecryptedMessage NCNonEncryption::nc_decrypt_message(NCEncryptedMessage &message) const {
     return NCDecryptedMessage{message.data};
 }
 

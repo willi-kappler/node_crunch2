@@ -14,18 +14,15 @@
 #include <vector>
 #include <string>
 #include <expected>
+#include <mutex>
 #include <atomic>
-
-// External includes:
-#include <asio.hpp>
 
 // Local includes:
 #include "nc_config.hpp"
 #include "nc_message.hpp"
+#include "nc_network.hpp"
 
 namespace NodeCrunch2 {
-using asio::ip::tcp;
-
 class NCNode {
     public:
         // Constructor:
@@ -54,9 +51,10 @@ class NCNode {
         // TODO: make this configurable:
         uint8_t max_error_count;
         NCMessageCodecNode message_codec_intern;
+        NCNetworkClient network_client_intern;
+        std::mutex node_mutex;
 
-        [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const& message,
-            tcp::socket &socket, tcp::resolver::results_type &endpoints) const;
+        [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const& message);
         void nc_send_heartbeat();
 
         // Must be implemented by the user:

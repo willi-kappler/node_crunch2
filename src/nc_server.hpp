@@ -21,6 +21,7 @@
 #include "nc_config.hpp"
 #include "nc_nodeid.hpp"
 #include "nc_message.hpp"
+#include "nc_network.hpp"
 
 namespace NodeCrunch2 {
 class NCServer {
@@ -53,7 +54,7 @@ class NCServer {
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);
-        void nc_handle_node(tcp::socket& sock);
+        void nc_handle_node(NCNetworkSocket& sock);
         void nc_check_heartbeat();
         bool nc_valid_node_id(NCNodeID node_id);
 

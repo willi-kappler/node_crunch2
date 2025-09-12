@@ -31,7 +31,9 @@ NCNode::NCNode(NCConfiguration config):
     node_id(NCNodeID()),
     quit(false),
     max_error_count(5),
-    message_codec_intern(NCMessageCodecNode(node_id, config.secret_key))
+    message_codec_intern(NCMessageCodecNode(node_id, config.secret_key)),
+    network_client_intern(config.server_address, config.server_port),
+    node_mutex()
     {}
 
 void NCNode::nc_run() {
@@ -40,11 +42,6 @@ void NCNode::nc_run() {
     NCEncodedMessageToServer const need_more_data_message = message_codec_intern.nc_gen_need_more_data_message();
     // TODO: make this configurable:
     auto const sleep_time = std::chrono::seconds(60);
-
-    asio::io_context io_context;
-    tcp::resolver resolver(io_context);
-    tcp::socket socket(io_context);
-    tcp::resolver::results_type endpoints = resolver.resolve(config_intern.server_address, std::to_string(config_intern.server_port));
 
     uint8_t error_counter = 0;
     NCDecodedMessageFromServer result;
@@ -60,16 +57,16 @@ void NCNode::nc_run() {
             switch (run_state) {
                 case NCRunState::Init:
                     spdlog::debug("Init state, send init message");
-                    result = nc_send_msg_return_answer(init_message, socket, endpoints);
+                    result = nc_send_msg_return_answer(init_message);
                 break;
                 case NCRunState::NeedData:
                     spdlog::debug("Need data state, send need more data message");
-                    result = nc_send_msg_return_answer(need_more_data_message, socket, endpoints);
+                    result = nc_send_msg_return_answer(need_more_data_message);
                 break;
                 case NCRunState::HasData:
                     spdlog::debug("Has data state, send result message");
                     result_message = message_codec_intern.nc_gen_result_message(new_data);
-                    result = nc_send_msg_return_answer(result_message, socket, endpoints);
+                    result = nc_send_msg_return_answer(result_message);
                 break;
                 default:
                     // Unknown state, should not happen, quit now.
@@ -130,11 +127,11 @@ void NCNode::nc_run() {
     spdlog::info("Will exit now.");
 }
 
-[[nodiscard]] NCDecodedMessageFromServer NCNode::nc_send_msg_return_answer(NCEncodedMessageToServer const& message,
-        tcp::socket &socket, tcp::resolver::results_type &endpoints) const {
-    asio::connect(socket, endpoints);
-    nc_send_data(message.data, socket);
-    NCEncodedMessageToNode message2{nc_receive_data(socket)};
+[[nodiscard]] NCDecodedMessageFromServer NCNode::nc_send_msg_return_answer(NCEncodedMessageToServer const& message) {
+    const std::lock_guard<std::mutex> lock(node_mutex);
+    NCNetworkSocket socket = network_client_intern.nc_connect();
+    socket.nc_send_data(message.data);
+    NCEncodedMessageToNode message2{socket.nc_receive_data()};
     return message_codec_intern.nc_decode_message_from_server(message2);
 }
 
@@ -145,16 +142,10 @@ void NCNode::nc_send_heartbeat() {
     uint8_t error_counter = 0;
     NCDecodedMessageFromServer result;
 
-    asio::io_context io_context;
-    asio::ip::tcp::resolver resolver(io_context);
-    asio::ip::tcp::socket socket(io_context);
-    asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(
-        config_intern.server_address, std::to_string(config_intern.server_port));
-
     while (!quit.load()) {
         std::this_thread::sleep_for(sleep_time);
         try {
-            result = nc_send_msg_return_answer(heartbeat_message, socket, endpoints);
+            result = nc_send_msg_return_answer(heartbeat_message);
         } catch (std::exception &e) {
             error_counter++;
             spdlog::error("Caught exception: {}", e.what());

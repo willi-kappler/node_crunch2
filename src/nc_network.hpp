@@ -16,9 +16,9 @@
 // External includes:
 #include <asio.hpp>
 
+namespace NodeCrunch2 {
 using asio::ip::tcp;
 
-namespace NodeCrunch2 {
 void nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket);
 [[nodiscard]] std::vector<uint8_t> nc_receive_data(tcp::socket& socket);
 
@@ -26,8 +26,10 @@ class NCNetworkSocket {
     public:
         virtual void nc_send_data(std::vector<uint8_t> const data);
         [[nodiscard]] virtual std::vector<uint8_t> nc_receive_data();
+        [[nodiscard]] virtual std::string nc_address();
 
         // Constructor:
+        NCNetworkSocket();
         NCNetworkSocket(tcp::socket &socket);
 
         // Destructor:
@@ -36,10 +38,10 @@ class NCNetworkSocket {
         // Default special member functions:
         NCNetworkSocket(NCNetworkSocket&&) = default;
         NCNetworkSocket(const NCNetworkSocket&) = default;
+        NCNetworkSocket& operator=(const NCNetworkSocket&) = default;
+        NCNetworkSocket& operator=(NCNetworkSocket&&) = default;
 
         // Disable all other special member functions:
-        NCNetworkSocket& operator=(const NCNetworkSocket&) = delete;
-        NCNetworkSocket& operator=(NCNetworkSocket&&) = delete;
 
     private:
         tcp::socket socket_intern;

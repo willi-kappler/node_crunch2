@@ -13,7 +13,6 @@
 
 // External includes:
 #include <spdlog/spdlog.h>
-#include <asio.hpp>
 
 // Local includes:
 #include "nc_network.hpp"
@@ -22,8 +21,6 @@
 #include "nc_util.hpp"
 
 namespace NodeCrunch2 {
-using asio::ip::tcp;
-
 NCServer::NCServer(NCConfiguration config):
     config_intern(config),
     quit(false),
@@ -38,9 +35,8 @@ void NCServer::nc_run() {
     // Make threahsold configurable
     const uint32_t max_thread_count = 10;
 
-    asio::io_context io_context;
-    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), config_intern.server_port));
-    tcp::socket sock(io_context);
+    NCNetworkServer network_server(config_intern.server_port);
+    NCNetworkSocket socket;
 
     // Have to use lambda in order to call non-static method:
     std::thread heartbeat_thread([this] () {nc_check_heartbeat();});
@@ -51,14 +47,14 @@ void NCServer::nc_run() {
     while (!quit.load()) {
         // Wait for a client to connect
         try {
-            acceptor.accept(sock);
+            socket = network_server.nc_accept();
         } catch (asio::system_error &e) {
             spdlog::error("Could not accept connection from socket: {}", e.what());
             quit.store(true);
             continue;
         }
 
-        client_threads.emplace([this] (auto sock2) {nc_handle_node(sock2);}, std::move(sock));
+        client_threads.emplace([this] (auto sock2) {nc_handle_node(sock2);}, std::move(socket));
 
         if (client_threads.size() > max_thread_count) {
             client_threads.front().join();
@@ -112,10 +108,11 @@ void NCServer::nc_update_node_time(NCNodeID node_id) {
     all_nodes[node_id] = node_time;
 }
 
-void NCServer::nc_handle_node(tcp::socket& sock) {
-    spdlog::debug("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
+void NCServer::nc_handle_node(NCNetworkSocket& socket) {
+    //spdlog::debug("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
+    spdlog::debug("NCServer::nc_handle_node(), ip: {}", socket.nc_address());
     //uint8_t quit_counter;
-    std::vector<uint8_t> message = nc_receive_data(sock);
+    std::vector<uint8_t> message = socket.nc_receive_data();
     NCDecodedMessageFromNode node_message = server_codec_intern.nc_decode_message_from_node(NCEncodedMessageToServer(message));
     NCNodeID const node_id = node_message.node_id;
 
@@ -131,14 +128,14 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
         case NCNodeMessageType::NodeNeedsMoreData:
             if (nc_valid_node_id(node_id)) {
                 NCEncodedMessageToNode msg_to_node = server_codec_intern.nc_gen_new_data_message(nc_get_new_data(node_id));
-                nc_send_data(msg_to_node.data, sock);
+                socket.nc_send_data(msg_to_node.data);
             }
         break;
         case NCNodeMessageType::NewResultFromNode:
             if (nc_valid_node_id(node_id)) {
                 nc_process_result(node_id, node_message.data);
                 NCEncodedMessageToNode msg_to_node = server_codec_intern.nc_gen_result_ok_message();
-                nc_send_data(msg_to_node.data, sock);
+                socket.nc_send_data(msg_to_node.data);
             }
         break;
         default:

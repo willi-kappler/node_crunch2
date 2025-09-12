@@ -14,29 +14,6 @@
 #include "nc_network.hpp"
 
 namespace NodeCrunch2 {
-void nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket) {
-    uint32_t data_size = static_cast<uint32_t>(data.size());
-    std::array<uint8_t, 4> size_bytes;
-    nc_to_big_endian_bytes(data_size, size_bytes);
-
-    asio::write(socket, asio::buffer(size_bytes));
-    asio::write(socket, asio::buffer(data));
-}
-
-[[nodiscard]] std::vector<uint8_t> nc_receive_data(tcp::socket& socket) {
-    std::array<uint8_t, 4> size_bytes;
-
-    asio::read(socket, asio::buffer(size_bytes));
-    uint32_t data_size = nc_from_big_endian_bytes(size_bytes);
-
-    std::vector<uint8_t> result(data_size);
-    if (data_size > 0) {
-        asio::read(socket, asio::buffer(result));
-    }
-
-    return result;
-}
-
 void NCNetworkSocket::nc_send_data(std::vector<uint8_t> const data) {
     uint32_t data_size = static_cast<uint32_t>(data.size());
     std::array<uint8_t, 4> size_bytes;
@@ -60,7 +37,13 @@ void NCNetworkSocket::nc_send_data(std::vector<uint8_t> const data) {
     return result;
 }
 
+[[nodiscard]] std::string NCNetworkSocket::nc_address() {
+    return socket_intern.remote_endpoint().address().to_string();
+}
+
 NCNetworkSocket::NCNetworkSocket(tcp::socket &socket): socket_intern(std::move(socket)) {}
+
+NCNetworkSocket::NCNetworkSocket(): socket_intern([](){asio::io_context io_context_local; return tcp::socket(io_context_local); }()) {}
 
 NCNetworkSocket NCNetworkClient::nc_connect() {
     tcp::socket socket(io_context_intern);

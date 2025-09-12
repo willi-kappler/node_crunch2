@@ -6,7 +6,6 @@
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
 - add empty connection class for testing.
-- refactor network into a NCConnector class.
 
 
 Done:
@@ -20,3 +19,4 @@ Done:
 # use dependency injection for server class and node class
 # add empty compressor class and encryption class for testing.
 # split enum NCMessageType into NCNodeMessageType and NCServerMessageType
+# refactor network into a NCConnector class.

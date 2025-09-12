@@ -120,98 +120,30 @@ void NCServer::nc_handle_node(tcp::socket& sock) {
     NCNodeID const node_id = node_message.node_id;
 
     switch (node_message.msg_type) {
-        case NCMessageType::Init:
+        case NCNodeMessageType::Init:
             nc_register_new_node(node_id);
         break;
-        case NCMessageType::Heartbeat:
+        case NCNodeMessageType::Heartbeat:
             if (nc_valid_node_id(node_id)) {
                 nc_update_node_time(node_id);
             }
         break;
-        case NCMessageType::NodeNeedsMoreData:
+        case NCNodeMessageType::NodeNeedsMoreData:
             if (nc_valid_node_id(node_id)) {
                 NCEncodedMessageToNode msg_to_node = server_codec_intern.nc_gen_new_data_message(nc_get_new_data(node_id));
                 nc_send_data(msg_to_node.data, sock);
-
-                /*
-                nc_gen_new_data_message(nc_get_new_data(node_id),
-                    secret_key).and_then([&sock] (NCEncodedMessageToNode msg_to_node) {
-                    return nc_send_data(msg_to_node.data, sock);
-                }).or_else([] (NCMessageError msg_error) {
-                    spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
-                    return std::expected<uint8_t, NCMessageError>(0);
-                });
-                */
             }
         break;
-        case NCMessageType::NewResultFromNode:
+        case NCNodeMessageType::NewResultFromNode:
             if (nc_valid_node_id(node_id)) {
                 nc_process_result(node_id, node_message.data);
                 NCEncodedMessageToNode msg_to_node = server_codec_intern.nc_gen_result_ok_message();
                 nc_send_data(msg_to_node.data, sock);
-
-                /*
-                nc_gen_result_ok_message(secret_key).and_then([&sock] (NCEncodedMessageToNode msg_to_node) {
-                    return nc_send_data(msg_to_node.data, sock);
-                }).or_else([] (NCMessageError msg_error) {
-                    spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
-                    return std::expected<uint8_t, NCMessageError>(0);
-                });
-                */
             }
         break;
         default:
             spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
     }
-
-
-/*
-    nc_receive_data(sock).and_then([this, &sock](std::vector<uint8_t> message) {
-        return nc_decode_message_from_node(NCEncodedMessageToServer(message), secret_key);
-    }).and_then([this, &sock] (NCDecodedMessageFromNode node_message) {
-        NCNodeID const node_id = node_message.node_id;
-
-        switch (node_message.msg_type) {
-            case NCMessageType::Init:
-                nc_register_new_node(node_id);
-            break;
-            case NCMessageType::Heartbeat:
-                if (nc_valid_node_id(node_id)) {
-                    nc_update_node_time(node_id);
-                }
-            break;
-            case NCMessageType::NodeNeedsMoreData:
-                if (nc_valid_node_id(node_id)) {
-                    nc_gen_new_data_message(nc_get_new_data(node_id),
-                        secret_key).and_then([&sock] (NCEncodedMessageToNode msg_to_node) {
-                        return nc_send_data(msg_to_node.data, sock);
-                    }).or_else([] (NCMessageError msg_error) {
-                        spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
-                        return std::expected<uint8_t, NCMessageError>(0);
-                    });
-                }
-            break;
-            case NCMessageType::NewResultFromNode:
-                if (nc_valid_node_id(node_id)) {
-                    nc_process_result(node_id, node_message.data);
-                    nc_gen_result_ok_message(secret_key).and_then([&sock] (NCEncodedMessageToNode msg_to_node) {
-                        return nc_send_data(msg_to_node.data, sock);
-                    }).or_else([] (NCMessageError msg_error) {
-                        spdlog::error("Error while sending data to node: {}", nc_error_to_str(msg_error));
-                        return std::expected<uint8_t, NCMessageError>(0);
-                    });
-                }
-            break;
-            default:
-                spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
-        }
-
-        return std::expected<uint8_t, NCMessageError>(0);
-    }).or_else([] (NCMessageError msg_error) {
-        spdlog::error("Error while handleing node: {}", nc_error_to_str(msg_error));
-        return std::expected<uint8_t, NCMessageError>(0);
-    });
-*/
 }
 
 void NCServer::nc_check_heartbeat() {

@@ -47,7 +47,7 @@ class NCMessageCodecBase {
 
 class NCMessageCodecNode : NCMessageCodecBase {
     public:
-        [[nodiscard]] NCEncodedMessageToServer nc_encode_message_to_server(NCMessageType const msg_type, std::vector<uint8_t> const& data) const;
+        [[nodiscard]] NCEncodedMessageToServer nc_encode_message_to_server(NCNodeMessageType const msg_type, std::vector<uint8_t> const& data) const;
         [[nodiscard]] NCDecodedMessageFromServer nc_decode_message_from_server(NCEncodedMessageToNode const& message) const;
 
         [[nodiscard]] NCEncodedMessageToServer nc_gen_heartbeat_message() const;
@@ -73,7 +73,7 @@ class NCMessageCodecNode : NCMessageCodecBase {
 
 class NCMessageCodecServer : NCMessageCodecBase {
     public:
-        [[nodiscard]] NCEncodedMessageToNode nc_encode_message_to_node(NCMessageType const msg_type, std::vector<uint8_t> const& data) const;
+        [[nodiscard]] NCEncodedMessageToNode nc_encode_message_to_node(NCServerMessageType const msg_type, std::vector<uint8_t> const& data) const;
         [[nodiscard]] NCDecodedMessageFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message) const;
 
         [[nodiscard]] NCEncodedMessageToNode nc_gen_heartbeat_message_ok() const;

@@ -17,17 +17,22 @@
 #include "nc_nodeid.hpp"
 
 namespace NodeCrunch2 {
-enum struct NCMessageType: uint8_t {
+enum struct NCNodeMessageType: uint8_t {
     Unknown = 0,
     Heartbeat,
+    Init,
+    NewResultFromNode,
+    NodeNeedsMoreData,
+    ConnectionError,
+};
+
+enum struct NCServerMessageType: uint8_t {
+    Unknown = 0,
     HeartbeatOK,
     HeartbeatError,
-    Init,
     InitOK,
     InitError,
     NewDataFromServer,
-    NewResultFromNode,
-    NodeNeedsMoreData,
     ResultOK,
     ConnectionError,
     Quit
@@ -63,13 +68,13 @@ struct NCEncodedMessageToNode {
 };
 
 struct NCDecodedMessageFromNode {
-    NCMessageType msg_type = NCMessageType::Unknown;
+    NCNodeMessageType msg_type = NCNodeMessageType::Unknown;
     NCNodeID node_id = NCNodeID();
     std::vector<uint8_t> data = {};
 };
 
 struct NCDecodedMessageFromServer {
-    NCMessageType msg_type = NCMessageType::Unknown;
+    NCServerMessageType msg_type = NCServerMessageType::Unknown;
     std::vector<uint8_t> data = {};
 };
 }

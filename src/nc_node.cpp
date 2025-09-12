@@ -83,30 +83,30 @@ void NCNode::nc_run() {
         }
 
         switch (result.msg_type) {
-            case NCMessageType::InitOK:
+            case NCServerMessageType::InitOK:
                 spdlog::debug("InitOK from server.");
                 nc_init(result.data);
                 run_state = NCRunState::NeedData;
             break;
-            case NCMessageType::InitError:
+            case NCServerMessageType::InitError:
                 // Error at initialisation.
                 error_counter++;
                 spdlog::error("InitError from server, error counter: {}", error_counter);
                 std::this_thread::sleep_for(sleep_time);
             break;
-            case NCMessageType::NewDataFromServer:
+            case NCServerMessageType::NewDataFromServer:
                 // Received new data from server.
                 spdlog::debug("New data from server.");
                 new_data = nc_process_data(result.data);
                 run_state = NCRunState::HasData;
             break;
-            case NCMessageType::ResultOK:
+            case NCServerMessageType::ResultOK:
                 // Result was accepted by server.
                 // Request more data.
                 spdlog::debug("ResultOK from server.");
                 run_state = NCRunState::NeedData;
             break;
-            case NCMessageType::Quit:
+            case NCServerMessageType::Quit:
                 // Job is done.
                 spdlog::info("Quit from server, will exit now.");
                 quit.store(true);
@@ -161,16 +161,16 @@ void NCNode::nc_send_heartbeat() {
         }
 
         switch (result.msg_type) {
-            case NCMessageType::HeartbeatOK:
+            case NCServerMessageType::HeartbeatOK:
                 spdlog::debug("HeartbeatOK from server.");
                 // Everything OK, nothing to do.
             break;
-            case NCMessageType::HeartbeatError:
+            case NCServerMessageType::HeartbeatError:
                 // Heartbeat was not sent in time.
                 error_counter++;
                 spdlog::error("HeartbetaError from server, error counter: {}", error_counter);
             break;
-            case NCMessageType::Quit:
+            case NCServerMessageType::Quit:
                 // Job is done, so we can quit.
                 spdlog::info("Quit from server, will exit now.");
                 quit.store(true);

@@ -32,51 +32,67 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     return result;
 }
 
-[[nodiscard]] std::string nc_type_to_string(NCMessageType const& msg_type) {
+[[nodiscard]] std::string nc_type_to_string(NCNodeMessageType const& msg_type) {
     std::string result = "Unknown type";
 
     switch (msg_type) {
-        case NCMessageType::Unknown:
+        case NCNodeMessageType::Unknown:
             result = "Unknown";
         break;
-        case NCMessageType::Heartbeat:
+        case NCNodeMessageType::Heartbeat:
             result = "Heartbeat";
         break;
-        case NCMessageType::HeartbeatOK:
-            result = "HeartbeatOK";
-        break;
-        case NCMessageType::HeartbeatError:
-            result = "HeartbeatError";
-        break;
-        case NCMessageType::Init:
+        case NCNodeMessageType::Init:
             result = "Init";
         break;
-        case NCMessageType::InitOK:
-            result = "InitOK";
-        break;
-        case NCMessageType::InitError:
-            result = "InitError";
-        break;
-        case NCMessageType::NewDataFromServer:
-            result = "NewDataFromServer";
-        break;
-        case NCMessageType::NewResultFromNode:
+        case NCNodeMessageType::NewResultFromNode:
             result = "NewResultFromNode";
         break;
-        case NCMessageType::NodeNeedsMoreData:
+        case NCNodeMessageType::NodeNeedsMoreData:
             result = "NodeNeedsMoreData";
         break;
-        case NCMessageType::ResultOK:
-            result = "ResultOK";
-        break;
-        case NCMessageType::ConnectionError:
+        case NCNodeMessageType::ConnectionError:
             result = "ConnectionError";
         break;
-        case NCMessageType::Quit:
+    }
+
+    return result;
+}
+
+[[nodiscard]] std::string nc_type_to_string(NCServerMessageType const& msg_type) {
+    std::string result = "Unknown type";
+
+    switch (msg_type) {
+        case NCServerMessageType::Unknown:
+            result = "Unknown";
+        break;
+        case NCServerMessageType::HeartbeatOK:
+            result = "HeartbeatOK";
+        break;
+        case NCServerMessageType::HeartbeatError:
+            result = "HeartbeatError";
+        break;
+        case NCServerMessageType::InitOK:
+            result = "InitOK";
+        break;
+        case NCServerMessageType::InitError:
+            result = "InitError";
+        break;
+        case NCServerMessageType::NewDataFromServer:
+            result = "NewDataFromServer";
+        break;
+        case NCServerMessageType::ResultOK:
+            result = "ResultOK";
+        break;
+        case NCServerMessageType::ConnectionError:
+            result = "ConnectionError";
+        break;
+        case NCServerMessageType::Quit:
             result = "Quit";
         break;
     }
 
     return result;
 }
+
 }

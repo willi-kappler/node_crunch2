@@ -75,7 +75,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     node_id_intern(node_id) {}
 
 [[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_encode_message_to_server(
-    NCMessageType const msg_type, std::vector<uint8_t> const& data) const {
+    NCNodeMessageType const msg_type, std::vector<uint8_t> const& data) const {
     // 1. Encode message:
     NCDecompressedMessage decompressed_message;
 
@@ -106,7 +106,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     // 4. Decode message:
     NCDecodedMessageFromServer result;
     // Decode message type:
-    result.msg_type = static_cast<NCMessageType>(decompressed_message.data[0]);
+    result.msg_type = static_cast<NCServerMessageType>(decompressed_message.data[0]);
     auto m_begin = decompressed_message.data.cbegin() + 1;
 
     // Decode the actual data, if any:
@@ -123,7 +123,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::Heartbeat, {});
+    return nc_encode_message_to_server(NCNodeMessageType::Heartbeat, {});
 }
 
 [[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_init_message() const {
@@ -135,7 +135,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::Init, {});
+    return nc_encode_message_to_server(NCNodeMessageType::Init, {});
 }
 
 [[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_result_message(
@@ -148,7 +148,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::NewResultFromNode, new_data);
+    return nc_encode_message_to_server(NCNodeMessageType::NewResultFromNode, new_data);
 }
 
 [[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_need_more_data_message() const {
@@ -160,7 +160,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCMessageType::NodeNeedsMoreData, {});
+    return nc_encode_message_to_server(NCNodeMessageType::NodeNeedsMoreData, {});
 }
 
 NCMessageCodecServer::NCMessageCodecServer(std::string const secret_key):
@@ -170,7 +170,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     NCMessageCodecBase(nc_compressor2, nc_encryption2) {}
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_encode_message_to_node(
-    NCMessageType const msg_type, std::vector<uint8_t> const& data) const {
+    NCServerMessageType const msg_type, std::vector<uint8_t> const& data) const {
     // 1. Encode message:
     NCDecompressedMessage decompressed_message;
 
@@ -197,7 +197,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     // 4. Decode message:
     NCDecodedMessageFromNode result;
     // Decode message type:
-    result.msg_type = static_cast<NCMessageType>(decompressed_message.data[0]);
+    result.msg_type = static_cast<NCNodeMessageType>(decompressed_message.data[0]);
     auto m_begin = decompressed_message.data.cbegin() + 1;
 
     // Decode node id:
@@ -219,7 +219,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::HeartbeatOK, {});
+    return nc_encode_message_to_node(NCServerMessageType::HeartbeatOK, {});
 }
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_heartbeat_message_error() const {
@@ -231,7 +231,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::HeartbeatError, {});
+    return nc_encode_message_to_node(NCServerMessageType::HeartbeatError, {});
 }
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_init_message_ok(
@@ -244,7 +244,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::InitOK, init_data);
+    return nc_encode_message_to_node(NCServerMessageType::InitOK, init_data);
 }
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_init_message_error() const {
@@ -255,7 +255,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::InitError, {});
+    return nc_encode_message_to_node(NCServerMessageType::InitError, {});
 }
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_new_data_message(
@@ -267,7 +267,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::NewDataFromServer, new_data);
+    return nc_encode_message_to_node(NCServerMessageType::NewDataFromServer, new_data);
 }
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_result_ok_message() const {
@@ -279,7 +279,7 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_node(NCMessageType::ResultOK, {});
+    return nc_encode_message_to_node(NCServerMessageType::ResultOK, {});
 }
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_quit_message() const {
@@ -293,6 +293,6 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     the quit message yet.
     */
 
-    return nc_encode_message_to_node(NCMessageType::Quit, {});
+    return nc_encode_message_to_node(NCServerMessageType::Quit, {});
 }
 }

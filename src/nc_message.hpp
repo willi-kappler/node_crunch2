@@ -30,14 +30,14 @@ class NCMessageCodecBase {
 
         // Constructor:
         NCMessageCodecBase(std::string const secret_key);
-        NCMessageCodecBase(NCCompressor compressor, NCEncryption encryption);
+        NCMessageCodecBase(NCCompressor const compressor, NCEncryption const encryption);
 
         // Default special member functions:
         NCMessageCodecBase(NCMessageCodecBase&&) = default;
+        NCMessageCodecBase(const NCMessageCodecBase&) = default;
+        NCMessageCodecBase& operator=(const NCMessageCodecBase&) = default;
 
         // Disable all other special member functions:
-        NCMessageCodecBase(const NCMessageCodecBase&) = delete;
-        NCMessageCodecBase& operator=(const NCMessageCodecBase&) = delete;
         NCMessageCodecBase& operator=(NCMessageCodecBase&&) = delete;
 
     private:
@@ -45,33 +45,33 @@ class NCMessageCodecBase {
         const NCEncryption encryption_intern;
 };
 
-class NCMessageCodecNode : NCMessageCodecBase {
+class NCMessageCodecNode: NCMessageCodecBase {
     public:
-        [[nodiscard]] NCEncodedMessageToServer nc_encode_message_to_server(NCNodeMessageType const msg_type, std::vector<uint8_t> const& data) const;
-        [[nodiscard]] NCDecodedMessageFromServer nc_decode_message_from_server(NCEncodedMessageToNode const& message) const;
+        [[nodiscard]] NCEncodedMessageToServer nc_encode_message_to_server(
+            NCNodeMessageType const msg_type, std::vector<uint8_t> const& data, NCNodeID const node_id) const;
+        [[nodiscard]] NCDecodedMessageFromServer nc_decode_message_from_server(
+            NCEncodedMessageToNode const& message) const;
 
-        [[nodiscard]] NCEncodedMessageToServer nc_gen_heartbeat_message() const;
-        [[nodiscard]] NCEncodedMessageToServer nc_gen_init_message() const;
-        [[nodiscard]] NCEncodedMessageToServer nc_gen_result_message(std::vector<uint8_t> const& new_data) const;
-        [[nodiscard]] NCEncodedMessageToServer nc_gen_need_more_data_message() const;
+        [[nodiscard]] NCEncodedMessageToServer nc_gen_heartbeat_message(NCNodeID const node_id) const;
+        [[nodiscard]] NCEncodedMessageToServer nc_gen_init_message(NCNodeID const node_id) const;
+        [[nodiscard]] NCEncodedMessageToServer nc_gen_result_message(
+            std::vector<uint8_t> const& new_data, NCNodeID const node_id) const;
+        [[nodiscard]] NCEncodedMessageToServer nc_gen_need_more_data_message(NCNodeID const node_id) const;
 
         // Constructor:
-        NCMessageCodecNode(NCNodeID const node_id, std::string const secret_key);
-        NCMessageCodecNode(NCNodeID const node_id, NCCompressor compressor, NCEncryption encryption);
+        NCMessageCodecNode(std::string const secret_key);
+        NCMessageCodecNode(NCCompressor const compressor, NCEncryption const encryption);
 
         // Default special member functions:
         NCMessageCodecNode(NCMessageCodecNode&&) = default;
+        NCMessageCodecNode(const NCMessageCodecNode&) = default;
+        NCMessageCodecNode& operator=(const NCMessageCodecNode&) = default;
 
         // Disable all other special member functions:
-        NCMessageCodecNode(const NCMessageCodecNode&) = delete;
-        NCMessageCodecNode& operator=(const NCMessageCodecNode&) = delete;
         NCMessageCodecNode& operator=(NCMessageCodecNode&&) = delete;
-
-    private:
-        const NCNodeID node_id_intern;
 };
 
-class NCMessageCodecServer : NCMessageCodecBase {
+class NCMessageCodecServer: NCMessageCodecBase {
     public:
         [[nodiscard]] NCEncodedMessageToNode nc_encode_message_to_node(NCServerMessageType const msg_type, std::vector<uint8_t> const& data) const;
         [[nodiscard]] NCDecodedMessageFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message) const;
@@ -90,10 +90,10 @@ class NCMessageCodecServer : NCMessageCodecBase {
 
         // Default special member functions:
         NCMessageCodecServer(NCMessageCodecServer&&) = default;
+        NCMessageCodecServer(const NCMessageCodecServer&) = default;
+        NCMessageCodecServer& operator=(const NCMessageCodecServer&) = default;
 
         // Disable all other special member functions:
-        NCMessageCodecServer(const NCMessageCodecServer&) = delete;
-        NCMessageCodecServer& operator=(const NCMessageCodecServer&) = delete;
         NCMessageCodecServer& operator=(NCMessageCodecServer&&) = delete;
 };
 }

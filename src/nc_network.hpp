@@ -19,9 +19,6 @@
 namespace NodeCrunch2 {
 using asio::ip::tcp;
 
-void nc_send_data(std::vector<uint8_t> const data, tcp::socket& socket);
-[[nodiscard]] std::vector<uint8_t> nc_receive_data(tcp::socket& socket);
-
 class NCNetworkSocket {
     public:
         virtual void nc_send_data(std::vector<uint8_t> const data);
@@ -50,6 +47,7 @@ class NCNetworkSocket {
 class NCNetworkClient {
     public:
         virtual NCNetworkSocket nc_connect();
+        virtual NCNetworkClient clone(std::string_view server, uint16_t port) const;
         //virtual NCNetworkSocket nc_connect_to(std::string_view server, std::string_view port);
 
         // Constructor:
@@ -59,10 +57,10 @@ class NCNetworkClient {
         virtual ~NCNetworkClient() = default;
 
         // Default special member functions:
-        NCNetworkClient(NCNetworkClient&&) = default;
-        NCNetworkClient(const NCNetworkClient&) = default;
 
         // Disable all other special member functions:
+        NCNetworkClient(NCNetworkClient&&) = delete;
+        NCNetworkClient(const NCNetworkClient&) = delete;
         NCNetworkClient& operator=(const NCNetworkClient&) = delete;
         NCNetworkClient& operator=(NCNetworkClient&&) = delete;
 
@@ -83,10 +81,10 @@ class NCNetworkServer {
         virtual ~NCNetworkServer() = default;
 
         // Default special member functions:
-        NCNetworkServer(NCNetworkServer&&) = default;
-        NCNetworkServer(const NCNetworkServer&) = default;
 
         // Disable all other special member functions:
+        NCNetworkServer(NCNetworkServer&&) = delete;
+        NCNetworkServer(const NCNetworkServer&) = delete;
         NCNetworkServer& operator=(const NCNetworkServer&) = delete;
         NCNetworkServer& operator=(NCNetworkServer&&) = delete;
 

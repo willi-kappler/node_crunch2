@@ -26,20 +26,32 @@ enum struct NCRunState: uint8_t {
     HasData
 };
 
-NCNode::NCNode(NCConfiguration config):
+NCNode::NCNode(NCConfiguration config, NCMessageCodecNode const message_codec, NCNetworkClient const network_client):
     config_intern(config),
     node_id(NCNodeID()),
     quit(false),
     max_error_count(5),
-    message_codec_intern(NCMessageCodecNode(node_id, config.secret_key)),
-    network_client_intern(config.server_address, config.server_port),
-    node_mutex()
+    node_mutex(),
+    message_codec_intern(message_codec),
+    network_client_intern(network_client.clone(config.server_address, config.server_port))
+    {}
+
+NCNode::NCNode(NCConfiguration config, NCMessageCodecNode const message_codec):
+    NCNode(config, message_codec, NCNetworkClient(config.server_address, config.server_port))
+    {}
+
+NCNode::NCNode(NCConfiguration config, NCNetworkClient const network_client):
+    NCNode(config, NCMessageCodecNode(config.secret_key), network_client.clone(config.server_address, config.server_port))
+    {}
+
+NCNode::NCNode(NCConfiguration config):
+    NCNode(config, NCMessageCodecNode(config.secret_key), NCNetworkClient(config.server_address, config.server_port))
     {}
 
 void NCNode::nc_run() {
     spdlog::info("NCNode::nc_run() - starting node");
-    NCEncodedMessageToServer const init_message = message_codec_intern.nc_gen_init_message();
-    NCEncodedMessageToServer const need_more_data_message = message_codec_intern.nc_gen_need_more_data_message();
+    NCEncodedMessageToServer const init_message = message_codec_intern.nc_gen_init_message(node_id);
+    NCEncodedMessageToServer const need_more_data_message = message_codec_intern.nc_gen_need_more_data_message(node_id);
     // TODO: make this configurable:
     auto const sleep_time = std::chrono::seconds(60);
 
@@ -65,7 +77,7 @@ void NCNode::nc_run() {
                 break;
                 case NCRunState::HasData:
                     spdlog::debug("Has data state, send result message");
-                    result_message = message_codec_intern.nc_gen_result_message(new_data);
+                    result_message = message_codec_intern.nc_gen_result_message(new_data, node_id);
                     result = nc_send_msg_return_answer(result_message);
                 break;
                 default:
@@ -138,7 +150,7 @@ void NCNode::nc_run() {
 void NCNode::nc_send_heartbeat() {
     spdlog::info("NCNode::nc_send_heartbeat() - starting heartbeat thread.");
     auto const sleep_time = std::chrono::seconds(config_intern.heartbeat_timeout);
-    auto const heartbeat_message = message_codec_intern.nc_gen_heartbeat_message();
+    auto const heartbeat_message = message_codec_intern.nc_gen_heartbeat_message(node_id);
     uint8_t error_counter = 0;
     NCDecodedMessageFromServer result;
 

@@ -17,7 +17,7 @@ NCMessageCodecBase::NCMessageCodecBase(std::string const secret_key):
     compressor_intern(),
     encryption_intern(NCEncryption(secret_key)) {}
 
-NCMessageCodecBase::NCMessageCodecBase(NCCompressor nc_compressor, NCEncryption nc_encryption):
+NCMessageCodecBase::NCMessageCodecBase(NCCompressor const nc_compressor, NCEncryption const nc_encryption):
     compressor_intern(nc_compressor),
     encryption_intern(nc_encryption) {}
 
@@ -66,16 +66,16 @@ NCMessageCodecBase::NCMessageCodecBase(NCCompressor nc_compressor, NCEncryption 
     return decompressed_message;
 }
 
-NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, std::string const secret_key):
-    NCMessageCodecBase(secret_key),
-    node_id_intern(node_id) {}
+NCMessageCodecNode::NCMessageCodecNode(std::string const secret_key):
+    NCMessageCodecBase(secret_key)
+    {}
 
-NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_compressor, NCEncryption nc_encryption):
-    NCMessageCodecBase(nc_compressor, nc_encryption),
-    node_id_intern(node_id) {}
+NCMessageCodecNode::NCMessageCodecNode(NCCompressor const nc_compressor, NCEncryption const nc_encryption):
+    NCMessageCodecBase(nc_compressor, nc_encryption)
+    {}
 
 [[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_encode_message_to_server(
-    NCNodeMessageType const msg_type, std::vector<uint8_t> const& data) const {
+    NCNodeMessageType const msg_type, std::vector<uint8_t> const& data, NCNodeID const node_id) const {
     // 1. Encode message:
     NCDecompressedMessage decompressed_message;
 
@@ -87,7 +87,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     auto dm_begin = decompressed_message.data.begin() + 1;
 
     // Node id has to be encoded here:
-    std::copy(node_id_intern.id.cbegin(), node_id_intern.id.cend(), dm_begin);
+    std::copy(node_id.id.cbegin(), node_id.id.cend(), dm_begin);
     dm_begin += NC_NODEID_LENGTH;
 
     // Encode the actual data, if there is any:
@@ -115,7 +115,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     return result;
 }
 
-[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_heartbeat_message() const {
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_heartbeat_message(NCNodeID const node_id) const {
     /*
     Generate a heartbeat message to be sent from the node to the server.
 
@@ -123,10 +123,10 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCNodeMessageType::Heartbeat, {});
+    return nc_encode_message_to_server(NCNodeMessageType::Heartbeat, {}, node_id);
 }
 
-[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_init_message() const {
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_init_message(NCNodeID const node_id) const {
     /*
     Generate an initialisation message to be sent from the node to the server.
 
@@ -135,11 +135,11 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCNodeMessageType::Init, {});
+    return nc_encode_message_to_server(NCNodeMessageType::Init, {}, node_id);
 }
 
 [[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_result_message(
-    std::vector<uint8_t> const& new_data) const {
+    std::vector<uint8_t> const& new_data, NCNodeID const node_id) const {
     /*
     Generate a result message to be sent from the node to the server.
 
@@ -148,10 +148,10 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCNodeMessageType::NewResultFromNode, new_data);
+    return nc_encode_message_to_server(NCNodeMessageType::NewResultFromNode, new_data, node_id);
 }
 
-[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_need_more_data_message() const {
+[[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_gen_need_more_data_message(NCNodeID const node_id) const {
     /*
     Generate a "need more data" message to be sent from the node to the server.
 
@@ -160,7 +160,7 @@ NCMessageCodecNode::NCMessageCodecNode(NCNodeID const node_id, NCCompressor nc_c
     The secret key is used to encode the message.
     */
 
-    return nc_encode_message_to_server(NCNodeMessageType::NodeNeedsMoreData, {});
+    return nc_encode_message_to_server(NCNodeMessageType::NodeNeedsMoreData, {}, node_id);
 }
 
 NCMessageCodecServer::NCMessageCodecServer(std::string const secret_key):

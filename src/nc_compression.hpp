@@ -33,9 +33,9 @@ class NCCompressor {
         // Default special member functions:
         NCCompressor(NCCompressor&&) = default;
         NCCompressor(const NCCompressor&) = default;
+        NCCompressor& operator=(const NCCompressor&) = default;
 
         // Disable all other special member functions:
-        NCCompressor& operator=(const NCCompressor&) = delete;
         NCCompressor& operator=(NCCompressor&&) = delete;
 };
 
@@ -50,11 +50,10 @@ class NCNonCompressor: NCCompressor {
         // Default special member functions:
         NCNonCompressor(NCNonCompressor&&) = default;
         NCNonCompressor(const NCNonCompressor&) = default;
+        NCNonCompressor& operator=(const NCNonCompressor&) = default;
 
         // Disable all other special member functions:
-        NCNonCompressor& operator=(const NCNonCompressor&) = delete;
         NCNonCompressor& operator=(NCNonCompressor&&) = delete;
-
 };
 
 }

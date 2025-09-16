@@ -45,6 +45,12 @@ NCNetworkSocket::NCNetworkSocket(tcp::socket &socket): socket_intern(std::move(s
 
 NCNetworkSocket::NCNetworkSocket(): socket_intern([](){asio::io_context io_context_local; return tcp::socket(io_context_local); }()) {}
 
+
+NCNetworkClient NCNetworkClient::clone(std::string_view server, uint16_t port) const {
+    return NCNetworkClient(server, port);
+}
+
+
 NCNetworkSocket NCNetworkClient::nc_connect() {
     tcp::socket socket(io_context_intern);
     // tcp::endpoint connection = asio::connect(socket, endpoints_intern);

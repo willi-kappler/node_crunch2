@@ -26,10 +26,10 @@ TEST_CASE("Encode / decode a message to the server", "[message]" ) {
     std::string const msg1 = "Hello world, this is a test for encoding a message. Add some more content: test, test, test, test, test, test, test, test.";
     std::vector<uint8_t> const data(msg1.begin(), msg1.end());
     std::string const key1 = "12345678901234567890123456789012";
-    NCMessageCodecNode node_codec(node_id, key1);
+    NCMessageCodecNode node_codec(key1);
     NCMessageCodecServer server_codec(key1);
 
-    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data);
+    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
     REQUIRE(encoded_message1.data.size() == 186);
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
@@ -46,10 +46,10 @@ TEST_CASE("Encode / decode an empty message to the server", "[message]" ) {
     NCNodeID const node_id = NCNodeID();
     std::vector<uint8_t> const data;
     std::string const key1 = "12345678901234567890123456789012";
-    NCMessageCodecNode node_codec(node_id, key1);
+    NCMessageCodecNode node_codec(key1);
     NCMessageCodecServer server_codec(key1);
 
-    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data);
+    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
     REQUIRE(encoded_message1.data.size() == 99);
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
@@ -64,10 +64,10 @@ TEST_CASE("Encode / decode a message to the node", "[message]" ) {
     std::string const msg1 = "Hello world, this is a test for encoding a message. Add some more content: test, test, test, test, test, test, test, test.";
     std::vector<uint8_t> const data(msg1.begin(), msg1.end());
     std::string const key1 = "12345678901234567890123456789012";
-    NCMessageCodecNode node_codec(node_id, key1);
+    NCMessageCodecNode node_codec(key1);
     NCMessageCodecServer server_codec(key1);
 
-    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data);
+    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
     REQUIRE(encoded_message1.data.size() == 186);
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
@@ -83,10 +83,10 @@ TEST_CASE("Encode / decode an empty message to the node", "[message]" ) {
     NCNodeID const node_id = NCNodeID();
     std::vector<uint8_t> const data;
     std::string const key1 = "12345678901234567890123456789012";
-    NCMessageCodecNode node_codec(node_id, key1);
+    NCMessageCodecNode node_codec(key1);
     NCMessageCodecServer server_codec(key1);
 
-    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data);
+    auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
     REQUIRE(encoded_message1.data.size() == 99);
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
@@ -97,10 +97,10 @@ TEST_CASE("Encode / decode an empty message to the node", "[message]" ) {
 TEST_CASE("Generate heartbeat message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
-    auto const message1 = node_codec.nc_gen_heartbeat_message();
+    auto const message1 = node_codec.nc_gen_heartbeat_message(node_id);
     auto const message2 = server_codec.nc_decode_message_from_node(message1);
 
     REQUIRE(message2.msg_type == NCNodeMessageType::Heartbeat);
@@ -111,7 +111,7 @@ TEST_CASE("Generate heartbeat message", "[message]" ) {
 TEST_CASE("Generate heartbeat ok message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
     auto const message1 = server_codec.nc_gen_heartbeat_message_ok();
@@ -124,7 +124,7 @@ TEST_CASE("Generate heartbeat ok message", "[message]" ) {
 TEST_CASE("Generate heartbeat error message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
     auto const message1 = server_codec.nc_gen_heartbeat_message_error();
@@ -137,10 +137,10 @@ TEST_CASE("Generate heartbeat error message", "[message]" ) {
 TEST_CASE("Generate init message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
-    auto const message1 = node_codec.nc_gen_init_message();
+    auto const message1 = node_codec.nc_gen_init_message(node_id);
     auto const message2 = server_codec.nc_decode_message_from_node(message1);
 
     REQUIRE(message2.msg_type == NCNodeMessageType::Init);
@@ -152,7 +152,7 @@ TEST_CASE("Generate init ok message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     std::vector<uint8_t> const data = {6, 7, 8, 9};
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
     auto const message1 = server_codec.nc_gen_init_message_ok(data);
@@ -165,7 +165,7 @@ TEST_CASE("Generate init ok message", "[message]" ) {
 TEST_CASE("Generate init error message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
     auto const message1 = server_codec.nc_gen_init_message_error();
@@ -179,10 +179,10 @@ TEST_CASE("Generate result message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
     std::vector<uint8_t> const data = {6, 7, 8, 9};
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
-    auto const message1 = node_codec.nc_gen_result_message(data);
+    auto const message1 = node_codec.nc_gen_result_message(data, node_id);
     auto const message2 = server_codec.nc_decode_message_from_node(message1);
 
     REQUIRE(message2.msg_type == NCNodeMessageType::NewResultFromNode);
@@ -193,10 +193,10 @@ TEST_CASE("Generate result message", "[message]" ) {
 TEST_CASE("Generate need more data message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
-    auto const message1 = node_codec.nc_gen_need_more_data_message();
+    auto const message1 = node_codec.nc_gen_need_more_data_message(node_id);
     auto const message2 = server_codec.nc_decode_message_from_node(message1);
 
     REQUIRE(message2.msg_type == NCNodeMessageType::NodeNeedsMoreData);
@@ -208,7 +208,7 @@ TEST_CASE("Generate new data from server message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     std::vector<uint8_t> const data = {6, 7, 8, 9};
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
     auto const message1 = server_codec.nc_gen_new_data_message(data);
@@ -221,7 +221,7 @@ TEST_CASE("Generate new data from server message", "[message]" ) {
 TEST_CASE("Generate result ok message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
     auto const message1 = server_codec.nc_gen_result_ok_message();
@@ -234,7 +234,7 @@ TEST_CASE("Generate result ok message", "[message]" ) {
 TEST_CASE("Generate quit message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(node_id, key);
+    NCMessageCodecNode node_codec(key);
     NCMessageCodecServer server_codec(key);
 
     auto const message1 = server_codec.nc_gen_quit_message();

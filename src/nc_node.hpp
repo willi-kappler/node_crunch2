@@ -26,8 +26,10 @@ namespace NodeCrunch2 {
 class NCNode {
     public:
         // Constructor:
+        NCNode(NCConfiguration config, NCMessageCodecNode const message_codec, NCNetworkClient const network_client);
+        NCNode(NCConfiguration config, NCMessageCodecNode const message_codec);
+        NCNode(NCConfiguration config, NCNetworkClient const network_client);
         NCNode(NCConfiguration config);
-        // TODO: NCNode(NCConfiguration config, NCMessageCodedNode nc_message_codec);
 
         // Destructor:
         virtual ~NCNode() = default;
@@ -46,13 +48,13 @@ class NCNode {
 
     private:
         NCConfiguration config_intern;
-        NCNodeID node_id;
+        const NCNodeID node_id;
         std::atomic_bool quit;
-        // TODO: make this configurable:
+        // TODO: make this configurable (max_error_count)
         uint8_t max_error_count;
+        std::mutex node_mutex;
         NCMessageCodecNode message_codec_intern;
         NCNetworkClient network_client_intern;
-        std::mutex node_mutex;
 
         [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const& message);
         void nc_send_heartbeat();

@@ -3,7 +3,7 @@
     Written by Willi Kappler, MIT License
     https://github.com/willi-kappler/node_crunch2
 
-    This file defines some helper functions for networking.
+    This file defines networking classes for the node and the server.
 */
 
 // External includes:
@@ -55,11 +55,6 @@ void NCNetworkSocket::nc_send_data(std::vector<uint8_t> const data) {
 NCNetworkSocket::NCNetworkSocket(tcp::socket &socket):
     NCNetworkSocketBase(),
     socket_intern(std::move(socket)) {}
-/*
-NCNetworkClient NCNetworkClient::clone(std::string_view server, uint16_t port) const {
-    return NCNetworkClient(server, port);
-}
-*/
 
 NCNetworkSocketBase NCNetworkClientBase::nc_connect() {
     return NCNetworkSocketBase();
@@ -67,7 +62,6 @@ NCNetworkSocketBase NCNetworkClientBase::nc_connect() {
 
 NCNetworkSocketBase NCNetworkClient::nc_connect() {
     tcp::socket socket(io_context_intern);
-    // tcp::endpoint connection = asio::connect(socket, endpoints_intern);
     asio::connect(socket, endpoints_intern);
     return NCNetworkSocket(socket);
 }

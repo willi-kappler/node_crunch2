@@ -21,13 +21,26 @@
 #include "nc_util.hpp"
 
 namespace NodeCrunch2 {
-NCServer::NCServer(NCConfiguration config):
+NCServer::NCServer(NCConfiguration config, NCMessageCodecServer const message_codec, NCNetworkServerBase const network_server):
     config_intern(config),
     quit(false),
     all_nodes(),
     server_mutex(),
-    server_codec_intern(config.secret_key)
-{}
+    message_codec_intern(message_codec),
+    network_server_intern(network_server)
+    {}
+
+NCServer::NCServer(NCConfiguration config, NCMessageCodecServer const message_codec):
+    NCServer(config, message_codec, NCNetworkServer(config.server_port))
+    {}
+
+NCServer::NCServer(NCConfiguration config, NCNetworkServerBase const network_server):
+    NCServer(config, NCMessageCodecServer(config.secret_key), network_server)
+    {}
+
+NCServer::NCServer(NCConfiguration config):
+    NCServer(config, NCMessageCodecServer(config.secret_key), NCNetworkServer(config.server_port))
+    {}
 
 void NCServer::nc_run() {
     spdlog::info("NCServer::nc_run() - starting server");
@@ -35,7 +48,6 @@ void NCServer::nc_run() {
     // Make threahsold configurable
     const uint32_t max_thread_count = 10;
 
-    NCNetworkServer network_server(config_intern.server_port);
     NCNetworkSocketBase socket;
 
     // Have to use lambda in order to call non-static method:
@@ -47,7 +59,7 @@ void NCServer::nc_run() {
     while (!quit.load()) {
         // Wait for a client to connect
         try {
-            socket = network_server.nc_accept();
+            socket = network_server_intern.nc_accept();
         } catch (asio::system_error &e) {
             spdlog::error("Could not accept connection from socket: {}", e.what());
             quit.store(true);
@@ -113,7 +125,7 @@ void NCServer::nc_handle_node(NCNetworkSocketBase &socket) {
     spdlog::debug("NCServer::nc_handle_node(), ip: {}", socket.nc_address());
     //uint8_t quit_counter;
     std::vector<uint8_t> message = socket.nc_receive_data();
-    NCDecodedMessageFromNode node_message = server_codec_intern.nc_decode_message_from_node(NCEncodedMessageToServer(message));
+    NCDecodedMessageFromNode node_message = message_codec_intern.nc_decode_message_from_node(NCEncodedMessageToServer(message));
     NCNodeID const node_id = node_message.node_id;
 
     switch (node_message.msg_type) {
@@ -127,14 +139,14 @@ void NCServer::nc_handle_node(NCNetworkSocketBase &socket) {
         break;
         case NCNodeMessageType::NodeNeedsMoreData:
             if (nc_valid_node_id(node_id)) {
-                NCEncodedMessageToNode msg_to_node = server_codec_intern.nc_gen_new_data_message(nc_get_new_data(node_id));
+                NCEncodedMessageToNode msg_to_node = message_codec_intern.nc_gen_new_data_message(nc_get_new_data(node_id));
                 socket.nc_send_data(msg_to_node.data);
             }
         break;
         case NCNodeMessageType::NewResultFromNode:
             if (nc_valid_node_id(node_id)) {
                 nc_process_result(node_id, node_message.data);
-                NCEncodedMessageToNode msg_to_node = server_codec_intern.nc_gen_result_ok_message();
+                NCEncodedMessageToNode msg_to_node = message_codec_intern.nc_gen_result_ok_message();
                 socket.nc_send_data(msg_to_node.data);
             }
         break;

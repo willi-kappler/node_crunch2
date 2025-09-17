@@ -26,8 +26,10 @@
 namespace NodeCrunch2 {
 class NCServer {
         // Constructor:
+        NCServer(NCConfiguration config, NCMessageCodecServer const message_codec, NCNetworkServerBase const network_server);
+        NCServer(NCConfiguration config, NCMessageCodecServer const message_codec);
+        NCServer(NCConfiguration config, NCNetworkServerBase const network_server);
         NCServer(NCConfiguration config);
-        // TODO: NCServer(NCConfiguration config, NCMessageCodecServer, nc_server_codec);
 
         // Destructor:
         virtual ~NCServer() = default;
@@ -50,7 +52,8 @@ class NCServer {
         std::unordered_map<NCNodeID, std::chrono::time_point<std::chrono::steady_clock>> all_nodes;
         // In code use: const std::lock_guard<std::mutex> lock(server_mutex);
         std::mutex server_mutex;
-        NCMessageCodecServer server_codec_intern;
+        NCMessageCodecServer message_codec_intern;
+        NCNetworkServerBase network_server_intern;
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);

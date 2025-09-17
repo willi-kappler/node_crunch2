@@ -6,6 +6,7 @@
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
 - add empty connection class for testing.
+- use NCNodeHandler base class and NCServerHandler base class.
 
 
 Done:

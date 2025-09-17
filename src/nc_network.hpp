@@ -3,7 +3,7 @@
     Written by Willi Kappler, MIT License
     https://github.com/willi-kappler/node_crunch2
 
-    This file defines some helper functions for networking.
+    This file defines networking classes for the node and the server.
 */
 
 #ifndef FILE_NC_NETWORK_HPP_INCLUDED
@@ -61,8 +61,6 @@ class NCNetworkClientBase {
         // Default special member functions:
         NCNetworkClientBase() = default;
         virtual ~NCNetworkClientBase() = default;
-
-        // Disable all other special member functions:
         NCNetworkClientBase(NCNetworkClientBase&&) = default;
         NCNetworkClientBase(const NCNetworkClientBase&) = default;
         NCNetworkClientBase& operator=(const NCNetworkClientBase&) = default;
@@ -72,14 +70,10 @@ class NCNetworkClientBase {
 class NCNetworkClient: public NCNetworkClientBase {
     public:
         NCNetworkSocketBase nc_connect() override;
-        //NCNetworkClient clone(std::string_view server, uint16_t port) const;
         //NCNetworkSocket nc_connect_to(std::string_view server, std::string_view port);
 
         // Constructor:
         NCNetworkClient(std::string_view server, uint16_t port);
-
-        // Default special member functions:
-        // virtual ~NCNetworkClient() = default;
 
         // Disable all other special member functions:
         NCNetworkClient(NCNetworkClient&&) = delete;
@@ -100,23 +94,18 @@ class NCNetworkServerBase {
         // Default special member functions:
         NCNetworkServerBase() = default;
         virtual ~NCNetworkServerBase() = default;
-
-        // Disable all other special member functions:
-        NCNetworkServerBase(NCNetworkServerBase&&) = delete;
-        NCNetworkServerBase(const NCNetworkServerBase&) = delete;
-        NCNetworkServerBase& operator=(const NCNetworkServerBase&) = delete;
-        NCNetworkServerBase& operator=(NCNetworkServerBase&&) = delete;
+        NCNetworkServerBase(NCNetworkServerBase&&) = default;
+        NCNetworkServerBase(const NCNetworkServerBase&) = default;
+        NCNetworkServerBase& operator=(const NCNetworkServerBase&) = default;
+        NCNetworkServerBase& operator=(NCNetworkServerBase&&) = default;
 };
 
-class NCNetworkServer: NCNetworkServerBase {
+class NCNetworkServer: public NCNetworkServerBase {
     public:
         NCNetworkSocketBase nc_accept() override;
 
         // Constructor:
         NCNetworkServer(uint16_t server_port);
-
-        // Default special member functions:
-        // virtual ~NCNetworkServer() = default;
 
         // Disable all other special member functions:
         NCNetworkServer(NCNetworkServer&&) = delete;

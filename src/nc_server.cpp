@@ -36,7 +36,7 @@ void NCServer::nc_run() {
     const uint32_t max_thread_count = 10;
 
     NCNetworkServer network_server(config_intern.server_port);
-    NCNetworkSocket socket;
+    NCNetworkSocketBase socket;
 
     // Have to use lambda in order to call non-static method:
     std::thread heartbeat_thread([this] () {nc_check_heartbeat();});
@@ -108,7 +108,7 @@ void NCServer::nc_update_node_time(NCNodeID node_id) {
     all_nodes[node_id] = node_time;
 }
 
-void NCServer::nc_handle_node(NCNetworkSocket& socket) {
+void NCServer::nc_handle_node(NCNetworkSocketBase &socket) {
     //spdlog::debug("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
     spdlog::debug("NCServer::nc_handle_node(), ip: {}", socket.nc_address());
     //uint8_t quit_counter;

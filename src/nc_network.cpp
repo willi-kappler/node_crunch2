@@ -14,6 +14,17 @@
 #include "nc_network.hpp"
 
 namespace NodeCrunch2 {
+void NCNetworkSocketBase::nc_send_data([[maybe_unused]] std::vector<uint8_t> const data) {
+}
+
+[[nodiscard]] std::vector<uint8_t> NCNetworkSocketBase::nc_receive_data() {
+    return std::vector<uint8_t>();
+}
+
+[[nodiscard]] std::string NCNetworkSocketBase::nc_address() {
+    return std::string();
+}
+
 void NCNetworkSocket::nc_send_data(std::vector<uint8_t> const data) {
     uint32_t data_size = static_cast<uint32_t>(data.size());
     std::array<uint8_t, 4> size_bytes;
@@ -41,17 +52,20 @@ void NCNetworkSocket::nc_send_data(std::vector<uint8_t> const data) {
     return socket_intern.remote_endpoint().address().to_string();
 }
 
-NCNetworkSocket::NCNetworkSocket(tcp::socket &socket): socket_intern(std::move(socket)) {}
-
-NCNetworkSocket::NCNetworkSocket(): socket_intern([](){asio::io_context io_context_local; return tcp::socket(io_context_local); }()) {}
-
-
+NCNetworkSocket::NCNetworkSocket(tcp::socket &socket):
+    NCNetworkSocketBase(),
+    socket_intern(std::move(socket)) {}
+/*
 NCNetworkClient NCNetworkClient::clone(std::string_view server, uint16_t port) const {
     return NCNetworkClient(server, port);
 }
+*/
 
+NCNetworkSocketBase NCNetworkClientBase::nc_connect() {
+    return NCNetworkSocketBase();
+}
 
-NCNetworkSocket NCNetworkClient::nc_connect() {
+NCNetworkSocketBase NCNetworkClient::nc_connect() {
     tcp::socket socket(io_context_intern);
     // tcp::endpoint connection = asio::connect(socket, endpoints_intern);
     asio::connect(socket, endpoints_intern);
@@ -59,18 +73,24 @@ NCNetworkSocket NCNetworkClient::nc_connect() {
 }
 
 NCNetworkClient::NCNetworkClient(std::string_view server, uint16_t port):
+    NCNetworkClientBase(),
     io_context_intern(),
     resolver_intern(io_context_intern),
     endpoints_intern(resolver_intern.resolve(server, std::to_string(port)))
     {}
 
-NCNetworkSocket NCNetworkServer::nc_accept() {
+NCNetworkSocketBase NCNetworkServerBase::nc_accept() {
+    return NCNetworkSocketBase();
+}
+
+NCNetworkSocketBase NCNetworkServer::nc_accept() {
     tcp::socket socket(io_context_intern);
     acceptor_intern.accept(socket);
     return NCNetworkSocket(socket);
 }
 
 NCNetworkServer::NCNetworkServer(uint16_t server_port):
+    NCNetworkServerBase(),
     io_context_intern(),
     acceptor_intern(io_context_intern, tcp::endpoint(tcp::v4(), server_port))
     {}

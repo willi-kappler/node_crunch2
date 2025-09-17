@@ -54,7 +54,7 @@ class NCServer {
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);
-        void nc_handle_node(NCNetworkSocket& sock);
+        void nc_handle_node(NCNetworkSocketBase &sock);
         void nc_check_heartbeat();
         bool nc_valid_node_id(NCNodeID node_id);
 

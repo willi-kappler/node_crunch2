@@ -26,22 +26,22 @@ enum struct NCRunState: uint8_t {
     HasData
 };
 
-NCNode::NCNode(NCConfiguration config, NCMessageCodecNode const message_codec, NCNetworkClient const network_client):
+NCNode::NCNode(NCConfiguration config, NCMessageCodecNode const message_codec, NCNetworkClientBase const network_client):
     config_intern(config),
     node_id(NCNodeID()),
     quit(false),
     max_error_count(5),
     node_mutex(),
     message_codec_intern(message_codec),
-    network_client_intern(network_client.clone(config.server_address, config.server_port))
+    network_client_intern(network_client)
     {}
 
 NCNode::NCNode(NCConfiguration config, NCMessageCodecNode const message_codec):
     NCNode(config, message_codec, NCNetworkClient(config.server_address, config.server_port))
     {}
 
-NCNode::NCNode(NCConfiguration config, NCNetworkClient const network_client):
-    NCNode(config, NCMessageCodecNode(config.secret_key), network_client.clone(config.server_address, config.server_port))
+NCNode::NCNode(NCConfiguration config, NCNetworkClientBase const network_client):
+    NCNode(config, NCMessageCodecNode(config.secret_key), network_client)
     {}
 
 NCNode::NCNode(NCConfiguration config):
@@ -141,7 +141,7 @@ void NCNode::nc_run() {
 
 [[nodiscard]] NCDecodedMessageFromServer NCNode::nc_send_msg_return_answer(NCEncodedMessageToServer const& message) {
     const std::lock_guard<std::mutex> lock(node_mutex);
-    NCNetworkSocket socket = network_client_intern.nc_connect();
+    NCNetworkSocketBase socket = network_client_intern.nc_connect();
     socket.nc_send_data(message.data);
     NCEncodedMessageToNode message2{socket.nc_receive_data()};
     return message_codec_intern.nc_decode_message_from_server(message2);

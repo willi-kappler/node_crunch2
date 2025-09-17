@@ -19,44 +19,67 @@
 namespace NodeCrunch2 {
 using asio::ip::tcp;
 
-class NCNetworkSocket {
+class NCNetworkSocketBase {
     public:
         virtual void nc_send_data(std::vector<uint8_t> const data);
         [[nodiscard]] virtual std::vector<uint8_t> nc_receive_data();
         [[nodiscard]] virtual std::string nc_address();
+        
+        // Default special member functions:
+        NCNetworkSocketBase() = default;
+        virtual ~NCNetworkSocketBase() = default;
+        NCNetworkSocketBase(NCNetworkSocketBase&&) = default;
+        NCNetworkSocketBase(const NCNetworkSocketBase&) = default;
+        NCNetworkSocketBase& operator=(const NCNetworkSocketBase&) = default;
+        NCNetworkSocketBase& operator=(NCNetworkSocketBase&&) = default;
+};
+
+class NCNetworkSocket: public NCNetworkSocketBase {
+    public:
+        void nc_send_data(std::vector<uint8_t> const data) override;
+        [[nodiscard]] std::vector<uint8_t> nc_receive_data() override;
+        [[nodiscard]] std::string nc_address() override;
 
         // Constructor:
-        NCNetworkSocket();
         NCNetworkSocket(tcp::socket &socket);
-
-        // Destructor:
-        virtual ~NCNetworkSocket() = default;
-
+        
         // Default special member functions:
+        ~NCNetworkSocket() = default;
         NCNetworkSocket(NCNetworkSocket&&) = default;
         NCNetworkSocket(const NCNetworkSocket&) = default;
         NCNetworkSocket& operator=(const NCNetworkSocket&) = default;
         NCNetworkSocket& operator=(NCNetworkSocket&&) = default;
 
-        // Disable all other special member functions:
-
     private:
         tcp::socket socket_intern;
 };
 
-class NCNetworkClient {
+class NCNetworkClientBase {
     public:
-        virtual NCNetworkSocket nc_connect();
-        virtual NCNetworkClient clone(std::string_view server, uint16_t port) const;
-        //virtual NCNetworkSocket nc_connect_to(std::string_view server, std::string_view port);
+        virtual NCNetworkSocketBase nc_connect();
+
+        // Default special member functions:
+        NCNetworkClientBase() = default;
+        virtual ~NCNetworkClientBase() = default;
+
+        // Disable all other special member functions:
+        NCNetworkClientBase(NCNetworkClientBase&&) = default;
+        NCNetworkClientBase(const NCNetworkClientBase&) = default;
+        NCNetworkClientBase& operator=(const NCNetworkClientBase&) = default;
+        NCNetworkClientBase& operator=(NCNetworkClientBase&&) = default;
+};
+
+class NCNetworkClient: public NCNetworkClientBase {
+    public:
+        NCNetworkSocketBase nc_connect() override;
+        //NCNetworkClient clone(std::string_view server, uint16_t port) const;
+        //NCNetworkSocket nc_connect_to(std::string_view server, std::string_view port);
 
         // Constructor:
         NCNetworkClient(std::string_view server, uint16_t port);
 
-        // Destructor:
-        virtual ~NCNetworkClient() = default;
-
         // Default special member functions:
+        // virtual ~NCNetworkClient() = default;
 
         // Disable all other special member functions:
         NCNetworkClient(NCNetworkClient&&) = delete;
@@ -70,17 +93,30 @@ class NCNetworkClient {
         tcp::resolver::results_type endpoints_intern;
 };
 
-class NCNetworkServer {
+class NCNetworkServerBase {
     public:
-        virtual NCNetworkSocket nc_accept();
+        virtual NCNetworkSocketBase nc_accept();
+
+        // Default special member functions:
+        NCNetworkServerBase() = default;
+        virtual ~NCNetworkServerBase() = default;
+
+        // Disable all other special member functions:
+        NCNetworkServerBase(NCNetworkServerBase&&) = delete;
+        NCNetworkServerBase(const NCNetworkServerBase&) = delete;
+        NCNetworkServerBase& operator=(const NCNetworkServerBase&) = delete;
+        NCNetworkServerBase& operator=(NCNetworkServerBase&&) = delete;
+};
+
+class NCNetworkServer: NCNetworkServerBase {
+    public:
+        NCNetworkSocketBase nc_accept() override;
 
         // Constructor:
         NCNetworkServer(uint16_t server_port);
 
-        // Destructor:
-        virtual ~NCNetworkServer() = default;
-
         // Default special member functions:
+        // virtual ~NCNetworkServer() = default;
 
         // Disable all other special member functions:
         NCNetworkServer(NCNetworkServer&&) = delete;

@@ -17,6 +17,7 @@
 
 // Local includes:
 #include "nc_compression.hpp"
+#include "nc_util.hpp"
 
 using namespace NodeCrunch2;
 

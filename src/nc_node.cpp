@@ -26,26 +26,34 @@ enum struct NCRunState: uint8_t {
     HasData
 };
 
-NCNode::NCNode(NCConfiguration config, NCMessageCodecNode const message_codec, NCNetworkClientBase const network_client):
+void NCNodeDataProcessor::nc_init([[maybe_unused]] std::vector<uint8_t> data) {
+}
+
+[[nodiscard]] std::vector<uint8_t> NCNodeDataProcessor::nc_process_data([[maybe_unused]] std::vector<uint8_t> data) {
+    return std::vector<uint8_t>();
+}
+
+NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor, NCMessageCodecNode const message_codec, NCNetworkClientBase const network_client):
     config_intern(config),
     node_id(NCNodeID()),
     quit(false),
     max_error_count(5),
     node_mutex(),
     message_codec_intern(message_codec),
-    network_client_intern(network_client)
+    network_client_intern(network_client),
+    data_processor_intern(data_processor)
     {}
 
-NCNode::NCNode(NCConfiguration config, NCMessageCodecNode const message_codec):
-    NCNode(config, message_codec, NCNetworkClient(config.server_address, config.server_port))
+NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor, NCMessageCodecNode const message_codec):
+    NCNode(config, data_processor, message_codec, NCNetworkClient(config.server_address, config.server_port))
     {}
 
-NCNode::NCNode(NCConfiguration config, NCNetworkClientBase const network_client):
-    NCNode(config, NCMessageCodecNode(config.secret_key), network_client)
+NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor, NCNetworkClientBase const network_client):
+    NCNode(config, data_processor, NCMessageCodecNode(config.secret_key), network_client)
     {}
 
-NCNode::NCNode(NCConfiguration config):
-    NCNode(config, NCMessageCodecNode(config.secret_key), NCNetworkClient(config.server_address, config.server_port))
+NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor):
+    NCNode(config, data_processor, NCMessageCodecNode(config.secret_key), NCNetworkClient(config.server_address, config.server_port))
     {}
 
 void NCNode::nc_run() {
@@ -94,7 +102,7 @@ void NCNode::nc_run() {
         switch (result.msg_type) {
             case NCServerMessageType::InitOK:
                 spdlog::debug("InitOK from server.");
-                nc_init(result.data);
+                data_processor_intern.nc_init(result.data);
                 run_state = NCRunState::NeedData;
             break;
             case NCServerMessageType::InitError:
@@ -106,7 +114,7 @@ void NCNode::nc_run() {
             case NCServerMessageType::NewDataFromServer:
                 // Received new data from server.
                 spdlog::debug("New data from server.");
-                new_data = nc_process_data(result.data);
+                new_data = data_processor_intern.nc_process_data(result.data);
                 run_state = NCRunState::HasData;
             break;
             case NCServerMessageType::ResultOK:

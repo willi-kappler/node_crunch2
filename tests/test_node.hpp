@@ -45,72 +45,119 @@ class TestSocket: public NCNetworkSocketBase {
         [[nodiscard]] std::string nc_address() override;
 
         // Constructor
-        TestSocket();
+        TestSocket(std::vector<uint8_t> init_data);
 
         // Members used in test cases
-        std::vector<uint8_t> buffer_intern;
-        NCMessageCodecServer message_codec_intern;
+        std::vector<uint8_t> server_data;
+        NCEncodedMessageToNode msg_to_node;;
+        NCMessageCodecServer message_codec;
+        uint8_t heartbeat_counter;
         std::vector<NCNodeID> node_ids;
+        std::vector<NCNodeMessageType> node_messages;
+        uint8_t test_mode;
 };
 
-TestSocket::TestSocket():
-    buffer_intern(),
-    message_codec_intern(TEST_KEY),
-    node_ids()
-    {}
+TestSocket::TestSocket(std::vector<uint8_t> init_data):
+    server_data(init_data),
+    msg_to_node(),
+    message_codec(TEST_KEY),
+    heartbeat_counter(0),
+    node_ids(),
+    node_messages(),
+    test_mode(0)
+{
+    if (init_data.size() == 0) {
+        throw std::invalid_argument("init_data is empty!");
+    } else {
+        test_mode = init_data[0];
+    }
+}
 
 void TestSocket::nc_send_data(std::vector<uint8_t> const data) {
     // TODO: process data and react:
 
-    NCDecodedMessageFromNode node_message = message_codec_intern.nc_decode_message_from_node(NCEncodedMessageToServer(data));
+    NCDecodedMessageFromNode node_message = message_codec.nc_decode_message_from_node(NCEncodedMessageToServer(data));
     NCNodeID const node_id = node_message.node_id;
-    NCEncodedMessageToNode msg_to_node;
 
     node_ids.push_back(node_id);
+    node_messages.push_back(node_message.msg_type);
 
     switch (node_message.msg_type) {
         case NCNodeMessageType::Init:
-            msg_to_node = message_codec_intern.nc_gen_unknown_error();
+            if (test_mode == 10) {
+                msg_to_node = message_codec.nc_gen_quit_message();
+            } else {
+                msg_to_node = message_codec.nc_gen_init_message_ok(server_data);
+            }
         break;
         case NCNodeMessageType::Heartbeat:
-            msg_to_node = message_codec_intern.nc_gen_unknown_error();
+            heartbeat_counter++;
+            if (test_mode == 20) {
+                msg_to_node = message_codec.nc_gen_quit_message();
+            } else {
+                msg_to_node = message_codec.nc_gen_heartbeat_message_ok();
+            }
         break;
         case NCNodeMessageType::NodeNeedsMoreData:
-            msg_to_node = message_codec_intern.nc_gen_unknown_error();
+            if (test_mode == 30) {
+                msg_to_node = message_codec.nc_gen_quit_message();
+            } else {
+                msg_to_node = message_codec.nc_gen_new_data_message(server_data);
+            }
         break;
         case NCNodeMessageType::NewResultFromNode:
-            msg_to_node = message_codec_intern.nc_gen_unknown_error();
+            for (size_t i = 0; i < server_data.size(); i++) {
+                server_data[i] = node_message.data[i] + 10;
+            }
+
+            /*
+            std::transform(node_message.data.begin(), node_message.data.end(), server_data.begin(),
+               [](uint8_t x) { return x + 10; });
+            */
+
+            if (test_mode == 40) {
+                msg_to_node = message_codec.nc_gen_quit_message();
+            } else {
+                msg_to_node = message_codec.nc_gen_result_ok_message();
+            }
         break;
         default:
-            msg_to_node = message_codec_intern.nc_gen_unknown_error();
+            msg_to_node = message_codec.nc_gen_unknown_error();
     }
-
-    buffer_intern = msg_to_node.data;
 }
 
 [[nodiscard]] std::vector<uint8_t> TestSocket::nc_receive_data() {
-    return buffer_intern;
+    return msg_to_node.data;
 }
 
 [[nodiscard]] std::string TestSocket::nc_address() {
     return std::string("TestSocket");
 }
 
-
 class TestClient: public NCNetworkClientBase {
     public:
         NCNetworkSocketBase nc_connect() override;
+        TestClient(std::vector<uint8_t> init_data);
+
+        TestSocket test_socket;
 };
 
-NCNetworkSocketBase TestClient::nc_connect() {
-    return TestSocket();
+TestClient::TestClient(std::vector<uint8_t> init_data):
+    test_socket(init_data)
+{
+    if (init_data.size() == 0) {
+        throw std::invalid_argument("init_data is empty!");
+    }
 }
 
-
+NCNetworkSocketBase TestClient::nc_connect() {
+    return test_socket;
+}
 
 TEST_CASE("Create node, send init message", "[node]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_KEY);
     TestDataProcessor data_processor1;
-    TestClient client1;
+    TestClient client1({10});
     NCNode node1(config1, data_processor1, client1);
+    // node1.nc_run();
 }

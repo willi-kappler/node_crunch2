@@ -121,19 +121,6 @@ TEST_CASE("Generate heartbeat ok message", "[message]" ) {
     REQUIRE(message2.data.size() == 0);
 }
 
-TEST_CASE("Generate heartbeat error message", "[message]" ) {
-    std::string const key = "12345678901234567890123456789012";
-    NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(key);
-    NCMessageCodecServer server_codec(key);
-
-    auto const message1 = server_codec.nc_gen_heartbeat_message_error();
-    auto const message2 = node_codec.nc_decode_message_from_server(message1);
-
-    REQUIRE(message2.msg_type == NCServerMessageType::HeartbeatError);
-    REQUIRE(message2.data.size() == 0);
-}
-
 TEST_CASE("Generate init message", "[message]" ) {
     std::string const key = "12345678901234567890123456789012";
     NCNodeID const node_id = NCNodeID();
@@ -160,19 +147,6 @@ TEST_CASE("Generate init ok message", "[message]" ) {
 
     REQUIRE(message2.msg_type == NCServerMessageType::InitOK);
     REQUIRE(message2.data == data);
-}
-
-TEST_CASE("Generate init error message", "[message]" ) {
-    std::string const key = "12345678901234567890123456789012";
-    NCNodeID const node_id = NCNodeID();
-    NCMessageCodecNode node_codec(key);
-    NCMessageCodecServer server_codec(key);
-
-    auto const message1 = server_codec.nc_gen_init_message_error();
-    auto const message2 = node_codec.nc_decode_message_from_server(message1);
-
-    REQUIRE(message2.msg_type == NCServerMessageType::InitError);
-    REQUIRE(message2.data.size() == 0);
 }
 
 TEST_CASE("Generate result message", "[message]" ) {
@@ -241,5 +215,31 @@ TEST_CASE("Generate quit message", "[message]" ) {
     auto const message2 = node_codec.nc_decode_message_from_server(message1);
 
     REQUIRE(message2.msg_type == NCServerMessageType::Quit);
+    REQUIRE(message2.data.size() == 0);
+}
+
+TEST_CASE("Generate invalid node id message", "[message]" ) {
+    std::string const key = "12345678901234567890123456789012";
+    NCNodeID const node_id = NCNodeID();
+    NCMessageCodecNode node_codec(key);
+    NCMessageCodecServer server_codec(key);
+
+    auto const message1 = server_codec.nc_gen_invalid_node_id_error();
+    auto const message2 = node_codec.nc_decode_message_from_server(message1);
+
+    REQUIRE(message2.msg_type == NCServerMessageType::InvalidNodeID);
+    REQUIRE(message2.data.size() == 0);
+}
+
+TEST_CASE("Generate unknown error message", "[message]" ) {
+    std::string const key = "12345678901234567890123456789012";
+    NCNodeID const node_id = NCNodeID();
+    NCMessageCodecNode node_codec(key);
+    NCMessageCodecServer server_codec(key);
+
+    auto const message1 = server_codec.nc_gen_unknown_error();
+    auto const message2 = node_codec.nc_decode_message_from_server(message1);
+
+    REQUIRE(message2.msg_type == NCServerMessageType::UnknownError);
     REQUIRE(message2.data.size() == 0);
 }

@@ -105,10 +105,11 @@ void NCNode::nc_run() {
                 data_processor_intern.nc_init(result.data);
                 run_state = NCRunState::NeedData;
             break;
-            case NCServerMessageType::InitError:
-                // Error at initialisation.
+            case NCServerMessageType::InvalidNodeID:
+                // Invalid node id was sent to the server.
+                // This node hasn't registered yet to the server.
                 error_counter++;
-                spdlog::error("InitError from server, error counter: {}", error_counter);
+                spdlog::error("InvalidNodeID from server, error counter: {}", error_counter);
                 std::this_thread::sleep_for(sleep_time);
             break;
             case NCServerMessageType::NewDataFromServer:
@@ -129,7 +130,7 @@ void NCNode::nc_run() {
                 quit.store(true);
             break;
             default:
-                // Unknown message
+                // Unknown message.
                 error_counter++;
                 spdlog::error("Unknown message: {}, error counter: {}", nc_type_to_string(result.msg_type), error_counter);
                 std::this_thread::sleep_for(sleep_time);
@@ -145,6 +146,10 @@ void NCNode::nc_run() {
     spdlog::debug("Waiting for heartbeat thread...");
     heartbeat_thread.join();
     spdlog::info("Will exit now.");
+}
+
+[[nodiscard]] NCNodeID NCNode::nc_get_node_id() {
+    return node_id;
 }
 
 [[nodiscard]] NCDecodedMessageFromServer NCNode::nc_send_msg_return_answer(NCEncodedMessageToServer const& message) {
@@ -176,10 +181,11 @@ void NCNode::nc_send_heartbeat() {
                 spdlog::debug("HeartbeatOK from server.");
                 // Everything OK, nothing to do.
             break;
-            case NCServerMessageType::HeartbeatError:
-                // Heartbeat was not sent in time.
+            case NCServerMessageType::InvalidNodeID:
+                // Invalid node id was sent to the server.
+                // This node hasn't registered yet to the server.
                 error_counter++;
-                spdlog::error("HeartbetaError from server, error counter: {}", error_counter);
+                spdlog::error("InvalidNodeID from server, error counter: {}", error_counter);
             break;
             case NCServerMessageType::Quit:
                 // Job is done, so we can quit.

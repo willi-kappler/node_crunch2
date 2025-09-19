@@ -18,23 +18,19 @@
 
 namespace NodeCrunch2 {
 enum struct NCNodeMessageType: uint8_t {
-    Unknown = 0,
+    Init = 0,
     Heartbeat,
-    Init,
     NewResultFromNode,
     NodeNeedsMoreData,
-    ConnectionError,
 };
 
 enum struct NCServerMessageType: uint8_t {
-    Unknown = 0,
+    UnknownError = 0,
     HeartbeatOK,
-    HeartbeatError,
     InitOK,
-    InitError,
     NewDataFromServer,
     ResultOK,
-    ConnectionError,
+    InvalidNodeID,
     Quit
 };
 
@@ -68,13 +64,13 @@ struct NCEncodedMessageToNode {
 };
 
 struct NCDecodedMessageFromNode {
-    NCNodeMessageType msg_type = NCNodeMessageType::Unknown;
+    NCNodeMessageType msg_type = NCNodeMessageType::Init;
     NCNodeID node_id = NCNodeID();
     std::vector<uint8_t> data = {};
 };
 
 struct NCDecodedMessageFromServer {
-    NCServerMessageType msg_type = NCServerMessageType::Unknown;
+    NCServerMessageType msg_type = NCServerMessageType::UnknownError;
     std::vector<uint8_t> data = {};
 };
 }

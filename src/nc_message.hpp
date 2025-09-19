@@ -83,12 +83,12 @@ class NCMessageCodecServer: NCMessageCodecBase {
         [[nodiscard]] virtual NCDecodedMessageFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message) const;
 
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_heartbeat_message_ok() const;
-        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_heartbeat_message_error() const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_init_message_ok(std::vector<uint8_t> const& init_data) const;
-        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_init_message_error() const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_new_data_message(std::vector<uint8_t> const& new_data) const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_result_ok_message() const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_quit_message() const;
+        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_invalid_node_id_error() const;
+        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_unknown_error() const;
 
         // Constructor:
         NCMessageCodecServer(std::string const secret_key);

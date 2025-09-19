@@ -222,18 +222,6 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     return nc_encode_message_to_node(NCServerMessageType::HeartbeatOK, {});
 }
 
-[[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_heartbeat_message_error() const {
-    /*
-    Generate a "heartbeat error" message to be sent from the server to the node.
-
-    This message is only sent if the heartbeat message from the node was
-    sent too late or did not contain a valid node id.
-    The secret key is used to encode the message.
-    */
-
-    return nc_encode_message_to_node(NCServerMessageType::HeartbeatError, {});
-}
-
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_init_message_ok(
     std::vector<uint8_t> const& init_data) const {
     /*
@@ -245,17 +233,6 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
     */
 
     return nc_encode_message_to_node(NCServerMessageType::InitOK, init_data);
-}
-
-[[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_init_message_error() const {
-    /*
-    Generate an "init error" message to be sent from the server to the node.
-
-    This message is only sent when the registration of the new node has failed.
-    The secret key is used to encode the message.
-    */
-
-    return nc_encode_message_to_node(NCServerMessageType::InitError, {});
 }
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_new_data_message(
@@ -295,4 +272,26 @@ NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryp
 
     return nc_encode_message_to_node(NCServerMessageType::Quit, {});
 }
+
+[[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_invalid_node_id_error() const {
+    /*
+    Generate an invalid node id message to be sent from the server to the node.
+
+    This message is only sent the node id is unknown to the server.
+    That is when the node hasn't registered first to the server.
+    */
+
+    return nc_encode_message_to_node(NCServerMessageType::InvalidNodeID, {});
+}
+
+[[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_gen_unknown_error() const {
+    /*
+    Generate an unknown error message to be sent from the server to the node.
+
+    This message is only sent when the node sends an invalid / unknown message.
+    */
+
+    return nc_encode_message_to_node(NCServerMessageType::UnknownError, {});
+}
+
 }

@@ -62,6 +62,7 @@ class NCNode {
 
         // API:
         void nc_run();
+        [[nodiscard]] NCNodeID nc_get_node_id();
 
     private:
         NCConfiguration config_intern;

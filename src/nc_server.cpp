@@ -105,9 +105,9 @@ void NCServer::nc_register_new_node(NCNodeID node_id) {
     const std::lock_guard<std::mutex> lock(server_mutex);
     if (all_nodes.contains(node_id)) {
         spdlog::debug("Node already registered: {}", node_id.id);
+    } else {
+        all_nodes[node_id] = node_time;
     }
-
-    all_nodes[node_id] = node_time;
 }
 
 void NCServer::nc_update_node_time(NCNodeID node_id) {
@@ -127,32 +127,48 @@ void NCServer::nc_handle_node(NCNetworkSocketBase &socket) {
     std::vector<uint8_t> message = socket.nc_receive_data();
     NCDecodedMessageFromNode node_message = message_codec_intern.nc_decode_message_from_node(NCEncodedMessageToServer(message));
     NCNodeID const node_id = node_message.node_id;
+    NCEncodedMessageToNode msg_to_node;
 
-    switch (node_message.msg_type) {
-        case NCNodeMessageType::Init:
-            nc_register_new_node(node_id);
-        break;
-        case NCNodeMessageType::Heartbeat:
-            if (nc_valid_node_id(node_id)) {
-                nc_update_node_time(node_id);
-            }
-        break;
-        case NCNodeMessageType::NodeNeedsMoreData:
-            if (nc_valid_node_id(node_id)) {
-                NCEncodedMessageToNode msg_to_node = message_codec_intern.nc_gen_new_data_message(nc_get_new_data(node_id));
-                socket.nc_send_data(msg_to_node.data);
-            }
-        break;
-        case NCNodeMessageType::NewResultFromNode:
-            if (nc_valid_node_id(node_id)) {
-                nc_process_result(node_id, node_message.data);
-                NCEncodedMessageToNode msg_to_node = message_codec_intern.nc_gen_result_ok_message();
-                socket.nc_send_data(msg_to_node.data);
-            }
-        break;
-        default:
-            spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
+    if (nc_is_job_done()) {
+        quit.store(true);
+        msg_to_node = message_codec_intern.nc_gen_quit_message();
+    } else {
+        switch (node_message.msg_type) {
+            case NCNodeMessageType::Init:
+                nc_register_new_node(node_id);
+                msg_to_node = message_codec_intern.nc_gen_init_message_ok(nc_get_init_data());
+            break;
+            case NCNodeMessageType::Heartbeat:
+                if (nc_valid_node_id(node_id)) {
+                    nc_update_node_time(node_id);
+                    msg_to_node = message_codec_intern.nc_gen_heartbeat_message_ok();
+                } else {
+                    msg_to_node = message_codec_intern.nc_gen_invalid_node_id_error();
+                }
+            break;
+            case NCNodeMessageType::NodeNeedsMoreData:
+                if (nc_valid_node_id(node_id)) {
+                    msg_to_node = message_codec_intern.nc_gen_new_data_message(nc_get_new_data(node_id));
+                } else {
+                    msg_to_node = message_codec_intern.nc_gen_invalid_node_id_error();
+                }
+            break;
+            case NCNodeMessageType::NewResultFromNode:
+                if (nc_valid_node_id(node_id)) {
+                    nc_process_result(node_id, node_message.data);
+                    msg_to_node = message_codec_intern.nc_gen_result_ok_message();
+                } else {
+                    msg_to_node = message_codec_intern.nc_gen_invalid_node_id_error();
+                }
+            break;
+            default:
+                spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
+                msg_to_node = message_codec_intern.nc_gen_unknown_error();
+        }
     }
+
+    // Send answer back to node:
+    socket.nc_send_data(msg_to_node.data);
 }
 
 void NCServer::nc_check_heartbeat() {

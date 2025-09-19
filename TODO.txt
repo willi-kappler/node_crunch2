@@ -6,7 +6,8 @@
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
 - add empty connection class for testing.
-- use NCNodeHandler base class and NCServerHandler base class.
+- use NCNodeDataProcessor base class and NCServerDataProcessor base class.
+- add max_data_size limit to configuration and check for data size.
 
 
 Done:

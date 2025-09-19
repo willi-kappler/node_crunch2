@@ -36,23 +36,17 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     std::string result = "Unknown type";
 
     switch (msg_type) {
-        case NCNodeMessageType::Unknown:
-            result = "Unknown";
+        case NCNodeMessageType::Init:
+            result = "Init";
         break;
         case NCNodeMessageType::Heartbeat:
             result = "Heartbeat";
-        break;
-        case NCNodeMessageType::Init:
-            result = "Init";
         break;
         case NCNodeMessageType::NewResultFromNode:
             result = "NewResultFromNode";
         break;
         case NCNodeMessageType::NodeNeedsMoreData:
             result = "NodeNeedsMoreData";
-        break;
-        case NCNodeMessageType::ConnectionError:
-            result = "ConnectionError";
         break;
     }
 
@@ -63,20 +57,14 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     std::string result = "Unknown type";
 
     switch (msg_type) {
-        case NCServerMessageType::Unknown:
-            result = "Unknown";
+        case NCServerMessageType::UnknownError:
+            result = "UnknownError";
         break;
         case NCServerMessageType::HeartbeatOK:
             result = "HeartbeatOK";
         break;
-        case NCServerMessageType::HeartbeatError:
-            result = "HeartbeatError";
-        break;
         case NCServerMessageType::InitOK:
             result = "InitOK";
-        break;
-        case NCServerMessageType::InitError:
-            result = "InitError";
         break;
         case NCServerMessageType::NewDataFromServer:
             result = "NewDataFromServer";
@@ -84,8 +72,8 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
         case NCServerMessageType::ResultOK:
             result = "ResultOK";
         break;
-        case NCServerMessageType::ConnectionError:
-            result = "ConnectionError";
+        case NCServerMessageType::InvalidNodeID:
+            result = "InvalidNodeID";
         break;
         case NCServerMessageType::Quit:
             result = "Quit";

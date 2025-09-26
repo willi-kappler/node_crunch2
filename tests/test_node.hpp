@@ -159,5 +159,5 @@ TEST_CASE("Create node, send init message", "[node]" ) {
     TestDataProcessor data_processor1;
     TestClient client1({10});
     NCNode node1(config1, data_processor1, client1);
-    // node1.nc_run();
+    node1.nc_run();
 }

@@ -13,6 +13,7 @@ add_cxxflags("-Wconversion", "-Wshadow", "-Wsign-conversion", "-Wdouble-promotio
 add_cxxflags("-Wundef", "-Wcast-qual", "-Wcast-align=strict", "-Wnon-virtual-dtor", "-Wold-style-cast")
 add_cxxflags("-Woverloaded-virtual", "-Wunused", "-Wuninitialized", "-Winit-self")
 add_cxxflags("-Wredundant-decls", "-Wsuggest-override", "-Wimplicit-fallthrough=5", "-Walloca")
+add_cxxflags("-O1")
 -- add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
 
 

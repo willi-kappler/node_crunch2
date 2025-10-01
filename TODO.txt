@@ -10,6 +10,12 @@
 - add max_data_size limit to configuration and check for data size.
 
 
+- for inheritance use objects on the heap:
+#include <memory>
+std::unique_ptr<Base>;
+
+
+
 Done:
 # implement encryption for messages (openssl chacha20 poly1305)
 # add test cases for encryption

@@ -6,5 +6,6 @@
       xmake
       meson
       gcc15
+      gdb
     ];
 }

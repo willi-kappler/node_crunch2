@@ -6,5 +6,6 @@
       xmake
       meson
       clang
+      gdb
     ];
 }

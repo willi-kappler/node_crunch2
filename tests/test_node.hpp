@@ -26,7 +26,13 @@ class TestDataProcessor: public NCNodeDataProcessor {
     public:
         void nc_init(std::vector<uint8_t> data) override;
         [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) override;
+
+        TestDataProcessor();
 };
+
+TestDataProcessor::TestDataProcessor():
+    NCNodeDataProcessor()
+    {}
 
 void TestDataProcessor::nc_init([[maybe_unused]] std::vector<uint8_t> data) {
 }
@@ -58,6 +64,7 @@ class TestSocket: public NCNetworkSocketBase {
 };
 
 TestSocket::TestSocket(std::vector<uint8_t> init_data):
+    NCNetworkSocketBase(),
     server_data(init_data),
     msg_to_node(),
     message_codec(TEST_KEY),
@@ -71,6 +78,8 @@ TestSocket::TestSocket(std::vector<uint8_t> init_data):
     } else {
         test_mode = init_data[0];
     }
+
+    msg_to_node.data = std::vector<uint8_t>();
 }
 
 void TestSocket::nc_send_data(std::vector<uint8_t> const data) {
@@ -143,6 +152,7 @@ class TestClient: public NCNetworkClientBase {
 };
 
 TestClient::TestClient(std::vector<uint8_t> init_data):
+    NCNetworkClientBase(),
     test_socket(init_data)
 {
     if (init_data.size() == 0) {

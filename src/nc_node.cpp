@@ -156,7 +156,8 @@ void NCNode::nc_run() {
     const std::lock_guard<std::mutex> lock(node_mutex);
     NCNetworkSocketBase socket = network_client_intern.nc_connect();
     socket.nc_send_data(message.data);
-    NCEncodedMessageToNode message2{socket.nc_receive_data()};
+    NCEncodedMessageToNode message2;
+    message2.data = socket.nc_receive_data();
     return message_codec_intern.nc_decode_message_from_server(message2);
 }
 

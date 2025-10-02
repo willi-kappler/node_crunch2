@@ -17,10 +17,6 @@ NCMessageCodecBase::NCMessageCodecBase(std::string const secret_key):
     NCMessageCodecBase(std::make_unique<NCCompressor>(),
     std::make_unique<NCEncryption>(secret_key))
     {}
-/*
-    compressor_intern(std::make_unique<NCCompressor>(NCCompressor())),
-    encryption_intern(std::make_unique<NCEncryption>(NCEncryption(secret_key))) {}
-*/
 
 NCMessageCodecBase::NCMessageCodecBase(std::unique_ptr<NCCompressor> nc_compressor,
     std::unique_ptr<NCEncryption> nc_encryption):

@@ -33,33 +33,50 @@ void NCNodeDataProcessor::nc_init([[maybe_unused]] std::vector<uint8_t> data) {
     return std::vector<uint8_t>();
 }
 
-NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor, NCMessageCodecNode const message_codec, NCNetworkClientBase const network_client):
+NCNode::NCNode(NCConfiguration config,
+    std::unique_ptr<NCNodeDataProcessor> data_processor,
+    std::unique_ptr<NCMessageCodecNode> message_codec,
+    std::unique_ptr<NCNetworkClientBase> network_client):
     config_intern(config),
     node_id(NCNodeID()),
     quit(false),
     max_error_count(5),
     node_mutex(),
-    message_codec_intern(message_codec),
-    network_client_intern(network_client),
-    data_processor_intern(data_processor)
+    message_codec_intern(std::move(message_codec)),
+    network_client_intern(std::move(network_client)),
+    data_processor_intern(std::move(data_processor))
     {}
 
-NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor, NCMessageCodecNode const message_codec):
-    NCNode(config, data_processor, message_codec, NCNetworkClient(config.server_address, config.server_port))
+NCNode::NCNode(NCConfiguration config,
+    std::unique_ptr<NCNodeDataProcessor> data_processor,
+    std::unique_ptr<NCMessageCodecNode> message_codec):
+    NCNode(config,
+        std::move(data_processor),
+        std::move(message_codec),
+        std::make_unique<NCNetworkClient>(config.server_address, config.server_port))
     {}
 
-NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor, NCNetworkClientBase const network_client):
-    NCNode(config, data_processor, NCMessageCodecNode(config.secret_key), network_client)
+NCNode::NCNode(NCConfiguration config,
+    std::unique_ptr<NCNodeDataProcessor> data_processor,
+    std::unique_ptr<NCNetworkClientBase> network_client):
+    NCNode(config,
+        std::move(data_processor),
+        std::make_unique<NCMessageCodecNode>(config.secret_key),
+        std::move(network_client))
     {}
 
-NCNode::NCNode(NCConfiguration config, NCNodeDataProcessor data_processor):
-    NCNode(config, data_processor, NCMessageCodecNode(config.secret_key), NCNetworkClient(config.server_address, config.server_port))
+NCNode::NCNode(NCConfiguration config,
+    std::unique_ptr<NCNodeDataProcessor> data_processor):
+    NCNode(config,
+        std::move(data_processor),
+        std::make_unique<NCMessageCodecNode>(config.secret_key),
+        std::make_unique<NCNetworkClient>(config.server_address, config.server_port))
     {}
 
 void NCNode::nc_run() {
     spdlog::info("NCNode::nc_run() - starting node");
-    NCEncodedMessageToServer const init_message = message_codec_intern.nc_gen_init_message(node_id);
-    NCEncodedMessageToServer const need_more_data_message = message_codec_intern.nc_gen_need_more_data_message(node_id);
+    NCEncodedMessageToServer const init_message = message_codec_intern->nc_gen_init_message(node_id);
+    NCEncodedMessageToServer const need_more_data_message = message_codec_intern->nc_gen_need_more_data_message(node_id);
     // TODO: make this configurable:
     auto const sleep_time = std::chrono::seconds(60);
 
@@ -85,7 +102,7 @@ void NCNode::nc_run() {
                 break;
                 case NCRunState::HasData:
                     spdlog::debug("Has data state, send result message");
-                    result_message = message_codec_intern.nc_gen_result_message(new_data, node_id);
+                    result_message = message_codec_intern->nc_gen_result_message(new_data, node_id);
                     result = nc_send_msg_return_answer(result_message);
                 break;
                 default:
@@ -102,7 +119,7 @@ void NCNode::nc_run() {
         switch (result.msg_type) {
             case NCServerMessageType::InitOK:
                 spdlog::debug("InitOK from server.");
-                data_processor_intern.nc_init(result.data);
+                data_processor_intern->nc_init(result.data);
                 run_state = NCRunState::NeedData;
             break;
             case NCServerMessageType::InvalidNodeID:
@@ -115,7 +132,7 @@ void NCNode::nc_run() {
             case NCServerMessageType::NewDataFromServer:
                 // Received new data from server.
                 spdlog::debug("New data from server.");
-                new_data = data_processor_intern.nc_process_data(result.data);
+                new_data = data_processor_intern->nc_process_data(result.data);
                 run_state = NCRunState::HasData;
             break;
             case NCServerMessageType::ResultOK:
@@ -154,17 +171,17 @@ void NCNode::nc_run() {
 
 [[nodiscard]] NCDecodedMessageFromServer NCNode::nc_send_msg_return_answer(NCEncodedMessageToServer const& message) {
     const std::lock_guard<std::mutex> lock(node_mutex);
-    NCNetworkSocketBase socket = network_client_intern.nc_connect();
-    socket.nc_send_data(message.data);
+    std::unique_ptr<NCNetworkSocketBase> socket = network_client_intern->nc_connect();
+    socket->nc_send_data(message.data);
     NCEncodedMessageToNode message2;
-    message2.data = socket.nc_receive_data();
-    return message_codec_intern.nc_decode_message_from_server(message2);
+    message2.data = socket->nc_receive_data();
+    return message_codec_intern->nc_decode_message_from_server(message2);
 }
 
 void NCNode::nc_send_heartbeat() {
     spdlog::info("NCNode::nc_send_heartbeat() - starting heartbeat thread.");
     auto const sleep_time = std::chrono::seconds(config_intern.heartbeat_timeout);
-    auto const heartbeat_message = message_codec_intern.nc_gen_heartbeat_message(node_id);
+    auto const heartbeat_message = message_codec_intern->nc_gen_heartbeat_message(node_id);
     uint8_t error_counter = 0;
     NCDecodedMessageFromServer result;
 

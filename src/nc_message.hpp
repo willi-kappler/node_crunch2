@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <expected>
+#include <memory>
 
 // Local includes:
 #include "nc_message_types.hpp"
@@ -30,22 +31,23 @@ class NCMessageCodecBase {
 
         // Constructor:
         NCMessageCodecBase(std::string const secret_key);
-        NCMessageCodecBase(NCCompressor const compressor, NCEncryption const encryption);
+        NCMessageCodecBase(std::unique_ptr<NCCompressor> compressor, 
+            std::unique_ptr<NCEncryption> encryption);
 
         // Desctructor:
         virtual ~NCMessageCodecBase() = default;
 
         // Default special member functions:
-        NCMessageCodecBase(NCMessageCodecBase&&) = default;
         NCMessageCodecBase(const NCMessageCodecBase&) = default;
         NCMessageCodecBase& operator=(const NCMessageCodecBase&) = default;
-
+        NCMessageCodecBase(NCMessageCodecBase&&) = default;
+        
         // Disable all other special member functions:
         NCMessageCodecBase& operator=(NCMessageCodecBase&&) = delete;
 
     private:
-        const NCCompressor compressor_intern;
-        const NCEncryption encryption_intern;
+        std::unique_ptr<NCCompressor> compressor_intern;
+        std::unique_ptr<NCEncryption> encryption_intern;
 };
 
 class NCMessageCodecNode: NCMessageCodecBase {
@@ -63,18 +65,19 @@ class NCMessageCodecNode: NCMessageCodecBase {
 
         // Constructor:
         NCMessageCodecNode(std::string const secret_key);
-        NCMessageCodecNode(NCCompressor const compressor, NCEncryption const encryption);
+        NCMessageCodecNode(std::unique_ptr<NCCompressor> compressor,
+            std::unique_ptr<NCEncryption> encryption);
 
         // Desctructor:
         virtual ~NCMessageCodecNode() = default;
 
        // Default special member functions:
-        NCMessageCodecNode(NCMessageCodecNode&&) = default;
-        NCMessageCodecNode(const NCMessageCodecNode&) = default;
-        NCMessageCodecNode& operator=(const NCMessageCodecNode&) = default;
-
-        // Disable all other special member functions:
-        NCMessageCodecNode& operator=(NCMessageCodecNode&&) = delete;
+       NCMessageCodecNode(const NCMessageCodecNode&) = default;
+       NCMessageCodecNode& operator=(const NCMessageCodecNode&) = default;
+       NCMessageCodecNode(NCMessageCodecNode&&) = default;
+       
+       // Disable all other special member functions:
+       NCMessageCodecNode& operator=(NCMessageCodecNode&&) = delete;
 };
 
 class NCMessageCodecServer: NCMessageCodecBase {
@@ -92,16 +95,17 @@ class NCMessageCodecServer: NCMessageCodecBase {
 
         // Constructor:
         NCMessageCodecServer(std::string const secret_key);
-        NCMessageCodecServer(NCCompressor compressor, NCEncryption encryption);
+        NCMessageCodecServer(std::unique_ptr<NCCompressor> compressor,
+            std::unique_ptr<NCEncryption> encryption);
 
         // Desctructor:
         virtual ~NCMessageCodecServer() = default;
 
         // Default special member functions:
-        NCMessageCodecServer(NCMessageCodecServer&&) = default;
         NCMessageCodecServer(const NCMessageCodecServer&) = default;
         NCMessageCodecServer& operator=(const NCMessageCodecServer&) = default;
-
+        NCMessageCodecServer(NCMessageCodecServer&&) = default;
+        
         // Disable all other special member functions:
         NCMessageCodecServer& operator=(NCMessageCodecServer&&) = delete;
 };

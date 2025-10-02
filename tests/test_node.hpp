@@ -145,29 +145,30 @@ void TestSocket::nc_send_data(std::vector<uint8_t> const data) {
 
 class TestClient: public NCNetworkClientBase {
     public:
-        NCNetworkSocketBase nc_connect() override;
+        std::unique_ptr<NCNetworkSocketBase> nc_connect() override;
         TestClient(std::vector<uint8_t> init_data);
 
-        TestSocket test_socket;
+        std::vector<uint8_t> data_intern;
 };
 
 TestClient::TestClient(std::vector<uint8_t> init_data):
     NCNetworkClientBase(),
-    test_socket(init_data)
+    data_intern(init_data)
 {
     if (init_data.size() == 0) {
         throw std::invalid_argument("init_data is empty!");
     }
 }
 
-NCNetworkSocketBase TestClient::nc_connect() {
-    return test_socket;
+std::unique_ptr<NCNetworkSocketBase> TestClient::nc_connect() {
+    return std::make_unique<TestSocket>(data_intern);
 }
 
 TEST_CASE("Create node, send init message", "[node]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_KEY);
-    TestDataProcessor data_processor1;
-    TestClient client1({10});
-    NCNode node1(config1, data_processor1, client1);
+    std::vector<uint8_t> init_data = {10};
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
 }

@@ -14,18 +14,24 @@
 
 namespace NodeCrunch2 {
 NCMessageCodecBase::NCMessageCodecBase(std::string const secret_key):
-    compressor_intern(),
-    encryption_intern(NCEncryption(secret_key)) {}
+    NCMessageCodecBase(std::make_unique<NCCompressor>(),
+    std::make_unique<NCEncryption>(secret_key))
+    {}
+/*
+    compressor_intern(std::make_unique<NCCompressor>(NCCompressor())),
+    encryption_intern(std::make_unique<NCEncryption>(NCEncryption(secret_key))) {}
+*/
 
-NCMessageCodecBase::NCMessageCodecBase(NCCompressor const nc_compressor, NCEncryption const nc_encryption):
-    compressor_intern(nc_compressor),
-    encryption_intern(nc_encryption) {}
+NCMessageCodecBase::NCMessageCodecBase(std::unique_ptr<NCCompressor> nc_compressor,
+    std::unique_ptr<NCEncryption> nc_encryption):
+    compressor_intern(std::move(nc_compressor)),
+    encryption_intern(std::move(nc_encryption)) {}
 
 [[nodiscard]] std::vector<uint8_t> NCMessageCodecBase::nc_encode(NCDecompressedMessage decompressed_message) const {
         // 2. Compress message:
-        NCCompressedMessage compressed_message = compressor_intern.nc_compress_message(decompressed_message);
+        NCCompressedMessage compressed_message = compressor_intern->nc_compress_message(decompressed_message);
         // 3. Encrypt compressed message:
-        NCEncryptedMessage encrypted_message = encryption_intern.nc_encrypt_message(NCDecryptedMessage{compressed_message.data});
+        NCEncryptedMessage encrypted_message = encryption_intern->nc_encrypt_message(NCDecryptedMessage{compressed_message.data});
         // 4. Encode encrypted compressed message:
         std::vector<uint8_t> result;
         uint32_t const result_size = NC_NONCE_LENGTH + NC_GCM_TAG_LENGTH + static_cast<uint32_t>(encrypted_message.data.size());
@@ -59,9 +65,9 @@ NCMessageCodecBase::NCMessageCodecBase(NCCompressor const nc_compressor, NCEncry
     encrypted_message.data = std::vector<uint8_t>(m_begin3, message.cend());
 
     // 2. Decrypt message:
-    NCDecryptedMessage decrypted_message = encryption_intern.nc_decrypt_message(encrypted_message);
+    NCDecryptedMessage decrypted_message = encryption_intern->nc_decrypt_message(encrypted_message);
     // 3. Decompress decrpted message:
-    NCDecompressedMessage decompressed_message = compressor_intern.nc_decompress_message(NCCompressedMessage{decrypted_message.data});
+    NCDecompressedMessage decompressed_message = compressor_intern->nc_decompress_message(NCCompressedMessage{decrypted_message.data});
 
     return decompressed_message;
 }
@@ -70,8 +76,9 @@ NCMessageCodecNode::NCMessageCodecNode(std::string const secret_key):
     NCMessageCodecBase(secret_key)
     {}
 
-NCMessageCodecNode::NCMessageCodecNode(NCCompressor const nc_compressor, NCEncryption const nc_encryption):
-    NCMessageCodecBase(nc_compressor, nc_encryption)
+NCMessageCodecNode::NCMessageCodecNode(std::unique_ptr<NCCompressor> nc_compressor,
+    std::unique_ptr<NCEncryption> nc_encryption):
+    NCMessageCodecBase(std::move(nc_compressor), std::move(nc_encryption))
     {}
 
 [[nodiscard]] NCEncodedMessageToServer NCMessageCodecNode::nc_encode_message_to_server(
@@ -166,8 +173,10 @@ NCMessageCodecNode::NCMessageCodecNode(NCCompressor const nc_compressor, NCEncry
 NCMessageCodecServer::NCMessageCodecServer(std::string const secret_key):
     NCMessageCodecBase(secret_key) {}
 
-NCMessageCodecServer::NCMessageCodecServer(NCCompressor nc_compressor2, NCEncryption nc_encryption2):
-    NCMessageCodecBase(nc_compressor2, nc_encryption2) {}
+NCMessageCodecServer::NCMessageCodecServer(std::unique_ptr<NCCompressor> nc_compressor,
+    std::unique_ptr<NCEncryption> nc_encryption):
+    NCMessageCodecBase(std::move(nc_compressor), std::move(nc_encryption))
+    {}
 
 [[nodiscard]] NCEncodedMessageToNode NCMessageCodecServer::nc_encode_message_to_node(
     NCServerMessageType const msg_type, std::vector<uint8_t> const& data) const {

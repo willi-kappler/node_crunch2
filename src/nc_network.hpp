@@ -56,7 +56,7 @@ class NCNetworkSocket: public NCNetworkSocketBase {
 
 class NCNetworkClientBase {
     public:
-        virtual NCNetworkSocketBase nc_connect();
+        virtual std::unique_ptr<NCNetworkSocketBase> nc_connect();
 
         // Default special member functions:
         NCNetworkClientBase() = default;
@@ -69,7 +69,7 @@ class NCNetworkClientBase {
 
 class NCNetworkClient: public NCNetworkClientBase {
     public:
-        NCNetworkSocketBase nc_connect() override;
+        std::unique_ptr<NCNetworkSocketBase> nc_connect() override;
         //NCNetworkSocket nc_connect_to(std::string_view server, std::string_view port);
 
         // Constructor:
@@ -89,7 +89,7 @@ class NCNetworkClient: public NCNetworkClientBase {
 
 class NCNetworkServerBase {
     public:
-        virtual NCNetworkSocketBase nc_accept();
+        virtual std::unique_ptr<NCNetworkSocketBase> nc_accept();
 
         // Default special member functions:
         NCNetworkServerBase() = default;
@@ -102,7 +102,7 @@ class NCNetworkServerBase {
 
 class NCNetworkServer: public NCNetworkServerBase {
     public:
-        NCNetworkSocketBase nc_accept() override;
+        std::unique_ptr<NCNetworkSocketBase> nc_accept() override;
 
         // Constructor:
         NCNetworkServer(uint16_t server_port);

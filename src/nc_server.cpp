@@ -21,25 +21,35 @@
 #include "nc_util.hpp"
 
 namespace NodeCrunch2 {
-NCServer::NCServer(NCConfiguration config, NCMessageCodecServer const message_codec, NCNetworkServerBase const network_server):
+NCServer::NCServer(NCConfiguration config,
+    std::unique_ptr<NCMessageCodecServer> message_codec,
+    std::unique_ptr<NCNetworkServerBase> network_server):
     config_intern(config),
     quit(false),
     all_nodes(),
     server_mutex(),
-    message_codec_intern(message_codec),
-    network_server_intern(network_server)
+    message_codec_intern(std::move(message_codec)),
+    network_server_intern(std::move(network_server))
     {}
 
-NCServer::NCServer(NCConfiguration config, NCMessageCodecServer const message_codec):
-    NCServer(config, message_codec, NCNetworkServer(config.server_port))
+NCServer::NCServer(NCConfiguration config,
+    std::unique_ptr<NCMessageCodecServer> message_codec):
+    NCServer(config,
+        std::move(message_codec),
+        std::make_unique<NCNetworkServer>(config.server_port))
     {}
 
-NCServer::NCServer(NCConfiguration config, NCNetworkServerBase const network_server):
-    NCServer(config, NCMessageCodecServer(config.secret_key), network_server)
+NCServer::NCServer(NCConfiguration config,
+    std::unique_ptr<NCNetworkServerBase> network_server):
+    NCServer(config,
+        std::make_unique<NCMessageCodecServer>(config.secret_key),
+        std::move(network_server))
     {}
 
 NCServer::NCServer(NCConfiguration config):
-    NCServer(config, NCMessageCodecServer(config.secret_key), NCNetworkServer(config.server_port))
+    NCServer(config,
+        std::make_unique<NCMessageCodecServer>(config.secret_key),
+        std::make_unique<NCNetworkServer>(config.server_port))
     {}
 
 void NCServer::nc_run() {
@@ -48,7 +58,7 @@ void NCServer::nc_run() {
     // Make threahsold configurable
     const uint32_t max_thread_count = 10;
 
-    NCNetworkSocketBase socket;
+    std::unique_ptr<NCNetworkSocketBase> socket;
 
     // Have to use lambda in order to call non-static method:
     std::thread heartbeat_thread([this] () {nc_check_heartbeat();});
@@ -59,7 +69,7 @@ void NCServer::nc_run() {
     while (!quit.load()) {
         // Wait for a client to connect
         try {
-            socket = network_server_intern.nc_accept();
+            socket = network_server_intern->nc_accept();
         } catch (asio::system_error &e) {
             spdlog::error("Could not accept connection from socket: {}", e.what());
             quit.store(true);
@@ -120,55 +130,55 @@ void NCServer::nc_update_node_time(NCNodeID node_id) {
     all_nodes[node_id] = node_time;
 }
 
-void NCServer::nc_handle_node(NCNetworkSocketBase &socket) {
+void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
     //spdlog::debug("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
-    spdlog::debug("NCServer::nc_handle_node(), ip: {}", socket.nc_address());
+    spdlog::debug("NCServer::nc_handle_node(), ip: {}", socket->nc_address());
     //uint8_t quit_counter;
-    std::vector<uint8_t> message = socket.nc_receive_data();
-    NCDecodedMessageFromNode node_message = message_codec_intern.nc_decode_message_from_node(NCEncodedMessageToServer(message));
+    std::vector<uint8_t> message = socket->nc_receive_data();
+    NCDecodedMessageFromNode node_message = message_codec_intern->nc_decode_message_from_node(NCEncodedMessageToServer(message));
     NCNodeID const node_id = node_message.node_id;
     NCEncodedMessageToNode msg_to_node;
 
     if (nc_is_job_done()) {
         quit.store(true);
-        msg_to_node = message_codec_intern.nc_gen_quit_message();
+        msg_to_node = message_codec_intern->nc_gen_quit_message();
     } else {
         switch (node_message.msg_type) {
             case NCNodeMessageType::Init:
                 nc_register_new_node(node_id);
-                msg_to_node = message_codec_intern.nc_gen_init_message_ok(nc_get_init_data());
+                msg_to_node = message_codec_intern->nc_gen_init_message_ok(nc_get_init_data());
             break;
             case NCNodeMessageType::Heartbeat:
                 if (nc_valid_node_id(node_id)) {
                     nc_update_node_time(node_id);
-                    msg_to_node = message_codec_intern.nc_gen_heartbeat_message_ok();
+                    msg_to_node = message_codec_intern->nc_gen_heartbeat_message_ok();
                 } else {
-                    msg_to_node = message_codec_intern.nc_gen_invalid_node_id_error();
+                    msg_to_node = message_codec_intern->nc_gen_invalid_node_id_error();
                 }
             break;
             case NCNodeMessageType::NodeNeedsMoreData:
                 if (nc_valid_node_id(node_id)) {
-                    msg_to_node = message_codec_intern.nc_gen_new_data_message(nc_get_new_data(node_id));
+                    msg_to_node = message_codec_intern->nc_gen_new_data_message(nc_get_new_data(node_id));
                 } else {
-                    msg_to_node = message_codec_intern.nc_gen_invalid_node_id_error();
+                    msg_to_node = message_codec_intern->nc_gen_invalid_node_id_error();
                 }
             break;
             case NCNodeMessageType::NewResultFromNode:
                 if (nc_valid_node_id(node_id)) {
                     nc_process_result(node_id, node_message.data);
-                    msg_to_node = message_codec_intern.nc_gen_result_ok_message();
+                    msg_to_node = message_codec_intern->nc_gen_result_ok_message();
                 } else {
-                    msg_to_node = message_codec_intern.nc_gen_invalid_node_id_error();
+                    msg_to_node = message_codec_intern->nc_gen_invalid_node_id_error();
                 }
             break;
             default:
                 spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
-                msg_to_node = message_codec_intern.nc_gen_unknown_error();
+                msg_to_node = message_codec_intern->nc_gen_unknown_error();
         }
     }
 
     // Send answer back to node:
-    socket.nc_send_data(msg_to_node.data);
+    socket->nc_send_data(msg_to_node.data);
 }
 
 void NCServer::nc_check_heartbeat() {

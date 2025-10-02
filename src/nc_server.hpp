@@ -26,9 +26,13 @@
 namespace NodeCrunch2 {
 class NCServer {
         // Constructor:
-        NCServer(NCConfiguration config, NCMessageCodecServer const message_codec, NCNetworkServerBase const network_server);
-        NCServer(NCConfiguration config, NCMessageCodecServer const message_codec);
-        NCServer(NCConfiguration config, NCNetworkServerBase const network_server);
+        NCServer(NCConfiguration config,
+            std::unique_ptr<NCMessageCodecServer> message_codec,
+            std::unique_ptr<NCNetworkServerBase> network_server);
+        NCServer(NCConfiguration config,
+            std::unique_ptr<NCMessageCodecServer> message_codec);
+        NCServer(NCConfiguration config,
+            std::unique_ptr<NCNetworkServerBase> network_server);
         NCServer(NCConfiguration config);
 
         // Destructor:
@@ -52,12 +56,12 @@ class NCServer {
         std::unordered_map<NCNodeID, std::chrono::time_point<std::chrono::steady_clock>> all_nodes;
         // In code use: const std::lock_guard<std::mutex> lock(server_mutex);
         std::mutex server_mutex;
-        NCMessageCodecServer message_codec_intern;
-        NCNetworkServerBase network_server_intern;
+        std::unique_ptr<NCMessageCodecServer> message_codec_intern;
+        std::unique_ptr<NCNetworkServerBase> network_server_intern;
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);
-        void nc_handle_node(NCNetworkSocketBase &sock);
+        void nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &sock);
         void nc_check_heartbeat();
         bool nc_valid_node_id(NCNodeID node_id);
 

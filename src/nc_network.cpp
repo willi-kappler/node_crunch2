@@ -56,14 +56,14 @@ NCNetworkSocket::NCNetworkSocket(tcp::socket &socket):
     NCNetworkSocketBase(),
     socket_intern(std::move(socket)) {}
 
-NCNetworkSocketBase NCNetworkClientBase::nc_connect() {
-    return NCNetworkSocketBase();
+std::unique_ptr<NCNetworkSocketBase> NCNetworkClientBase::nc_connect() {
+    return std::make_unique<NCNetworkSocketBase>();
 }
 
-NCNetworkSocketBase NCNetworkClient::nc_connect() {
+std::unique_ptr<NCNetworkSocketBase> NCNetworkClient::nc_connect() {
     tcp::socket socket(io_context_intern);
     asio::connect(socket, endpoints_intern);
-    return NCNetworkSocket(socket);
+    return std::make_unique<NCNetworkSocket>(socket);
 }
 
 NCNetworkClient::NCNetworkClient(std::string_view server, uint16_t port):
@@ -73,14 +73,14 @@ NCNetworkClient::NCNetworkClient(std::string_view server, uint16_t port):
     endpoints_intern(resolver_intern.resolve(server, std::to_string(port)))
     {}
 
-NCNetworkSocketBase NCNetworkServerBase::nc_accept() {
-    return NCNetworkSocketBase();
+std::unique_ptr<NCNetworkSocketBase> NCNetworkServerBase::nc_accept() {
+    return std::make_unique<NCNetworkSocketBase>();
 }
 
-NCNetworkSocketBase NCNetworkServer::nc_accept() {
+std::unique_ptr<NCNetworkSocketBase> NCNetworkServer::nc_accept() {
     tcp::socket socket(io_context_intern);
     acceptor_intern.accept(socket);
-    return NCNetworkSocket(socket);
+    return std::make_unique<NCNetworkSocket>(socket);
 }
 
 NCNetworkServer::NCNetworkServer(uint16_t server_port):

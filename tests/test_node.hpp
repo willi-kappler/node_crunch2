@@ -10,6 +10,7 @@
 */
 
 // STD includes:
+#include <thread>
 
 // External includes:
 #include <snitch/snitch.hpp>
@@ -28,17 +29,41 @@ class TestDataProcessor: public NCNodeDataProcessor {
         [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) override;
 
         TestDataProcessor();
+
+        std::vector<uint8_t> initial_data;
 };
 
 TestDataProcessor::TestDataProcessor():
-    NCNodeDataProcessor()
+    NCNodeDataProcessor(),
+    initial_data()
     {}
 
-void TestDataProcessor::nc_init([[maybe_unused]] std::vector<uint8_t> data) {
+void TestDataProcessor::nc_init(std::vector<uint8_t> data) {
+    initial_data = data;
 }
 
-[[nodiscard]] std::vector<uint8_t> TestDataProcessor::nc_process_data([[maybe_unused]] std::vector<uint8_t> data) {
-    return std::vector<uint8_t>();
+[[nodiscard]] std::vector<uint8_t> TestDataProcessor::nc_process_data(std::vector<uint8_t> data) {
+    std::vector<uint8_t> result;
+
+    size_t i, j = 0;
+    uint8_t value = 0;
+
+    for (i = 0; i < data.size(); i++) {
+        value = data[i] * 2;
+        value = initial_data[j] + value;
+        result.push_back(value);
+
+        j++;
+        if (j >= initial_data.size()) {
+            j = 0;
+        }
+    }
+
+    // Simulate long computation:
+    auto const sleep_time = std::chrono::seconds(2);
+    std::this_thread::sleep_for(sleep_time);
+
+    return result;
 }
 
 class TestSocketData {
@@ -85,8 +110,6 @@ TestSocket::TestSocket(std::shared_ptr<TestSocketData> init_data):
     {}
 
 void TestSocket::nc_send_data(std::vector<uint8_t> const data) {
-    // TODO: process data and react:
-
     NCDecodedMessageFromNode node_message = data_intern->message_codec.nc_decode_message_from_node(NCEncodedMessageToServer(data));
     NCNodeID const node_id = node_message.node_id;
 
@@ -103,33 +126,31 @@ void TestSocket::nc_send_data(std::vector<uint8_t> const data) {
         break;
         case NCNodeMessageType::Heartbeat:
             data_intern->heartbeat_counter++;
+
             if (data_intern->test_mode == 20) {
                 data_intern->msg_to_node = data_intern->message_codec.nc_gen_quit_message();
             } else {
                 data_intern->msg_to_node = data_intern->message_codec.nc_gen_heartbeat_message_ok();
             }
         break;
-        case NCNodeMessageType::NodeNeedsMoreData:
+        case NCNodeMessageType::NewResultFromNode:
+            data_intern->server_data.clear();
+
+            for (uint8_t v: node_message.data) {
+                data_intern->server_data.push_back(v);
+            }
+
             if (data_intern->test_mode == 30) {
                 data_intern->msg_to_node = data_intern->message_codec.nc_gen_quit_message();
             } else {
-                data_intern->msg_to_node = data_intern->message_codec.nc_gen_new_data_message(data_intern->server_data);
+                data_intern->msg_to_node = data_intern->message_codec.nc_gen_result_ok_message();
             }
         break;
-        case NCNodeMessageType::NewResultFromNode:
-            for (size_t i = 0; i < data_intern->server_data.size(); i++) {
-                data_intern->server_data[i] = node_message.data[i] + 10;
-            }
-
-            /*
-            std::transform(node_message.data.begin(), node_message.data.end(), server_data.begin(),
-               [](uint8_t x) { return x + 10; });
-            */
-
+        case NCNodeMessageType::NodeNeedsMoreData:
             if (data_intern->test_mode == 40) {
                 data_intern->msg_to_node = data_intern->message_codec.nc_gen_quit_message();
             } else {
-                data_intern->msg_to_node = data_intern->message_codec.nc_gen_result_ok_message();
+                data_intern->msg_to_node = data_intern->message_codec.nc_gen_new_data_message(data_intern->server_data);
             }
         break;
         default:
@@ -162,17 +183,23 @@ std::unique_ptr<NCNetworkSocketBase> TestClient::nc_connect() {
     return std::make_unique<TestSocket>(data_intern);
 }
 
-TEST_CASE("Create node, send init message", "[node]" ) {
+TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_KEY);
     std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
     init_data->test_mode = 10;
+    init_data->server_data = {1, 2, 3, 4, 5};
 
     std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
     std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
 
-    REQUIRE(init_data->server_data.size() == 0);
+    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data[0] == 1);
+    REQUIRE(init_data->server_data[1] == 2);
+    REQUIRE(init_data->server_data[2] == 3);
+    REQUIRE(init_data->server_data[3] == 4);
+    REQUIRE(init_data->server_data[4] == 5);
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
     //REQUIRE(init_data->msg_to_node.data == expected_message.data);
     REQUIRE(init_data->heartbeat_counter == 0);
@@ -180,5 +207,112 @@ TEST_CASE("Create node, send init message", "[node]" ) {
     REQUIRE(init_data->node_messages.size() == 1);
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->test_mode == 10);
+
+}
+
+TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
+    NCConfiguration config1 = NCConfiguration(TEST_KEY);
+    config1.heartbeat_timeout = 10;
+    std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
+    init_data->test_mode = 20;
+    init_data->server_data = {1, 2, 3, 4, 5};
+
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    NCNode node1(config1, std::move(data_processor1), std::move(client1));
+    node1.nc_run();
+
+    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data[0] == 31);
+    REQUIRE(init_data->server_data[1] == 62);
+    REQUIRE(init_data->server_data[2] == 93);
+    REQUIRE(init_data->server_data[3] == 124);
+    REQUIRE(init_data->server_data[4] == 155);
+
+    NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
+    //REQUIRE(init_data->msg_to_node.data == expected_message.data);
+    REQUIRE(init_data->heartbeat_counter == 1);
+    REQUIRE(init_data->node_ids.size() == 11);
+
+    REQUIRE(init_data->node_messages.size() == 11);
+    REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
+    REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
+    REQUIRE(init_data->node_messages[2] == NCNodeMessageType::NewResultFromNode);
+    REQUIRE(init_data->node_messages[3] == NCNodeMessageType::NodeNeedsMoreData);
+    REQUIRE(init_data->node_messages[4] == NCNodeMessageType::NewResultFromNode);
+    REQUIRE(init_data->node_messages[5] == NCNodeMessageType::NodeNeedsMoreData);
+    REQUIRE(init_data->node_messages[6] == NCNodeMessageType::NewResultFromNode);
+    REQUIRE(init_data->node_messages[7] == NCNodeMessageType::NodeNeedsMoreData);
+    REQUIRE(init_data->node_messages[8] == NCNodeMessageType::NewResultFromNode);
+    REQUIRE(init_data->node_messages[9] == NCNodeMessageType::NodeNeedsMoreData);
+    REQUIRE(init_data->node_messages[10] == NCNodeMessageType::Heartbeat);
+
+    REQUIRE(init_data->test_mode == 20);
+
+}
+
+TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
+    NCConfiguration config1 = NCConfiguration(TEST_KEY);
+    config1.heartbeat_timeout = 10;
+    std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
+    init_data->test_mode = 30;
+    init_data->server_data = {1, 2, 3, 4, 5};
+
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    NCNode node1(config1, std::move(data_processor1), std::move(client1));
+    node1.nc_run();
+
+    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data[0] == 3);
+    REQUIRE(init_data->server_data[1] == 6);
+    REQUIRE(init_data->server_data[2] == 9);
+    REQUIRE(init_data->server_data[3] == 12);
+    REQUIRE(init_data->server_data[4] == 15);
+
+    NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
+    //REQUIRE(init_data->msg_to_node.data == expected_message.data);
+    REQUIRE(init_data->heartbeat_counter == 1);
+    REQUIRE(init_data->node_ids.size() == 4);
+
+    REQUIRE(init_data->node_messages.size() == 4);
+    REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
+    REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
+    REQUIRE(init_data->node_messages[2] == NCNodeMessageType::NewResultFromNode);
+    REQUIRE(init_data->node_messages[3] == NCNodeMessageType::Heartbeat);
+
+    REQUIRE(init_data->test_mode == 30);
+
+}
+
+TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" ) {
+    NCConfiguration config1 = NCConfiguration(TEST_KEY);
+    config1.heartbeat_timeout = 10;
+    std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
+    init_data->test_mode = 40;
+    init_data->server_data = {1, 2, 3, 4, 5};
+
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    NCNode node1(config1, std::move(data_processor1), std::move(client1));
+    node1.nc_run();
+
+    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data[0] == 1);
+    REQUIRE(init_data->server_data[1] == 2);
+    REQUIRE(init_data->server_data[2] == 3);
+    REQUIRE(init_data->server_data[3] == 4);
+    REQUIRE(init_data->server_data[4] == 5);
+
+    NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
+    //REQUIRE(init_data->msg_to_node.data == expected_message.data);
+    REQUIRE(init_data->heartbeat_counter == 0);
+    REQUIRE(init_data->node_ids.size() == 2);
+
+    REQUIRE(init_data->node_messages.size() == 2);
+    REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
+    REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
+
+    REQUIRE(init_data->test_mode == 40);
 
 }

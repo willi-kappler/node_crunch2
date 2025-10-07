@@ -15,7 +15,6 @@
 #include <string>
 #include <atomic>
 #include <mutex>
-#include <chrono>
 
 // Local includes:
 #include "nc_config.hpp"

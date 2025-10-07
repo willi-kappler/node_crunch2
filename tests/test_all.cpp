@@ -5,7 +5,9 @@
 
     This file includes all the test cases.
 
-    Run with: xmake run -d -w ./ nc_test
+    Run with:
+    normal: xmake run -w ./ nc_test
+    debug:  xmake run -d -w ./ nc_test
     List all tests: xmake run -w ./ nc_test -l
 */
 

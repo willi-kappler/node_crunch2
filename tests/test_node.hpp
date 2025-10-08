@@ -21,28 +21,28 @@
 
 using namespace NodeCrunch2;
 
-const std::string TEST_KEY("12345678901234567890123456789012");
+const std::string TEST_NODE_KEY("12345678901234567890123456789012");
 
-class TestDataProcessor: public NCNodeDataProcessor {
+class TestNodeDataProcessor: public NCNodeDataProcessor {
     public:
         void nc_init(std::vector<uint8_t> data) override;
         [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) override;
 
-        TestDataProcessor();
+        TestNodeDataProcessor();
 
         std::vector<uint8_t> initial_data;
 };
 
-TestDataProcessor::TestDataProcessor():
+TestNodeDataProcessor::TestNodeDataProcessor():
     NCNodeDataProcessor(),
     initial_data()
     {}
 
-void TestDataProcessor::nc_init(std::vector<uint8_t> data) {
+void TestNodeDataProcessor::nc_init(std::vector<uint8_t> data) {
     initial_data = data;
 }
 
-[[nodiscard]] std::vector<uint8_t> TestDataProcessor::nc_process_data(std::vector<uint8_t> data) {
+[[nodiscard]] std::vector<uint8_t> TestNodeDataProcessor::nc_process_data(std::vector<uint8_t> data) {
     std::vector<uint8_t> result;
 
     size_t i, j = 0;
@@ -66,7 +66,7 @@ void TestDataProcessor::nc_init(std::vector<uint8_t> data) {
     return result;
 }
 
-class TestSocketData {
+class TestNodeSocketData {
     public:
 
         // Members used in test cases
@@ -78,20 +78,20 @@ class TestSocketData {
         std::vector<NCNodeMessageType> node_messages;
         uint8_t test_mode;
 
-        TestSocketData();
+        TestNodeSocketData();
 };
 
-TestSocketData::TestSocketData():
+TestNodeSocketData::TestNodeSocketData():
     server_data(),
     msg_to_node(),
-    message_codec(TEST_KEY),
+    message_codec(TEST_NODE_KEY),
     heartbeat_counter(),
     node_ids(),
     node_messages(),
     test_mode()
     {}
 
-class TestSocket: public NCNetworkSocketBase {
+class TestNodeSocket: public NCNetworkSocketBase {
     public:
         // API
         void nc_send_data(std::vector<uint8_t> const data) override;
@@ -99,17 +99,17 @@ class TestSocket: public NCNetworkSocketBase {
         [[nodiscard]] std::string nc_address() override;
 
         // Constructor
-        TestSocket(std::shared_ptr<TestSocketData> init_data);
+        TestNodeSocket(std::shared_ptr<TestNodeSocketData> init_data);
 
-        std::shared_ptr<TestSocketData> data_intern;
+        std::shared_ptr<TestNodeSocketData> data_intern;
 };
 
-TestSocket::TestSocket(std::shared_ptr<TestSocketData> init_data):
+TestNodeSocket::TestNodeSocket(std::shared_ptr<TestNodeSocketData> init_data):
     NCNetworkSocketBase(),
     data_intern(init_data)
     {}
 
-void TestSocket::nc_send_data(std::vector<uint8_t> const data) {
+void TestNodeSocket::nc_send_data(std::vector<uint8_t> const data) {
     NCDecodedMessageFromNode node_message = data_intern->message_codec.nc_decode_message_from_node(NCEncodedMessageToServer(data));
     NCNodeID const node_id = node_message.node_id;
 
@@ -158,38 +158,38 @@ void TestSocket::nc_send_data(std::vector<uint8_t> const data) {
     }
 }
 
-[[nodiscard]] std::vector<uint8_t> TestSocket::nc_receive_data() {
+[[nodiscard]] std::vector<uint8_t> TestNodeSocket::nc_receive_data() {
     return data_intern->msg_to_node.data;
 }
 
-[[nodiscard]] std::string TestSocket::nc_address() {
-    return std::string("TestSocket");
+[[nodiscard]] std::string TestNodeSocket::nc_address() {
+    return std::string("TestNodeSocket");
 }
 
 class TestClient: public NCNetworkClientBase {
     public:
         std::unique_ptr<NCNetworkSocketBase> nc_connect() override;
-        TestClient(std::shared_ptr<TestSocketData> init_data);
+        TestClient(std::shared_ptr<TestNodeSocketData> init_data);
 
-        std::shared_ptr<TestSocketData> data_intern;
+        std::shared_ptr<TestNodeSocketData> data_intern;
 };
 
-TestClient::TestClient(std::shared_ptr<TestSocketData> init_data):
+TestClient::TestClient(std::shared_ptr<TestNodeSocketData> init_data):
     NCNetworkClientBase(),
     data_intern(init_data)
     {}
 
 std::unique_ptr<NCNetworkSocketBase> TestClient::nc_connect() {
-    return std::make_unique<TestSocket>(data_intern);
+    return std::make_unique<TestNodeSocket>(data_intern);
 }
 
 TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
-    NCConfiguration config1 = NCConfiguration(TEST_KEY);
-    std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
+    NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
+    std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 10;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
     std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
@@ -211,13 +211,13 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
 }
 
 TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
-    NCConfiguration config1 = NCConfiguration(TEST_KEY);
+    NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
     config1.heartbeat_timeout = 10;
-    std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
+    std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 20;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
     std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
@@ -252,13 +252,13 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
 }
 
 TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
-    NCConfiguration config1 = NCConfiguration(TEST_KEY);
+    NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
     config1.heartbeat_timeout = 10;
-    std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
+    std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 30;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
     std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
@@ -286,13 +286,13 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
 }
 
 TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" ) {
-    NCConfiguration config1 = NCConfiguration(TEST_KEY);
+    NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
     config1.heartbeat_timeout = 10;
-    std::shared_ptr<TestSocketData> init_data = std::make_shared<TestSocketData>();
+    std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 40;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestDataProcessor>();
+    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
     std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();

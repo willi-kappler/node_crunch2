@@ -23,16 +23,39 @@
 #include "nc_network.hpp"
 
 namespace NodeCrunch2 {
+class NCServerDataProcessor {
+    public:
+        // Default special member functions:
+        NCServerDataProcessor() = default;
+        virtual ~NCServerDataProcessor() = default;
+        NCServerDataProcessor (NCServerDataProcessor&&) = default;
+        NCServerDataProcessor(const NCServerDataProcessor&) = default;
+        NCServerDataProcessor& operator=(const NCServerDataProcessor&) = default;
+        NCServerDataProcessor& operator=(NCServerDataProcessor&&) = default;
+
+        // Must be implemented by the user:
+        [[nodiscard]] virtual std::vector<uint8_t> nc_get_init_data();
+        [[nodiscard]] virtual bool nc_is_job_done();
+        virtual void nc_save_data();
+        virtual void nc_node_timeout(NCNodeID node_id);
+        [[nodiscard]] virtual std::vector<uint8_t> nc_get_new_data(NCNodeID node_id);
+        virtual void nc_process_result(NCNodeID node_id, std::vector<uint8_t> result);
+};
+
 class NCServer {
         // Constructor:
         NCServer(NCConfiguration config,
+            std::unique_ptr<NCServerDataProcessor> data_processor,
             std::unique_ptr<NCMessageCodecServer> message_codec,
             std::unique_ptr<NCNetworkServerBase> network_server);
         NCServer(NCConfiguration config,
+            std::unique_ptr<NCServerDataProcessor> data_processor,
             std::unique_ptr<NCMessageCodecServer> message_codec);
         NCServer(NCConfiguration config,
+            std::unique_ptr<NCServerDataProcessor> data_processor,
             std::unique_ptr<NCNetworkServerBase> network_server);
-        NCServer(NCConfiguration config);
+        NCServer(NCConfiguration config,
+            std::unique_ptr<NCServerDataProcessor> data_processor);
 
         // Destructor:
         virtual ~NCServer() = default;
@@ -53,25 +76,16 @@ class NCServer {
         NCConfiguration config_intern;
         std::atomic_bool quit;
         std::unordered_map<NCNodeID, std::chrono::time_point<std::chrono::steady_clock>> all_nodes;
-        // In code use: const std::lock_guard<std::mutex> lock(server_mutex);
         std::mutex server_mutex;
         std::unique_ptr<NCMessageCodecServer> message_codec_intern;
         std::unique_ptr<NCNetworkServerBase> network_server_intern;
+        std::unique_ptr<NCServerDataProcessor> data_processor_intern;
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);
         void nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &sock);
         void nc_check_heartbeat();
         bool nc_valid_node_id(NCNodeID node_id);
-
-        // Must be implemented by the user:
-        // (pure virtual functions)
-        [[nodiscard]] virtual std::vector<uint8_t> nc_get_init_data() = 0;
-        [[nodiscard]] virtual bool nc_is_job_done() = 0;
-        virtual void nc_save_data() = 0;
-        virtual void nc_node_timeout(NCNodeID node_id) = 0;
-        [[nodiscard]] virtual std::vector<uint8_t> nc_get_new_data(NCNodeID node_id) = 0;
-        virtual void nc_process_result(NCNodeID node_id, std::vector<uint8_t> result) = 0;
 };
 }
 

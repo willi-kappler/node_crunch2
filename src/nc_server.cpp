@@ -21,7 +21,29 @@
 #include "nc_util.hpp"
 
 namespace NodeCrunch2 {
+[[nodiscard]] std::vector<uint8_t> NCServerDataProcessor::nc_get_init_data() {
+    return std::vector<uint8_t>();
+}
+
+[[nodiscard]] bool NCServerDataProcessor::nc_is_job_done() {
+    return true;
+}
+
+void NCServerDataProcessor::nc_save_data() {
+}
+
+void NCServerDataProcessor::nc_node_timeout([[maybe_unused]] NCNodeID node_id) {
+}
+
+[[nodiscard]] std::vector<uint8_t> NCServerDataProcessor::nc_get_new_data([[maybe_unused]] NCNodeID node_id) {
+    return std::vector<uint8_t>();
+}
+
+void NCServerDataProcessor::nc_process_result([[maybe_unused]] NCNodeID node_id, [[maybe_unused]] std::vector<uint8_t> result) {
+}
+
 NCServer::NCServer(NCConfiguration config,
+    std::unique_ptr<NCServerDataProcessor> data_processor,
     std::unique_ptr<NCMessageCodecServer> message_codec,
     std::unique_ptr<NCNetworkServerBase> network_server):
     config_intern(config),
@@ -29,25 +51,32 @@ NCServer::NCServer(NCConfiguration config,
     all_nodes(),
     server_mutex(),
     message_codec_intern(std::move(message_codec)),
-    network_server_intern(std::move(network_server))
+    network_server_intern(std::move(network_server)),
+    data_processor_intern(std::move(data_processor))
     {}
 
 NCServer::NCServer(NCConfiguration config,
+    std::unique_ptr<NCServerDataProcessor> data_processor,
     std::unique_ptr<NCMessageCodecServer> message_codec):
     NCServer(config,
+        std::move(data_processor),
         std::move(message_codec),
         std::make_unique<NCNetworkServer>(config.server_port))
     {}
 
 NCServer::NCServer(NCConfiguration config,
+    std::unique_ptr<NCServerDataProcessor> data_processor,
     std::unique_ptr<NCNetworkServerBase> network_server):
     NCServer(config,
+        std::move(data_processor),
         std::make_unique<NCMessageCodecServer>(config.secret_key),
         std::move(network_server))
     {}
 
-NCServer::NCServer(NCConfiguration config):
+NCServer::NCServer(NCConfiguration config,
+    std::unique_ptr<NCServerDataProcessor> data_processor):
     NCServer(config,
+        std::move(data_processor),
         std::make_unique<NCMessageCodecServer>(config.secret_key),
         std::make_unique<NCNetworkServer>(config.server_port))
     {}
@@ -139,14 +168,14 @@ void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
     NCNodeID const node_id = node_message.node_id;
     NCEncodedMessageToNode msg_to_node;
 
-    if (nc_is_job_done()) {
+    if (data_processor_intern->nc_is_job_done()) {
         quit.store(true);
         msg_to_node = message_codec_intern->nc_gen_quit_message();
     } else {
         switch (node_message.msg_type) {
             case NCNodeMessageType::Init:
                 nc_register_new_node(node_id);
-                msg_to_node = message_codec_intern->nc_gen_init_message_ok(nc_get_init_data());
+                msg_to_node = message_codec_intern->nc_gen_init_message_ok(data_processor_intern->nc_get_init_data());
             break;
             case NCNodeMessageType::Heartbeat:
                 if (nc_valid_node_id(node_id)) {
@@ -158,14 +187,14 @@ void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
             break;
             case NCNodeMessageType::NodeNeedsMoreData:
                 if (nc_valid_node_id(node_id)) {
-                    msg_to_node = message_codec_intern->nc_gen_new_data_message(nc_get_new_data(node_id));
+                    msg_to_node = message_codec_intern->nc_gen_new_data_message(data_processor_intern->nc_get_new_data(node_id));
                 } else {
                     msg_to_node = message_codec_intern->nc_gen_invalid_node_id_error();
                 }
             break;
             case NCNodeMessageType::NewResultFromNode:
                 if (nc_valid_node_id(node_id)) {
-                    nc_process_result(node_id, node_message.data);
+                    data_processor_intern->nc_process_result(node_id, node_message.data);
                     msg_to_node = message_codec_intern->nc_gen_result_ok_message();
                 } else {
                     msg_to_node = message_codec_intern->nc_gen_invalid_node_id_error();
@@ -195,7 +224,7 @@ void NCServer::nc_check_heartbeat() {
             auto const time_diff = std::chrono::duration_cast<std::chrono::seconds>(current_time - node_time);
             if (time_diff > sleep_time) {
                 spdlog::debug("Node timeout: {}", node_id.id);
-                nc_node_timeout(node_id);
+                data_processor_intern->nc_node_timeout(node_id);
             }
         }
     }

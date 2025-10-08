@@ -43,6 +43,7 @@ class NCServerDataProcessor {
 };
 
 class NCServer {
+    public:
         // Constructor:
         NCServer(NCConfiguration config,
             std::unique_ptr<NCServerDataProcessor> data_processor,

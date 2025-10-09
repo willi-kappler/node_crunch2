@@ -222,9 +222,9 @@ TEST_CASE("Create server, send need more data message (test mode 10)", "[server]
     NCNodeID node_id;
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 10);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
-    std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
+    std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);
     std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
-    NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
+    NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
     REQUIRE(init_data->node_data.size() == 5);
@@ -243,6 +243,15 @@ TEST_CASE("Create server, send need more data message (test mode 10)", "[server]
     REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
 
     REQUIRE(init_data->test_mode == 10);
+
+    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->save_data_called == 1);
+    REQUIRE(data_processor1->timeout_nodes.size() == 0);
+    REQUIRE(data_processor1->data_nodes.size() == 2);
+    REQUIRE(data_processor1->data_nodes[0] == node_id);
+    REQUIRE(data_processor1->data_nodes[1] == node_id);
+    REQUIRE(data_processor1->process_nodes.size() == 1);
+    REQUIRE(data_processor1->process_nodes[0] == node_id);
 }
 
 TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
@@ -252,9 +261,9 @@ TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
     NCNodeID node_id;
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 20);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
-    std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
+    std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);
     std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
-    NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
+    NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
     REQUIRE(init_data->node_data.size() == 0);
@@ -268,6 +277,12 @@ TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
     REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
 
     REQUIRE(init_data->test_mode == 20);
+
+    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->save_data_called == 1);
+    REQUIRE(data_processor1->timeout_nodes.size() == 0);
+    REQUIRE(data_processor1->data_nodes.size() == 0);
+    REQUIRE(data_processor1->process_nodes.size() == 0);
 }
 
 TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
@@ -277,9 +292,9 @@ TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
     NCNodeID node_id;
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 30);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
-    std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
+    std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);
     std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
-    NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
+    NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
     REQUIRE(init_data->node_data.size() == 0);
@@ -293,6 +308,12 @@ TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
     REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
 
     REQUIRE(init_data->test_mode == 30);
+
+    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->save_data_called == 1);
+    REQUIRE(data_processor1->timeout_nodes.size() == 0);
+    REQUIRE(data_processor1->data_nodes.size() == 0);
+    REQUIRE(data_processor1->process_nodes.size() == 0);
 }
 
 TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
@@ -302,9 +323,9 @@ TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
     NCNodeID node_id;
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 40);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
-    std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
+    std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);
     std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
-    NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
+    NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
     REQUIRE(init_data->node_data.size() == 0);
@@ -318,4 +339,10 @@ TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
     REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
 
     REQUIRE(init_data->test_mode == 40);
+
+    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->save_data_called == 1);
+    REQUIRE(data_processor1->timeout_nodes.size() == 0);
+    REQUIRE(data_processor1->data_nodes.size() == 0);
+    REQUIRE(data_processor1->process_nodes.size() == 0);
 }

@@ -189,9 +189,9 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     init_data->test_mode = 10;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::shared_ptr<TestNodeDataProcessor> data_processor1 = std::make_shared<TestNodeDataProcessor>();
     std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
-    NCNode node1(config1, std::move(data_processor1), std::move(client1));
+    NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
     REQUIRE(init_data->server_data.size() == 5);
@@ -217,9 +217,9 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     init_data->test_mode = 20;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::shared_ptr<TestNodeDataProcessor> data_processor1 = std::make_shared<TestNodeDataProcessor>();
     std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
-    NCNode node1(config1, std::move(data_processor1), std::move(client1));
+    NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
     REQUIRE(init_data->server_data.size() == 5);
@@ -258,9 +258,9 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     init_data->test_mode = 30;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::shared_ptr<TestNodeDataProcessor> data_processor1 = std::make_shared<TestNodeDataProcessor>();
     std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
-    NCNode node1(config1, std::move(data_processor1), std::move(client1));
+    NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
     REQUIRE(init_data->server_data.size() == 5);
@@ -292,9 +292,9 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     init_data->test_mode = 40;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::shared_ptr<TestNodeDataProcessor> data_processor1 = std::make_shared<TestNodeDataProcessor>();
     std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
-    NCNode node1(config1, std::move(data_processor1), std::move(client1));
+    NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
     REQUIRE(init_data->server_data.size() == 5);

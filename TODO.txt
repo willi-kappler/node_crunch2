@@ -1,14 +1,11 @@
 - add mandelbrot example
 - add documentation
-- add test cases for node
-- add test cases for server
 - add test cases for communication (node <-> server)
 - use #pragma once instead of guards
 - add [[nodiscard]], noexcept, ... when needed.
 - add empty connection class for testing.
-- use NCServerDataProcessor base class.
 - add max_data_size limit to configuration and check for data size.
-
+- add a test case for the server: check for heartbeat timeout.
 
 
 
@@ -26,3 +23,6 @@ Done:
 # refactor network into a NCConnector class.
 # use NCNodeDataProcessor
 # use unique_ptr and shared_ptr for dependency injection derived objects.
+# use NCServerDataProcessor base class.
+# add test cases for node
+# add test cases for server

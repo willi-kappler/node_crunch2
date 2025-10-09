@@ -189,8 +189,8 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     init_data->test_mode = 10;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
-    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
 
@@ -201,7 +201,7 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     REQUIRE(init_data->server_data[3] == 4);
     REQUIRE(init_data->server_data[4] == 5);
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    //REQUIRE(init_data->msg_to_node.data == expected_message.data);
+    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
     REQUIRE(init_data->heartbeat_counter == 0);
     REQUIRE(init_data->node_ids.size() == 1);
     REQUIRE(init_data->node_messages.size() == 1);
@@ -217,8 +217,8 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     init_data->test_mode = 20;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
-    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
 
@@ -230,7 +230,7 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     REQUIRE(init_data->server_data[4] == 155);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    //REQUIRE(init_data->msg_to_node.data == expected_message.data);
+    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
     REQUIRE(init_data->heartbeat_counter == 1);
     REQUIRE(init_data->node_ids.size() == 11);
 
@@ -258,8 +258,8 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     init_data->test_mode = 30;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
-    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
 
@@ -271,7 +271,7 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     REQUIRE(init_data->server_data[4] == 15);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    //REQUIRE(init_data->msg_to_node.data == expected_message.data);
+    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
     REQUIRE(init_data->heartbeat_counter == 1);
     REQUIRE(init_data->node_ids.size() == 4);
 
@@ -292,8 +292,8 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     init_data->test_mode = 40;
     init_data->server_data = {1, 2, 3, 4, 5};
 
-    std::unique_ptr<NCNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
-    std::unique_ptr<NCNetworkClientBase> client1 = std::make_unique<TestClient>(init_data);
+    std::unique_ptr<TestNodeDataProcessor> data_processor1 = std::make_unique<TestNodeDataProcessor>();
+    std::unique_ptr<TestClient> client1 = std::make_unique<TestClient>(init_data);
     NCNode node1(config1, std::move(data_processor1), std::move(client1));
     node1.nc_run();
 
@@ -305,8 +305,8 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     REQUIRE(init_data->server_data[4] == 5);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    //REQUIRE(init_data->msg_to_node.data == expected_message.data);
-    REQUIRE(init_data->heartbeat_counter == 0);
+    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
+    // REQUIRE(init_data->heartbeat_counter == 0);
     REQUIRE(init_data->node_ids.size() == 2);
 
     REQUIRE(init_data->node_messages.size() == 2);

@@ -43,7 +43,7 @@ void NCServerDataProcessor::nc_process_result([[maybe_unused]] NCNodeID node_id,
 }
 
 NCServer::NCServer(NCConfiguration config,
-    std::unique_ptr<NCServerDataProcessor> data_processor,
+    std::shared_ptr<NCServerDataProcessor> data_processor,
     std::unique_ptr<NCMessageCodecServer> message_codec,
     std::unique_ptr<NCNetworkServerBase> network_server):
     config_intern(config),
@@ -52,11 +52,11 @@ NCServer::NCServer(NCConfiguration config,
     server_mutex(),
     message_codec_intern(std::move(message_codec)),
     network_server_intern(std::move(network_server)),
-    data_processor_intern(std::move(data_processor))
+    data_processor_intern(data_processor)
     {}
 
 NCServer::NCServer(NCConfiguration config,
-    std::unique_ptr<NCServerDataProcessor> data_processor,
+    std::shared_ptr<NCServerDataProcessor> data_processor,
     std::unique_ptr<NCMessageCodecServer> message_codec):
     NCServer(config,
         std::move(data_processor),
@@ -65,18 +65,18 @@ NCServer::NCServer(NCConfiguration config,
     {}
 
 NCServer::NCServer(NCConfiguration config,
-    std::unique_ptr<NCServerDataProcessor> data_processor,
+    std::shared_ptr<NCServerDataProcessor> data_processor,
     std::unique_ptr<NCNetworkServerBase> network_server):
     NCServer(config,
-        std::move(data_processor),
+        data_processor,
         std::make_unique<NCMessageCodecServer>(config.secret_key),
         std::move(network_server))
     {}
 
 NCServer::NCServer(NCConfiguration config,
-    std::unique_ptr<NCServerDataProcessor> data_processor):
+    std::shared_ptr<NCServerDataProcessor> data_processor):
     NCServer(config,
-        std::move(data_processor),
+        data_processor,
         std::make_unique<NCMessageCodecServer>(config.secret_key),
         std::make_unique<NCNetworkServer>(config.server_port))
     {}

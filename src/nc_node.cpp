@@ -34,7 +34,7 @@ void NCNodeDataProcessor::nc_init([[maybe_unused]] std::vector<uint8_t> data) {
 }
 
 NCNode::NCNode(NCConfiguration config,
-    std::unique_ptr<NCNodeDataProcessor> data_processor,
+    std::shared_ptr<NCNodeDataProcessor> data_processor,
     std::unique_ptr<NCMessageCodecNode> message_codec,
     std::unique_ptr<NCNetworkClientBase> network_client):
     config_intern(config),
@@ -44,31 +44,31 @@ NCNode::NCNode(NCConfiguration config,
     node_mutex(),
     message_codec_intern(std::move(message_codec)),
     network_client_intern(std::move(network_client)),
-    data_processor_intern(std::move(data_processor))
+    data_processor_intern(data_processor)
     {}
 
 NCNode::NCNode(NCConfiguration config,
-    std::unique_ptr<NCNodeDataProcessor> data_processor,
+    std::shared_ptr<NCNodeDataProcessor> data_processor,
     std::unique_ptr<NCMessageCodecNode> message_codec):
     NCNode(config,
-        std::move(data_processor),
+        data_processor,
         std::move(message_codec),
         std::make_unique<NCNetworkClient>(config.server_address, config.server_port))
     {}
 
 NCNode::NCNode(NCConfiguration config,
-    std::unique_ptr<NCNodeDataProcessor> data_processor,
+    std::shared_ptr<NCNodeDataProcessor> data_processor,
     std::unique_ptr<NCNetworkClientBase> network_client):
     NCNode(config,
-        std::move(data_processor),
+        data_processor,
         std::make_unique<NCMessageCodecNode>(config.secret_key),
         std::move(network_client))
     {}
 
 NCNode::NCNode(NCConfiguration config,
-    std::unique_ptr<NCNodeDataProcessor> data_processor):
+    std::shared_ptr<NCNodeDataProcessor> data_processor):
     NCNode(config,
-        std::move(data_processor),
+        data_processor,
         std::make_unique<NCMessageCodecNode>(config.secret_key),
         std::make_unique<NCNetworkClient>(config.server_address, config.server_port))
     {}

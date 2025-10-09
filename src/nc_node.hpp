@@ -42,16 +42,16 @@ class NCNode {
     public:
         // Constructor:
         NCNode(NCConfiguration config,
-            std::unique_ptr<NCNodeDataProcessor> data_processor,
+            std::shared_ptr<NCNodeDataProcessor> data_processor,
             std::unique_ptr<NCMessageCodecNode> message_codec,
             std::unique_ptr<NCNetworkClientBase> network_client);
         NCNode(NCConfiguration config,
-            std::unique_ptr<NCNodeDataProcessor> data_processor,
+            std::shared_ptr<NCNodeDataProcessor> data_processor,
             std::unique_ptr<NCMessageCodecNode> message_codec);
         NCNode(NCConfiguration config,
-            std::unique_ptr<NCNodeDataProcessor> data_processor,
+            std::shared_ptr<NCNodeDataProcessor> data_processor,
             std::unique_ptr<NCNetworkClientBase> network_client);
-        NCNode(NCConfiguration config, std::unique_ptr<NCNodeDataProcessor> data_processor);
+        NCNode(NCConfiguration config, std::shared_ptr<NCNodeDataProcessor> data_processor);
 
         // Disable all other special member functions:
         NCNode (NCNode&&) = delete;
@@ -73,7 +73,7 @@ class NCNode {
         std::mutex node_mutex;
         std::unique_ptr<NCMessageCodecNode> message_codec_intern;
         std::unique_ptr<NCNetworkClientBase> network_client_intern;
-        std::unique_ptr<NCNodeDataProcessor> data_processor_intern;
+        std::shared_ptr<NCNodeDataProcessor> data_processor_intern;
 
         [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const& message);
         void nc_send_heartbeat();

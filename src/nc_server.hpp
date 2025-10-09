@@ -46,17 +46,17 @@ class NCServer {
     public:
         // Constructor:
         NCServer(NCConfiguration config,
-            std::unique_ptr<NCServerDataProcessor> data_processor,
+            std::shared_ptr<NCServerDataProcessor> data_processor,
             std::unique_ptr<NCMessageCodecServer> message_codec,
             std::unique_ptr<NCNetworkServerBase> network_server);
         NCServer(NCConfiguration config,
-            std::unique_ptr<NCServerDataProcessor> data_processor,
+            std::shared_ptr<NCServerDataProcessor> data_processor,
             std::unique_ptr<NCMessageCodecServer> message_codec);
         NCServer(NCConfiguration config,
-            std::unique_ptr<NCServerDataProcessor> data_processor,
+            std::shared_ptr<NCServerDataProcessor> data_processor,
             std::unique_ptr<NCNetworkServerBase> network_server);
         NCServer(NCConfiguration config,
-            std::unique_ptr<NCServerDataProcessor> data_processor);
+            std::shared_ptr<NCServerDataProcessor> data_processor);
 
         // Destructor:
         virtual ~NCServer() = default;
@@ -80,7 +80,7 @@ class NCServer {
         std::mutex server_mutex;
         std::unique_ptr<NCMessageCodecServer> message_codec_intern;
         std::unique_ptr<NCNetworkServerBase> network_server_intern;
-        std::unique_ptr<NCServerDataProcessor> data_processor_intern;
+        std::shared_ptr<NCServerDataProcessor> data_processor_intern;
 
         void nc_register_new_node(NCNodeID node_id);
         void nc_update_node_time(NCNodeID node_id);

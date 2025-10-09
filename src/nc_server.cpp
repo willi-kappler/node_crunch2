@@ -113,6 +113,10 @@ void NCServer::nc_run() {
         }
     }
 
+    // Save all data:
+    spdlog::debug("Saving data...");
+    data_processor_intern->nc_save_data();
+
     spdlog::debug("Waiting for heartbeat thread...");
     heartbeat_thread.join();
 

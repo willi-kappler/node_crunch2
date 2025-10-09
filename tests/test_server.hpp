@@ -37,7 +37,7 @@ class TestServerDataProcessor: public NCServerDataProcessor {
 
         std::vector<uint8_t> initial_data;
         std::vector<uint8_t> new_data;
-        bool job_done;
+        uint8_t job_counter;
         uint8_t save_data_called;
         std::vector<NCNodeID> timeout_nodes;
         std::vector<NCNodeID> data_nodes;
@@ -48,7 +48,7 @@ TestServerDataProcessor::TestServerDataProcessor(std::vector<uint8_t> data):
     NCServerDataProcessor(),
     initial_data(data),
     new_data(data),
-    job_done(false),
+    job_counter(0),
     save_data_called(0),
     timeout_nodes(),
     data_nodes(),
@@ -60,7 +60,8 @@ TestServerDataProcessor::TestServerDataProcessor(std::vector<uint8_t> data):
 }
 
 [[nodiscard]] bool TestServerDataProcessor::nc_is_job_done() {
-    return job_done;
+    job_counter++;
+    return job_counter >= 5;
 }
 
 void TestServerDataProcessor::nc_save_data() {
@@ -132,7 +133,6 @@ TestServerSocket::TestServerSocket(std::shared_ptr<TestServerSocketData> init_da
 void TestServerSocket::nc_send_data(std::vector<uint8_t> const data) {
     NCDecodedMessageFromServer server_message = data_intern->message_codec.nc_decode_message_from_server(NCEncodedMessageToNode(data));
     data_intern->server_messages.push_back(server_message.msg_type);
-    auto const sleep_time = std::chrono::seconds(2);
     NCNodeID new_node_id;
     NCNodeMessageType invalid_message = static_cast<NCNodeMessageType>(100);
 
@@ -147,33 +147,33 @@ void TestServerSocket::nc_send_data(std::vector<uint8_t> const data) {
             spdlog::info("InitOK");
 
             switch (data_intern->test_mode) {
-                case 10:
+                case 10: // Node needs more data
                     data_intern->msg_to_server = data_intern->message_codec.nc_gen_need_more_data_message(data_intern->node_id);
                 break;
-                case 20:
+                case 20: // Heartbeat
                     data_intern->msg_to_server = data_intern->message_codec.nc_gen_heartbeat_message(data_intern->node_id);
                 break;
-                case 30:
+                case 30: // Invalid (unknown) node id
                     data_intern->msg_to_server = data_intern->message_codec.nc_gen_heartbeat_message(new_node_id);
                 break;
-                default:
+                default: // Invalid message type
                     data_intern->msg_to_server = data_intern->message_codec.nc_encode_message_to_server(invalid_message, {}, new_node_id);
             }
         break;
         case NCServerMessageType::NewDataFromServer:
             spdlog::info("NewDataFromServer");
 
-            size_t i;
-            for (i = 0; i < server_message.data.size(); i++) {
-                data_intern->node_data[i] = server_message.data[i] + 1;
+            data_intern->node_data.clear();
+
+            for (uint8_t v: server_message.data) {
+                data_intern->node_data.push_back(v + 1);
             }
 
             data_intern->msg_to_server = data_intern->message_codec.nc_gen_result_message(data_intern->node_data, data_intern->node_id);
-            // Simulate long computation:
-            std::this_thread::sleep_for(sleep_time);
         break;
         case NCServerMessageType::ResultOK:
             spdlog::info("ResultOK");
+            data_intern->msg_to_server = data_intern->message_codec.nc_gen_need_more_data_message(data_intern->node_id);
         break;
         case NCServerMessageType::InvalidNodeID:
             spdlog::info("InvalidNodeID");
@@ -194,37 +194,53 @@ void TestServerSocket::nc_send_data(std::vector<uint8_t> const data) {
     return std::string("TestServerSocket");
 }
 
-class TestServer: public NCNetworkServerBase {
+class TestNetworkServer: public NCNetworkServerBase {
     public:
         std::unique_ptr<NCNetworkSocketBase> nc_accept() override;
-        TestServer(std::shared_ptr<TestServerSocketData> init_data);
+        TestNetworkServer(std::shared_ptr<TestServerSocketData> init_data);
 
         std::shared_ptr<TestServerSocketData> data_intern;
 };
 
-TestServer::TestServer(std::shared_ptr<TestServerSocketData> init_data):
+TestNetworkServer::TestNetworkServer(std::shared_ptr<TestServerSocketData> init_data):
     NCNetworkServerBase(),
     data_intern(init_data)
     {}
 
-std::unique_ptr<NCNetworkSocketBase> TestServer::nc_accept() {
+std::unique_ptr<NCNetworkSocketBase> TestNetworkServer::nc_accept() {
+    auto const sleep_time = std::chrono::seconds(2);
+    // Simulate long computation:
+    std::this_thread::sleep_for(sleep_time);
+
     return std::make_unique<TestServerSocket>(data_intern);
 }
 
-TEST_CASE("Create server, answer init message", "[server]" ) {
-    NCConfiguration config1 = NCConfiguration("12345678901234567890123456789012");
-    //NCServer server1(config1);
-}
-
-TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
+TEST_CASE("Create server, send need more data message (test mode 10)", "[server]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
+    config1.heartbeat_timeout = 20;
+
     NCNodeID node_id;
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 10);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
     std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
-    data_processor1->job_done = true;
-
-    std::unique_ptr<NCNetworkServerBase> network_server1 = std::make_unique<TestServer>(init_data);
+    std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
     NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
     server1.nc_run();
+
+    REQUIRE(init_data->node_data.size() == 5);
+    REQUIRE(init_data->node_data[0] == 3);
+    REQUIRE(init_data->node_data[1] == 4);
+    REQUIRE(init_data->node_data[2] == 5);
+    REQUIRE(init_data->node_data[3] == 6);
+    REQUIRE(init_data->node_data[4] == 7);
+
+    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
+    REQUIRE(init_data->server_messages[1] == NCServerMessageType::NewDataFromServer);
+    REQUIRE(init_data->server_messages[2] == NCServerMessageType::ResultOK);
+    REQUIRE(init_data->server_messages[3] == NCServerMessageType::NewDataFromServer);
+    REQUIRE(init_data->server_messages[4] == NCServerMessageType::Quit);
+    REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
+
+    REQUIRE(init_data->test_mode == 10);
 }

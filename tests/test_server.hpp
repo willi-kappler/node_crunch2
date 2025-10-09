@@ -244,3 +244,78 @@ TEST_CASE("Create server, send need more data message (test mode 10)", "[server]
 
     REQUIRE(init_data->test_mode == 10);
 }
+
+TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
+    NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
+    config1.heartbeat_timeout = 20;
+
+    NCNodeID node_id;
+    std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 20);
+    std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
+    std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
+    std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
+    NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
+    server1.nc_run();
+
+    REQUIRE(init_data->node_data.size() == 0);
+
+    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
+    REQUIRE(init_data->server_messages[1] == NCServerMessageType::HeartbeatOK);
+    REQUIRE(init_data->server_messages[2] == NCServerMessageType::HeartbeatOK);
+    REQUIRE(init_data->server_messages[3] == NCServerMessageType::HeartbeatOK);
+    REQUIRE(init_data->server_messages[4] == NCServerMessageType::Quit);
+    REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
+
+    REQUIRE(init_data->test_mode == 20);
+}
+
+TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
+    NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
+    config1.heartbeat_timeout = 20;
+
+    NCNodeID node_id;
+    std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 30);
+    std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
+    std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
+    std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
+    NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
+    server1.nc_run();
+
+    REQUIRE(init_data->node_data.size() == 0);
+
+    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
+    REQUIRE(init_data->server_messages[1] == NCServerMessageType::InvalidNodeID);
+    REQUIRE(init_data->server_messages[2] == NCServerMessageType::InvalidNodeID);
+    REQUIRE(init_data->server_messages[3] == NCServerMessageType::InvalidNodeID);
+    REQUIRE(init_data->server_messages[4] == NCServerMessageType::Quit);
+    REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
+
+    REQUIRE(init_data->test_mode == 30);
+}
+
+TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
+    NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
+    config1.heartbeat_timeout = 20;
+
+    NCNodeID node_id;
+    std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 40);
+    std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
+    std::unique_ptr<TestServerDataProcessor> data_processor1 = std::make_unique<TestServerDataProcessor>(first_data);
+    std::unique_ptr<TestNetworkServer> network_server1 = std::make_unique<TestNetworkServer>(init_data);
+    NCServer server1(config1, std::move(data_processor1), std::move(network_server1));
+    server1.nc_run();
+
+    REQUIRE(init_data->node_data.size() == 0);
+
+    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
+    REQUIRE(init_data->server_messages[1] == NCServerMessageType::UnknownError);
+    REQUIRE(init_data->server_messages[2] == NCServerMessageType::UnknownError);
+    REQUIRE(init_data->server_messages[3] == NCServerMessageType::UnknownError);
+    REQUIRE(init_data->server_messages[4] == NCServerMessageType::Quit);
+    REQUIRE(init_data->server_messages[5] == NCServerMessageType::Quit);
+
+    REQUIRE(init_data->test_mode == 40);
+}

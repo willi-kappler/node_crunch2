@@ -3,6 +3,9 @@ add_rules("mode.debug", "mode.release")
 -- Clean configuration:
 -- xmake f -c
 
+-- Set configuration:
+-- xmake f -m release
+-- xmake f -m debug
 
 -- Set clang:
 -- xmake f --toolchain=clang --runtimes=c++_shared
@@ -19,8 +22,9 @@ add_cxxflags("-O1")
 
 set_languages("c++23")
 set_version("0.1.0")
--- set_optimize("fastest")
-set_defaultmode("debug")
+set_optimize("fastest")
+-- set_defaultmode("debug")
+set_defaultmode("release")
 
 
 add_requires("taocpp-json")

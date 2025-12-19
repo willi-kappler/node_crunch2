@@ -32,9 +32,14 @@ public:
   NCEncryptionException(const char *msg): std::runtime_error(msg) { }
 };
 
-class NCDencryptionException: public std::runtime_error {
+class NCDecryptionException: public std::runtime_error {
 public:
-  NCDencryptionException(const char *msg): std::runtime_error(msg) { }
+  NCDecryptionException(const char *msg): std::runtime_error(msg) { }
+};
+
+class NCConfigurationException: public std::runtime_error {
+public:
+  NCConfigurationException(const char *msg): std::runtime_error(msg) { }
 };
 
 }

@@ -35,89 +35,72 @@ TEST_CASE("Create invalid default configuration", "[configuration]" ) {
 TEST_CASE("Read valid JSON configuration", "[configuration]" ) {
     auto config1 = nc_config_from_file("tests/config1.json");
 
-    REQUIRE(config1.has_value() == true);
-    REQUIRE(config1->server_address == "33.44.55.66");
-    REQUIRE(config1->server_port == 9999);
-    REQUIRE(config1->heartbeat_timeout == 10);
-    REQUIRE(config1->quit_counter == 3);
-    REQUIRE(config1->secret_key == "123456789012345678901234567890A1");
+    REQUIRE(config1.server_address == "33.44.55.66");
+    REQUIRE(config1.server_port == 9999);
+    REQUIRE(config1.heartbeat_timeout == 10);
+    REQUIRE(config1.quit_counter == 3);
+    REQUIRE(config1.secret_key == "123456789012345678901234567890A1");
 }
 
 TEST_CASE("File open error", "[configuration]") {
-    auto config1 = nc_config_from_file("does_not_exist.json");
-
-    REQUIRE(config1.has_value() == false);
-    REQUIRE(config1.error() == NCConfigurationError::NCFileOpenError);
+    REQUIRE_THROWS_AS(nc_config_from_file("does_not_exist.json"), NCConfigurationException);
 }
 
 TEST_CASE("Only server address", "[configuration]") {
     std::string input1{R"({"secret_key": "123456789012345678901234567890A2", "server_address": "11.22.33.44"})"};
     auto config1 = nc_config_from_string(input1);
 
-    REQUIRE(config1.has_value() == true);
-    REQUIRE(config1->server_address == "11.22.33.44");
-    REQUIRE(config1->server_port == 3100);
-    REQUIRE(config1->heartbeat_timeout == 60*5);
-    REQUIRE(config1->quit_counter == 10);
-    REQUIRE(config1->secret_key == "123456789012345678901234567890A2");
+    REQUIRE(config1.server_address == "11.22.33.44");
+    REQUIRE(config1.server_port == 3100);
+    REQUIRE(config1.heartbeat_timeout == 60*5);
+    REQUIRE(config1.quit_counter == 10);
+    REQUIRE(config1.secret_key == "123456789012345678901234567890A2");
 }
 
 TEST_CASE("Only server port", "[configuration]") {
     std::string input1{R"({"secret_key": "123456789012345678901234567890A3", "server_port": 1111})"};
     auto config1 = nc_config_from_string(input1);
 
-    REQUIRE(config1.has_value() == true);
-    REQUIRE(config1->server_address == "127.0.0.1");
-    REQUIRE(config1->server_port == 1111);
-    REQUIRE(config1->heartbeat_timeout == 60*5);
-    REQUIRE(config1->quit_counter == 10);
-    REQUIRE(config1->secret_key == "123456789012345678901234567890A3");
+    REQUIRE(config1.server_address == "127.0.0.1");
+    REQUIRE(config1.server_port == 1111);
+    REQUIRE(config1.heartbeat_timeout == 60*5);
+    REQUIRE(config1.quit_counter == 10);
+    REQUIRE(config1.secret_key == "123456789012345678901234567890A3");
 }
 
 TEST_CASE("Only heartbeat timeout", "[configuration]") {
     std::string input1{R"({"secret_key": "123456789012345678901234567890A4", "heartbeat_timeout": 500})"};
     auto config1 = nc_config_from_string(input1);
 
-    REQUIRE(config1.has_value() == true);
-    REQUIRE(config1->server_address == "127.0.0.1");
-    REQUIRE(config1->server_port == 3100);
-    REQUIRE(config1->heartbeat_timeout == 500);
-    REQUIRE(config1->quit_counter == 10);
-    REQUIRE(config1->secret_key == "123456789012345678901234567890A4");
+    REQUIRE(config1.server_address == "127.0.0.1");
+    REQUIRE(config1.server_port == 3100);
+    REQUIRE(config1.heartbeat_timeout == 500);
+    REQUIRE(config1.quit_counter == 10);
+    REQUIRE(config1.secret_key == "123456789012345678901234567890A4");
 }
 
 TEST_CASE("Only quit counter", "[configuration]") {
     std::string input1{R"({"secret_key": "123456789012345678901234567890A5", "quit_counter": 20})"};
     auto config1 = nc_config_from_string(input1);
 
-    REQUIRE(config1.has_value() == true);
-    REQUIRE(config1->server_address == "127.0.0.1");
-    REQUIRE(config1->server_port == 3100);
-    REQUIRE(config1->heartbeat_timeout == 60*5);
-    REQUIRE(config1->quit_counter == 20);
-    REQUIRE(config1->secret_key == "123456789012345678901234567890A5");
+    REQUIRE(config1.server_address == "127.0.0.1");
+    REQUIRE(config1.server_port == 3100);
+    REQUIRE(config1.heartbeat_timeout == 60*5);
+    REQUIRE(config1.quit_counter == 20);
+    REQUIRE(config1.secret_key == "123456789012345678901234567890A5");
 }
 
 TEST_CASE("Missing secret key", "[configuration]") {
     std::string input1{R"({})"};
-    auto config1 = nc_config_from_string(input1);
-
-    REQUIRE(config1.has_value() == false);
-    REQUIRE(config1.error() == NCConfigurationError::NCMissingSecretKey);
+    REQUIRE_THROWS_AS(nc_config_from_string(input1), NCConfigurationException);
 }
 
 TEST_CASE("Invalid server port", "[configuration]") {
     std::string input1{R"({"secret_key": "123456789012345678901234567890A6", "server_port": 0})"};
-    auto config1 = nc_config_from_string(input1);
-
-    REQUIRE(config1.has_value() == false);
-    REQUIRE(config1.error() == NCConfigurationError::NCInvalidPort);
+    REQUIRE_THROWS_AS(nc_config_from_string(input1), NCConfigurationException);
 }
 
 TEST_CASE("Invalid heartbeat timeout", "[configuration]") {
     std::string input1{R"({"secret_key": "123456789012345678901234567890A7", "heartbeat_timeout": 0})"};
-    auto config1 = nc_config_from_string(input1);
-
-    REQUIRE(config1.has_value() == false);
-    REQUIRE(config1.error() == NCConfigurationError::NCInvalidHeartbeat);
+    REQUIRE_THROWS_AS(nc_config_from_string(input1), NCConfigurationException);
 }

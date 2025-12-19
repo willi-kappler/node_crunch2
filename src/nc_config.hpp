@@ -20,13 +20,6 @@
 #include "nc_exceptions.hpp"
 
 namespace NodeCrunch2 {
-enum struct NCConfigurationError: uint8_t {
-    NCFileOpenError,
-    NCMissingSecretKey,
-    NCInvalidPort,
-    NCInvalidHeartbeat
-};
-
 class NCConfiguration {
     public:
         std::string server_address;
@@ -48,9 +41,9 @@ class NCConfiguration {
         NCConfiguration& operator=(NCConfiguration&&) = delete;
 };
 
-[[nodiscard]] std::expected<NCConfiguration, NCConfigurationError> nc_config_from_string(std::string_view);
+[[nodiscard]] NCConfiguration nc_config_from_string(std::string_view);
 
-[[nodiscard]] std::expected<NCConfiguration, NCConfigurationError> nc_config_from_file(std::filesystem::path);
+[[nodiscard]] NCConfiguration nc_config_from_file(std::filesystem::path);
 }
 
 #endif // FILE_NC_CONFIG_HPP_INCLUDED

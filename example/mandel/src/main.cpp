@@ -1,16 +1,16 @@
-#include <argparse/argparse.hpp>
-
 /*
     Node Crunch2
     Written by Willi Kappler, MIT License
     https://github.com/willi-kappler/node_crunch2
 
-    This file includes all the test cases.
+    This file includes the main function for the mandel example.
 
     Run with:
     normal: xmake run mandel_nc
     debug:  xmake run -d mandel_nc
 */
+
+#include <argparse/argparse.hpp>
 
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program("test");

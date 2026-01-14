@@ -12,6 +12,9 @@
 
 #include <argparse/argparse.hpp>
 
+#include "mandel_node.hpp"
+#include "mandel_server.hpp"
+
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program("test");
 

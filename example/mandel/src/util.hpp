@@ -5,3 +5,10 @@
 
     This file includes some utils for the mandel example.
 */
+
+#include <stdfloat>
+
+class MandelData {
+    public:
+        MandelData(float64_t )
+}

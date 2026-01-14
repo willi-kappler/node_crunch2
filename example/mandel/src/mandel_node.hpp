@@ -5,3 +5,17 @@
 
     This file includes the node code for the mandel example.
 */
+
+// Local includes:
+#include "nc_node.hpp"
+#include "util.hpp"
+
+class MandelNodeProcessor: public NCNodeDataProcessor {
+    public:
+        void nc_init(std::vector<uint8_t> data) override;
+        [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) override;
+
+        MandelNodeProcessor();
+
+        MandelData mandel_data;
+};

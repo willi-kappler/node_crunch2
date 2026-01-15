@@ -6,6 +6,10 @@
     This file includes the node code for the mandel example.
 */
 
+// External includes:
+#include <spdlog/spdlog.h>
+
+// Internal includes:
 #include "mandel_node.hpp"
 
 MandelNodeProcessor::MandelNodeProcessor():
@@ -14,10 +18,12 @@ MandelNodeProcessor::MandelNodeProcessor():
     {}
 
 void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
-    initial_data = data;
+    spdlog::debug("Initial data received: {}", data[0]);
 }
 
 [[nodiscard]] std::vector<uint8_t> MandelNodeProcessor::nc_process_data(std::vector<uint8_t> data) {
+    spdlog::debug("Data to process received: {}", data[0]);
+
     std::vector<uint8_t> result;
 
     return result;

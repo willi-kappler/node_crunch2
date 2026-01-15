@@ -10,6 +10,8 @@
 #include "nc_node.hpp"
 #include "util.hpp"
 
+using namespace NodeCrunch2;
+
 class MandelNodeProcessor: public NCNodeDataProcessor {
     public:
         void nc_init(std::vector<uint8_t> data) override;
@@ -17,5 +19,6 @@ class MandelNodeProcessor: public NCNodeDataProcessor {
 
         MandelNodeProcessor();
 
+    private:
         MandelData mandel_data;
 };

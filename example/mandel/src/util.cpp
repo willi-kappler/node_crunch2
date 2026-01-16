@@ -7,27 +7,73 @@
 */
 
 // External includes:
+#include <cstring>
 #include <spdlog/spdlog.h>
 
 // Internal includes:
 #include "util.hpp"
 
 MandelData::MandelData():
-    re1(0.0),
-    re2(0.0),
-    im1(0.0),
-    im2(0.0),
-    width(800),
-    height(600)
+    re1(-2.0),
+    re2(1.0),
+    im1(-1.5),
+    im2(1.5),
+    width(2048),
+    height(2048),
+    max_iteration(2048)
     {}
 
 MandelData::MandelData(std::vector<uint8_t> data):
-    re1(0.0),
-    re2(0.0),
-    im1(0.0),
-    im2(0.0),
-    width(800),
-    height(600)
-{
-    spdlog::debug("Constructor with data: {}", data[0]);
+    // Delegating constructor
+    MandelData() {
+    if (data.size() < MANDEL_DATA_SIZE) {
+        // Basic safety check
+        return;
+    }
+
+    const uint8_t* ptr = data.data();
+
+    // Get the actual values from the data block:
+    // All floats:
+    std::memcpy(&re1, ptr, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+    std::memcpy(&re2, ptr, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+    std::memcpy(&im1, ptr, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+    std::memcpy(&im2, ptr, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+
+    // All ints:
+    std::memcpy(&width, ptr, UINT32_SIZE);
+    ptr += UINT32_SIZE;
+    std::memcpy(&height, ptr, UINT32_SIZE);
+    ptr += UINT32_SIZE;
+    std::memcpy(&max_iteration, ptr, UINT32_SIZE);
+}
+
+std::vector<uint8_t> MandelData::to_vector() {
+    std::vector<uint8_t> result;
+    result.resize(MANDEL_DATA_SIZE);
+    uint8_t* ptr = result.data();
+
+    // Write all the values to the data block:
+    // All floats:
+    std::memcpy(ptr, &re1, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+    std::memcpy(ptr, &re2, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+    std::memcpy(ptr, &im1, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+    std::memcpy(ptr, &im2, FLOAT_SIZE);
+    ptr += FLOAT_SIZE;
+
+    // All ints:
+    std::memcpy(ptr, &width, UINT32_SIZE);
+    ptr += UINT32_SIZE;
+    std::memcpy(ptr, &height, UINT32_SIZE);
+    ptr += UINT32_SIZE;
+    std::memcpy(ptr, &max_iteration, UINT32_SIZE);
+
+    return result;
 }

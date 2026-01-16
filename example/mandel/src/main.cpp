@@ -8,6 +8,9 @@
     Run with:
     normal: xmake run mandel_nc
     debug:  xmake run -d mandel_nc
+
+    To just build use:
+    xmake build
 */
 
 #include <argparse/argparse.hpp>

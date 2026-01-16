@@ -18,7 +18,8 @@ MandelNodeProcessor::MandelNodeProcessor():
     {}
 
 void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
-    spdlog::debug("Initial data received: {}", data[0]);
+    mandel_data = MandelData(data);
+    spdlog::debug("Initial data received: {}", mandel_data);
 }
 
 [[nodiscard]] std::vector<uint8_t> MandelNodeProcessor::nc_process_data(std::vector<uint8_t> data) {

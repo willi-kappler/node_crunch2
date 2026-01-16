@@ -7,11 +7,12 @@
 */
 
 // External includes:
-
 #include <stdfloat>
 #include <cstdint>
 #include <vector>
 #include <memory>
+
+#include <spdlog/fmt/bundled/format.h>
 
 const uint8_t FLOAT_SIZE = 8;
 const uint8_t UINT32_SIZE = 4;
@@ -26,4 +27,22 @@ class MandelData {
 
         std::float64_t re1, re2, im1, im2;
         uint32_t width, height, max_iteration;
+};
+
+// For spdlog:
+// Specialization of fmt::formatter for MandelData
+template <>
+struct fmt::formatter<MandelData> {
+    // Parses format specs like {:x}; we'll just support the default {}
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        return ctx.begin();
+    }
+
+    // Format the real mandel data:
+    template <typename FormatContext>
+    auto format(const MandelData& d, FormatContext& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(),
+            "[MandelData: Re({:.2f}, {:.2f}), Im({:.2f}, {:.2f}), Size({}x{}), Iter({})]",
+            d.re1, d.re2, d.im1, d.im2, d.width, d.height, d.max_iteration);
+    }
 };

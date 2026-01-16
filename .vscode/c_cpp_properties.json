@@ -7,10 +7,10 @@
                 "${userHome}/.xmake/packages/**"
             ],
             "defines": [],
-            "compilerPath": "/run/current-system/sw/bin/clang",
+            "compilerPath": "/run/current-system/sw/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++23",
-            "intelliSenseMode": "linux-clang-x64"
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ],
     "version": 4

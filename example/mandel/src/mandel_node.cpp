@@ -23,9 +23,22 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
 }
 
 [[nodiscard]] std::vector<uint8_t> MandelNodeProcessor::nc_process_data(std::vector<uint8_t> data) {
-    spdlog::debug("Data to process received: {}", data[0]);
-
     std::vector<uint8_t> result;
+
+    if (data.size() < UINT32_SIZE) {
+        return result;
+    }
+
+    uint32_t current_row = 0;
+    std::memcpy(&current_row, data.data(), UINT32_SIZE);
+
+    spdlog::debug("Data to process received: {} (current row)", current_row);
+
+    std::vector<uint32_t> line(mandel_data.width);
+
+
+    result.resize(mandel_data.width * UINT32_SIZE);
+    // std::memcpy(dest.data(), source.data(), dest.size());
 
     return result;
 }

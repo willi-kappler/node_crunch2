@@ -25,7 +25,7 @@ class MandelData {
 
         std::vector<uint8_t> to_vector();
 
-        std::float64_t re1, re2, im1, im2;
+        std::float64_t re1, re2, im1, im2, re_step, im_step;
         uint32_t width, height, max_iteration;
 };
 

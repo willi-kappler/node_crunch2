@@ -18,10 +18,14 @@ MandelData::MandelData():
     re2(1.0),
     im1(-1.5),
     im2(1.5),
+    re_step(0.0),
+    im_step(0.0),
     width(2048),
     height(2048),
-    max_iteration(2048)
-    {}
+    max_iteration(2048) {
+        re_step = ((re2 - re1) / std::float64_t(width));
+        im_step = ((im2 - im1) / std::float64_t(height));
+    }
 
 MandelData::MandelData(std::vector<uint8_t> data):
     // Delegating constructor
@@ -50,6 +54,9 @@ MandelData::MandelData(std::vector<uint8_t> data):
     std::memcpy(&height, ptr, UINT32_SIZE);
     ptr += UINT32_SIZE;
     std::memcpy(&max_iteration, ptr, UINT32_SIZE);
+
+    re_step = ((re2 - re1) / std::float64_t(width));
+    im_step = ((im2 - im1) / std::float64_t(height));
 }
 
 std::vector<uint8_t> MandelData::to_vector() {

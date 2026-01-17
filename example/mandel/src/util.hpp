@@ -46,3 +46,7 @@ struct fmt::formatter<MandelData> {
             d.re1, d.re2, d.im1, d.im2, d.width, d.height, d.max_iteration);
     }
 };
+
+void vec_u8_to_vec_u32(std::vector<uint8_t> vec_in, std::vector<uint32_t> vec_out);
+
+void vec_u32_to_vec_u8(std::vector<uint32_t> vec_in, std::vector<uint8_t> vec_out);

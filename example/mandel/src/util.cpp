@@ -8,6 +8,8 @@
 
 // External includes:
 #include <cstring>
+#include <bit>
+
 #include <spdlog/spdlog.h>
 
 // Internal includes:
@@ -83,4 +85,29 @@ std::vector<uint8_t> MandelData::to_vector() {
     std::memcpy(ptr, &max_iteration, UINT32_SIZE);
 
     return result;
+}
+
+void vec_u8_to_vec_u32(std::vector<uint8_t>in, std::vector<uint32_t> out) {
+    uint32_t value;
+
+    for (size_t i = 0; i < out.size(); ++i) {
+        std::memcpy(&value, &in[i * 4], UINT32_SIZE);
+        if (std::endian::native == std::endian::little) {
+            value = std::byteswap(value);
+        }
+
+        out[i] = value;
+    }
+}
+
+void vec_u32_to_vec_u8(std::vector<uint32_t>in, std::vector<uint8_t> out) {
+    uint32_t value;
+
+    for (size_t i = 0; i < in.size(); ++i) {
+        value = in[i];
+        if (std::endian::native == std::endian::little) {
+            value = std::byteswap(value);
+        }
+        std::memcpy(&out[i * 4], &value, UINT32_SIZE);
+    }
 }

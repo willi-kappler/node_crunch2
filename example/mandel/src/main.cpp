@@ -38,13 +38,16 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
-    NCConfiguration config1("config1.json");
+    NCConfiguration config("config1.json");
 
     if (program["--server"] == true) {
         std::cout << "Server mode" << std::endl;
+        MandelData mandel_data();
+        std::shared_ptr<MandelServerProcessor> mandel_server = std::make_shared<MandelServerProcessor>(mandel_data);
+        NCServer nc_server(config, mandel_server);
     } else {
         std::cout << "Node (client) mode" << std::endl;
         std::shared_ptr<MandelNodeProcessor> mandel = std::make_shared<MandelNodeProcessor>();
-        NCNode nc_node(config1, mandel);
+        NCNode nc_node(config, mandel);
     }
 }

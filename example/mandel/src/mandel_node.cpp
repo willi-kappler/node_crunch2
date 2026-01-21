@@ -6,6 +6,9 @@
     This file includes the node code for the mandel example.
 */
 
+// STD include:
+#include <chrono>
+
 // External includes:
 #include <spdlog/spdlog.h>
 
@@ -14,7 +17,8 @@
 
 MandelNodeProcessor::MandelNodeProcessor():
     NCNodeDataProcessor(),
-    mandel_data()
+    mandel_data(),
+    compute_time(5)
     {}
 
 void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
@@ -25,7 +29,8 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
 [[nodiscard]] std::vector<uint8_t> MandelNodeProcessor::nc_process_data(std::vector<uint8_t> data) {
     std::vector<uint8_t> result;
 
-    if (data.size() < UINT32_SIZE) {
+    if (data.size() != UINT32_SIZE) {
+        // Size does not match, we expect 4 bytes.
         return result;
     }
 
@@ -35,6 +40,7 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
     std::memcpy(&current_row, data.data(), UINT32_SIZE);
 
     if (current_row >= mandel_data.height) {
+        // Out of bounds, larger than image height:
         return result;
     }
 
@@ -69,6 +75,9 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
 
     result.resize(mandel_data.width * UINT32_SIZE);
     std::memcpy(result.data(), line.data(), result.size());
+
+    // Simulate some heavy computations:
+    std::this_thread::sleep_for(compute_time);
 
     return result;
 }

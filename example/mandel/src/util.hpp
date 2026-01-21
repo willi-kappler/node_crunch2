@@ -6,12 +6,13 @@
     This file includes some utils for the mandel example.
 */
 
-// External includes:
+// STD includes:
 #include <stdfloat>
 #include <cstdint>
 #include <vector>
 #include <memory>
 
+// External includes:
 #include <spdlog/fmt/bundled/format.h>
 
 const uint8_t FLOAT_SIZE = 8;

@@ -6,10 +6,11 @@
     This file includes some utils for the mandel example.
 */
 
-// External includes:
+// STD includes:
 #include <cstring>
 #include <bit>
 
+// External includes:
 #include <spdlog/spdlog.h>
 
 // Internal includes:

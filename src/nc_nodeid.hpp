@@ -17,6 +17,9 @@
 #include <string>
 #include <random>
 
+// External includes:
+#include <spdlog/spdlog.h>
+
 namespace NodeCrunch2 {
 const size_t NC_NODEID_LENGTH = 64;
 
@@ -35,6 +38,23 @@ class NCNodeID {
 template<> struct std::hash<NodeCrunch2::NCNodeID> {
     std::size_t operator()(NodeCrunch2::NCNodeID const& node) const noexcept {
         return std::hash<std::string>{}(node.id);
+    }
+};
+
+// For spdlog:
+// Specialization of fmt::formatter for NCNodeID
+template <>
+struct fmt::formatter<NodeCrunch2::NCNodeID> {
+    // Parses format specs like {:x}; we'll just support the default {}:
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        return ctx.begin();
+    }
+
+    // Format the real mandel data:
+    template <typename FormatContext>
+    auto format(const NodeCrunch2::NCNodeID& node, FormatContext& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(),
+            "[NCNodeID: ]", node.id);
     }
 };
 

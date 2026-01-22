@@ -6,6 +6,9 @@
     This file includes the node code for the mandel example.
 */
 
+#ifndef MANDEL_NODE_HPP_INCLUDED
+#define MANDEL_NODE_HPP_INCLUDED
+
 // STD includes:
 #include <chrono>
 
@@ -26,3 +29,5 @@ class MandelNodeProcessor: public NCNodeDataProcessor {
         MandelData mandel_data;
         std::chrono::seconds compute_time;
 };
+
+#endif // MANDEL_NODE__HPP_INCLUDED

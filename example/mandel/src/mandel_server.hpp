@@ -6,6 +6,9 @@
     This file includes the server code for the mandel example.
 */
 
+#ifndef MANDEL_SERVER_HPP_INCLUDED
+#define MANDEL_SERVER_HPP_INCLUDED
+
 // STD includes:
 #include <unordered_map>
 
@@ -37,3 +40,5 @@ class MandelServerProcessor: public NCServerDataProcessor {
         std::vector<uint32_t> mandel_image;
         std::unordered_map<NCNodeID, uint32_t> node_map;
 };
+
+#endif // MANDEL_SERVER_HPP_INCLUDED

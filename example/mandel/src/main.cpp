@@ -42,12 +42,12 @@ int main(int argc, char *argv[]) {
 
     if (program["--server"] == true) {
         std::cout << "Server mode" << std::endl;
-        MandelData mandel_data();
+        MandelData mandel_data;
         std::shared_ptr<MandelServerProcessor> mandel_server = std::make_shared<MandelServerProcessor>(mandel_data);
         NCServer nc_server(config, mandel_server);
     } else {
         std::cout << "Node (client) mode" << std::endl;
-        std::shared_ptr<MandelNodeProcessor> mandel = std::make_shared<MandelNodeProcessor>();
-        NCNode nc_node(config, mandel);
+        std::shared_ptr<MandelNodeProcessor> mandel_node = std::make_shared<MandelNodeProcessor>();
+        NCNode nc_node(config, mandel_node);
     }
 }

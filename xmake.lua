@@ -13,7 +13,9 @@ add_rules("mode.debug", "mode.release")
 -- xmake f --toolchain=clang --runtimes=c++_shared
 -- xmake f --toolchain=clang --runtimes=stdc++_shared
 
--- Fore rebuild:
+-- Force rebuild:
+-- rm -rf build/ .xmake/
+-- xmake config -c
 -- xmake clean
 -- xmake -a -r
 

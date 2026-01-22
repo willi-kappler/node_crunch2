@@ -53,8 +53,7 @@ struct fmt::formatter<NodeCrunch2::NCNodeID> {
     // Format the real mandel data:
     template <typename FormatContext>
     auto format(const NodeCrunch2::NCNodeID& node, FormatContext& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(),
-            "[NCNodeID: ]", node.id);
+        return fmt::format_to(ctx.out(), "[NCNodeID: {}]", node.id);
     }
 };
 

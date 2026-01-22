@@ -13,6 +13,10 @@ add_rules("mode.debug", "mode.release")
 -- xmake f --toolchain=clang --runtimes=c++_shared
 -- xmake f --toolchain=clang --runtimes=stdc++_shared
 
+-- Fore rebuild:
+-- xmake clean
+-- xmake -a -r
+
 set_warnings("error", "everything", "extra", "pedantic", "all")
 add_cxxflags("-Wconversion", "-Wshadow", "-Wsign-conversion", "-Wdouble-promotion", "-Wformat=2")
 add_cxxflags("-Wundef", "-Wcast-qual", "-Wcast-align=strict", "-Wnon-virtual-dtor", "-Wold-style-cast")

@@ -6,8 +6,8 @@
     This file includes some utils for the mandel example.
 */
 
-#ifndef MANDEL_UTIL_HPP_INCLUDED
-#define MANDEL_UTIL_HPP_INCLUDED
+#ifndef FILE_MANDEL_UTIL_HPP_INCLUDED
+#define FILE_MANDEL_UTIL_HPP_INCLUDED
 
 // STD includes:
 #include <stdfloat>
@@ -60,4 +60,4 @@ void vec_u8_to_vec_u32(std::vector<uint8_t> vec_in, std::vector<uint32_t> vec_ou
 
 void vec_u32_to_vec_u8(std::vector<uint32_t> vec_in, std::vector<uint8_t> vec_out);
 
-#endif // MANDEL_UTIL_HPP_INCLUDED
+#endif // FILE_MANDEL_UTIL_HPP_INCLUDED

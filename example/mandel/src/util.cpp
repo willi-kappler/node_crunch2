@@ -23,9 +23,9 @@ MandelData::MandelData():
     im2(1.5),
     re_step(0.0),
     im_step(0.0),
-    width(1024),
-    height(1024),
-    max_iteration(1024) {
+    width(2048),
+    height(2048),
+    max_iteration(2048) {
         re_step = ((re2 - re1) / std::float64_t(width));
         im_step = ((im2 - im1) / std::float64_t(height));
     }

@@ -27,7 +27,7 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
 
 [[nodiscard]] std::vector<uint8_t> MandelNodeProcessor::nc_process_data(std::vector<uint8_t> data) {
     std::vector<uint8_t> result;
-    std::chrono::milliseconds compute_time(100);
+    std::chrono::milliseconds compute_time(50);
 
     if (data.size() != UINT32_SIZE) {
         // Size does not match, we expect 4 bytes.
@@ -80,7 +80,6 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
 
     // Simulate some heavy computations:
     std::this_thread::sleep_for(compute_time);
-    // spdlog::get("nc_logger")->flush();
 
     return result;
 }

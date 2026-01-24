@@ -47,17 +47,17 @@ void MandelServerProcessor::nc_save_data() {
     mandel_file << mandel_data_intern.width << " " << mandel_data_intern.height << std::endl;
     mandel_file << "255" << std::endl;
 
-    std::float64_t pixel_value = 0.0;
-    const std::float64_t scale_factor = std::float64_t(mandel_data_intern.max_iteration);
+    std::uint32_t mandel_value = 0;
+    std::uint32_t color_value = 0;
 
     for (uint32_t i = 0; i < mandel_data_intern.height; i++) {
         for (uint32_t j = 0; j < mandel_data_intern.width; j++) {
-            pixel_value = std::float64_t(mandel_image[(mandel_data_intern.height * i) + j]) / scale_factor;
-
-            if (pixel_value < 0.5) {
-                mandel_file << "255 " << uint32_t((pixel_value * 2.0) * 255.0) << " 0 ";
+            mandel_value = mandel_image[(mandel_data_intern.height * i) + j];
+            if (mandel_value < mandel_data_intern.max_iteration) {
+                color_value = (mandel_value % 16) * 16;
+                mandel_file << "255 " << color_value << " 0 ";
             } else {
-                mandel_file << uint32_t(((1.0 - pixel_value) * 2.0) * 255.0) << " 0 0 ";
+                mandel_file << "0 0 0 ";
             }
         }
         mandel_file << std::endl;
@@ -102,7 +102,6 @@ void MandelServerProcessor::nc_node_timeout(NCNodeID node_id) {
 
 void MandelServerProcessor::nc_process_result(NCNodeID node_id, std::vector<uint8_t> result) {
     spdlog::debug("Mandel: Processed data from node: {}", node_id);
-    // spdlog::get("nc_logger")->flush();
 
     if (node_map.contains(node_id)) {
         uint32_t i = node_map[node_id];

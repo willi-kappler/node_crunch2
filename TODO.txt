@@ -1,4 +1,3 @@
-- add mandelbrot example
 - add documentation
 - add test cases for communication (node <-> server)
 - use #pragma once instead of guards
@@ -6,7 +5,7 @@
 - add empty connection class for testing.
 - add max_data_size limit to configuration and check for data size.
 - add a test case for the server: check for heartbeat timeout.
-
+- use a different logger for lib and mandel example.
 
 
 Done:
@@ -26,3 +25,4 @@ Done:
 # use NCServerDataProcessor base class.
 # add test cases for node
 # add test cases for server
+# add mandelbrot example

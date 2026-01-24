@@ -9,11 +9,9 @@
 // STD include:
 #include <chrono>
 
-// External includes:
-#include <spdlog/spdlog.h>
-
 // Internal includes:
 #include "mandel_node.hpp"
+#include "util.hpp"
 
 MandelNodeProcessor::MandelNodeProcessor():
     NCNodeDataProcessor(),
@@ -22,7 +20,7 @@ MandelNodeProcessor::MandelNodeProcessor():
 
 void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
     mandel_data = MandelData(data);
-    spdlog::debug("Mandel: Initial data received: {}", mandel_data);
+    spdlog::get("mandel_logger")->debug("Initial data received: {}", mandel_data);
 }
 
 [[nodiscard]] std::vector<uint8_t> MandelNodeProcessor::nc_process_data(std::vector<uint8_t> data) {
@@ -46,7 +44,7 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
         return result;
     }
 
-    spdlog::debug("Mandel: Data to process received: {} (current row)", current_row);
+    spdlog::get("mandel_logger")->debug("Data to process received: {} (current row)", current_row);
 
     std::vector<uint32_t> line(mandel_data.width);
     std::float64_t im_start = mandel_data.im1 + (std::float64_t(current_row) * mandel_data.im_step);

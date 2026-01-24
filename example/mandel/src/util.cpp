@@ -11,10 +11,14 @@
 #include <bit>
 
 // External includes:
-#include <spdlog/spdlog.h>
+// #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 // Internal includes:
 #include "util.hpp"
+#include "nc_logger.hpp"
+
+using namespace NodeCrunch2;
 
 MandelData::MandelData():
     re1(-2.0),
@@ -131,4 +135,15 @@ void vec_u32_to_vec_u8(std::vector<uint32_t>in, std::vector<uint8_t> out) {
 
         std::memcpy(&out[i * 4], &value, UINT32_SIZE);
     }
+}
+
+void mandel_server_logger(spdlog::level::level_enum log_level) {
+    std::shared_ptr<spdlog::logger> file_logger = spdlog::basic_logger_mt("mandel_logger", "mandel_server.log");
+    file_logger->set_level(log_level);
+}
+
+void mandel_node_logger(spdlog::level::level_enum log_level) {
+    std::string file_name = nc_gen_log_file_name("mandel_node");
+    std::shared_ptr<spdlog::logger> file_logger = spdlog::basic_logger_mt("mandel_logger", file_name);
+    file_logger->set_level(log_level);
 }

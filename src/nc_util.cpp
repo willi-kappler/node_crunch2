@@ -6,14 +6,9 @@
     This file defines some helper functions.
 */
 
-// STD includes:
-#include <filesystem>
-
-// External includes:
-#include <spdlog/sinks/basic_file_sink.h>
-
 // Local includes:
 #include "nc_util.hpp"
+#include "nc_logger.hpp"
 
 namespace NodeCrunch2 {
 void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noexcept {
@@ -87,40 +82,5 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     }
 
     return result;
-}
-
-void nc_server_logger(std::string prefix, spdlog::level::level_enum log_level) {
-    auto file_logger = spdlog::get("nc_logger");
-
-    if (!file_logger) {
-        std::string file_name = fmt::format("{}_server.log", prefix);
-        file_logger = spdlog::basic_logger_mt("nc_logger", file_name);
-    }
-
-    file_logger->set_level(log_level);
-    spdlog::set_default_logger(file_logger);
-}
-
-void nc_node_logger(std::string prefix, spdlog::level::level_enum log_level) {
-    auto file_logger = spdlog::get("nc_logger");
-
-    if (!file_logger) {
-        uint32_t file_counter = 1;
-        std::string file_name = fmt::format("{}_node001.log", prefix);
-
-        while (true) {
-            if (std::filesystem::exists(file_name)) {
-                file_counter++;
-                file_name = fmt::format("{}_node{:03}.log", prefix, file_counter);
-            } else {
-                break;
-            }
-        }
-
-        file_logger = spdlog::basic_logger_mt("nc_logger", file_name);
-    }
-
-    file_logger->set_level(log_level);
-    spdlog::set_default_logger(file_logger);
 }
 }

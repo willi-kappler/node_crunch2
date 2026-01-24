@@ -43,16 +43,10 @@ template<> struct std::hash<NodeCrunch2::NCNodeID> {
 
 // For spdlog:
 // Specialization of fmt::formatter for NCNodeID
-template <>
-struct fmt::formatter<NodeCrunch2::NCNodeID> {
-    // Parses format specs like {:x}; we'll just support the default {}:
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-        return ctx.begin();
-    }
-
-    // Format the real mandel data:
-    template <typename FormatContext>
-    auto format(const NodeCrunch2::NCNodeID& node, FormatContext& ctx) const -> decltype(ctx.out()) {
+template<>
+struct fmt::formatter<NodeCrunch2::NCNodeID> : fmt::formatter<std::string>
+{
+    auto format(const NodeCrunch2::NCNodeID& node, format_context& ctx) const -> decltype(ctx.out()) {
         return fmt::format_to(ctx.out(), "[NCNodeID: {}]", node.id);
     }
 };

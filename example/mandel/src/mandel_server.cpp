@@ -11,11 +11,9 @@
 #include <fstream>
 #include <stdfloat>
 
-// External includes:
-#include <spdlog/spdlog.h>
-
 // Internal includes:
 #include "mandel_server.hpp"
+#include "util.hpp"
 
 MandelServerProcessor::MandelServerProcessor(MandelData mandel_data):
     NCServerDataProcessor(),
@@ -40,7 +38,7 @@ MandelServerProcessor::MandelServerProcessor(MandelData mandel_data):
 }
 
 void MandelServerProcessor::nc_save_data() {
-    spdlog::info("Mandel: Save the mandel image to disk.");
+    spdlog::get("mandel_logger")->info("Mandel: Save the mandel image to disk.");
 
     std::ofstream mandel_file("mandel_image.ppm");
     mandel_file << "P3" << std::endl;
@@ -68,7 +66,7 @@ void MandelServerProcessor::nc_save_data() {
 }
 
 void MandelServerProcessor::nc_node_timeout(NCNodeID node_id) {
-    spdlog::debug("Mandel: Node timeout: {}", node_id);
+    spdlog::get("mandel_logger")->debug("Mandel: Node timeout: {}", node_id);
 
     if (node_map.contains(node_id)) {
         uint32_t i = node_map[node_id];
@@ -76,16 +74,16 @@ void MandelServerProcessor::nc_node_timeout(NCNodeID node_id) {
             // Give another node a chance to process this job / line:
             mandel_job[i] = JobStatus::UnProcessed;
         } else {
-            spdlog::debug("Mandel: Job at {} not processing.", i);
+            spdlog::get("mandel_logger")->debug("Mandel: Job at {} not processing.", i);
         }
         node_map.erase(node_id);
     } else {
-        spdlog::debug("Mandel: Timeout node {} not found in map.", node_id);
+        spdlog::get("mandel_logger")->debug("Mandel: Timeout node {} not found in map.", node_id);
     }
 }
 
 [[nodiscard]] std::vector<uint8_t> MandelServerProcessor::nc_get_new_data(NCNodeID node_id) {
-    spdlog::debug("Mandel: New data for node: {}", node_id);
+    spdlog::get("mandel_logger")->debug("Mandel: New data for node: {}", node_id);
 
     for (uint32_t i = 0; i < mandel_data_intern.height; i++) {
         if (mandel_job[i] == JobStatus::UnProcessed) {
@@ -101,7 +99,7 @@ void MandelServerProcessor::nc_node_timeout(NCNodeID node_id) {
 }
 
 void MandelServerProcessor::nc_process_result(NCNodeID node_id, std::vector<uint8_t> result) {
-    spdlog::debug("Mandel: Processed data from node: {}", node_id);
+    spdlog::get("mandel_logger")->debug("Mandel: Processed data from node: {}", node_id);
 
     if (node_map.contains(node_id)) {
         uint32_t i = node_map[node_id];
@@ -111,12 +109,12 @@ void MandelServerProcessor::nc_process_result(NCNodeID node_id, std::vector<uint
             if (result.size() == mandel_data_intern.width * 4) {
                 std::memcpy(&mandel_image[i * mandel_data_intern.height], result.data(), result.size());
             } else {
-                spdlog::error("Mandel: Size missmatch, expected: {}, got: {}", mandel_data_intern.width * 4, result.size());
+                spdlog::get("mandel_logger")->error("Mandel: Size missmatch, expected: {}, got: {}", mandel_data_intern.width * 4, result.size());
             }
         } else {
-            spdlog::error("Mandel: Not processing at index {}", i);
+            spdlog::get("mandel_logger")->error("Mandel: Not processing at index {}", i);
         }
     } else {
-        spdlog::error("Mandel: Node not found in node map: {}", node_id);
+        spdlog::get("mandel_logger")->error("Mandel: Node not found in node map: {}", node_id);
     }
 }

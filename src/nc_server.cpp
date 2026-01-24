@@ -12,7 +12,6 @@
 #include <queue>
 
 // External includes:
-#include <spdlog/spdlog.h>
 #include <spdlog/stopwatch.h>
 
 // Local includes:
@@ -20,6 +19,7 @@
 #include "nc_message.hpp"
 #include "nc_server.hpp"
 #include "nc_util.hpp"
+#include "nc_logger.hpp"
 
 namespace NodeCrunch2 {
 [[nodiscard]] std::vector<uint8_t> NCServerDataProcessor::nc_get_init_data() {
@@ -83,7 +83,7 @@ NCServer::NCServer(NCConfiguration config,
     {}
 
 void NCServer::nc_run() {
-    spdlog::info("NCServer::nc_run() - starting server");
+    nc_log_info("NCServer::nc_run() - starting server");
     spdlog::stopwatch sw;
 
     // Make threahsold configurable
@@ -102,7 +102,7 @@ void NCServer::nc_run() {
         try {
             socket = network_server_intern->nc_accept();
         } catch (asio::system_error &e) {
-            spdlog::error("Could not accept connection from socket: {}", e.what());
+            nc_log_error(fmt::format("Could not accept connection from socket: {}", e.what()));
             quit.store(true);
             continue;
         }
@@ -116,20 +116,20 @@ void NCServer::nc_run() {
     }
 
     // Save all data:
-    spdlog::debug("Saving data...");
+    nc_log_debug("Saving data...");
     data_processor_intern->nc_save_data();
 
-    spdlog::debug("Waiting for heartbeat thread...");
+    nc_log_debug("Waiting for heartbeat thread...");
     heartbeat_thread.join();
 
-    spdlog::debug("Waiting for client threads...");
+    nc_log_debug("Waiting for client threads...");
     while (client_threads.size() > 0) {
         client_threads.front().join();
         client_threads.pop();
     }
 
-    spdlog::info("Elapsed time: {}", sw);
-    spdlog::info("Will exit now.");
+    nc_log_info(fmt::format("Elapsed time: {} sec.", sw));
+    nc_log_info("Will exit now.");
 }
 
 bool NCServer::nc_valid_node_id(NCNodeID node_id) {
@@ -137,27 +137,27 @@ bool NCServer::nc_valid_node_id(NCNodeID node_id) {
     if (all_nodes.contains(node_id)) {
         return true;
     } else {
-        spdlog::error("Unknown node id: {}", node_id.id);
+        nc_log_error(fmt::format("Unknown node id: {}", node_id.id));
         return false;
     }
 }
 
 void NCServer::nc_register_new_node(NCNodeID node_id) {
-    spdlog::info("NCServer::nc_register_new_node(), node_id: {}", node_id.id);
+    nc_log_info(fmt::format("NCServer::nc_register_new_node(), node_id: {}", node_id.id));
 
     std::chrono::steady_clock clock;
     std::chrono::time_point node_time = clock.now();
 
     const std::lock_guard<std::mutex> lock(server_mutex);
     if (all_nodes.contains(node_id)) {
-        spdlog::debug("Node already registered: {}", node_id.id);
+        nc_log_debug(fmt::format("Node already registered: {}", node_id.id));
     } else {
         all_nodes[node_id] = node_time;
     }
 }
 
 void NCServer::nc_update_node_time(NCNodeID node_id) {
-    spdlog::debug("NCServer::nc_update_node_time(), node_id: {}", node_id.id);
+    nc_log_debug(fmt::format("NCServer::nc_update_node_time(), node_id: {}", node_id.id));
 
     std::chrono::steady_clock clock;
     std::chrono::time_point node_time = clock.now();
@@ -167,7 +167,7 @@ void NCServer::nc_update_node_time(NCNodeID node_id) {
 }
 
 void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
-    spdlog::debug("NCServer::nc_handle_node(), ip: {}", socket->nc_address());
+    nc_log_debug(fmt::format("NCServer::nc_handle_node(), ip: {}", socket->nc_address()));
     std::vector<uint8_t> message = socket->nc_receive_data();
     NCDecodedMessageFromNode node_message = message_codec_intern->nc_decode_message_from_node(NCEncodedMessageToServer(message));
     NCNodeID const node_id = node_message.node_id;
@@ -206,7 +206,7 @@ void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
                 }
             break;
             default:
-                spdlog::error("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type));
+                nc_log_error(fmt::format("Unexpected message from node: {}", nc_type_to_string(node_message.msg_type)));
                 msg_to_node = message_codec_intern->nc_gen_unknown_error();
         }
     }
@@ -228,7 +228,7 @@ void NCServer::nc_check_heartbeat() {
         for (const auto& [node_id, node_time]: all_nodes) {
             auto const time_diff = std::chrono::duration_cast<std::chrono::seconds>(current_time - node_time);
             if (time_diff > sleep_time) {
-                spdlog::debug("Node timeout: {}", node_id.id);
+                nc_log_debug(fmt::format("Node timeout: {}", node_id.id));
                 data_processor_intern->nc_node_timeout(node_id);
             }
         }

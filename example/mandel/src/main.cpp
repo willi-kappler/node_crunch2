@@ -6,8 +6,7 @@
     This file includes the main function for the mandel example.
 
     Run with:
-    normal: xmake run mandel_nc
-    debug:  xmake run -d mandel_nc
+    ./run_mandel
 
     To just build use:
     xmake build
@@ -18,7 +17,7 @@
 
 // Local includes:
 #include "nc_config.hpp"
-#include "nc_util.hpp"
+#include "nc_logger.hpp"
 
 #include "mandel_node.hpp"
 #include "mandel_server.hpp"
@@ -44,7 +43,8 @@ int main(int argc, char *argv[]) {
     if (program["--server"] == true) {
         std::cout << "Server mode" << std::endl;
 
-        nc_server_logger("mandel");
+        nc_server_logger();
+        mandel_server_logger();
 
         MandelData mandel_data;
         std::shared_ptr<MandelServerProcessor> mandel_server = std::make_shared<MandelServerProcessor>(mandel_data);
@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
     } else {
         std::cout << "Node (client) mode" << std::endl;
 
-        nc_node_logger("mandel");
+        nc_node_logger();
+        mandel_node_logger();
 
         std::shared_ptr<MandelNodeProcessor> mandel_node = std::make_shared<MandelNodeProcessor>();
         NCNode nc_node(config, mandel_node);

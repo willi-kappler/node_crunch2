@@ -6,9 +6,6 @@
     This file defines networking classes for the node and the server.
 */
 
-// External includes:
-#include <spdlog/spdlog.h>
-
 // Local includes:
 #include "nc_util.hpp"
 #include "nc_network.hpp"

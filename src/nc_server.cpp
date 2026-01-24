@@ -13,6 +13,7 @@
 
 // External includes:
 #include <spdlog/spdlog.h>
+#include <spdlog/stopwatch.h>
 
 // Local includes:
 #include "nc_network.hpp"
@@ -83,6 +84,7 @@ NCServer::NCServer(NCConfiguration config,
 
 void NCServer::nc_run() {
     spdlog::info("NCServer::nc_run() - starting server");
+    spdlog::stopwatch sw;
 
     // Make threahsold configurable
     const uint32_t max_thread_count = 10;
@@ -126,6 +128,7 @@ void NCServer::nc_run() {
         client_threads.pop();
     }
 
+    spdlog::info("Elapsed time: {}", sw);
     spdlog::info("Will exit now.");
 }
 

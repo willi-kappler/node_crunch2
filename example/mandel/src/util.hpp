@@ -52,6 +52,21 @@ struct fmt::formatter<MandelData> {
     }
 };
 
+/*
+
+template<>
+struct fmt::formatter<MandelData> : fmt::formatter<std::string>
+{
+    auto format(const MandelData& md, FormatContext& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(),
+            "[MandelData: Re({:.2f}, {:.2f}), Im({:.2f}, {:.2f}), Size({}x{}), Iter({})]",
+            md.re1, md.re2, md.im1, md.im2, md.width, md.height, md.max_iteration);
+    }
+};
+
+*/
+
+
 std::vector<uint8_t> u32_to_vec_u8(uint32_t in);
 
 uint32_t vec_u8_to_u32(std::vector<uint8_t> in);

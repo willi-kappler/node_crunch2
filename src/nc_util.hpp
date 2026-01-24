@@ -16,6 +16,9 @@
 #include <bit>
 #include <span>
 
+// External includes:
+#include <spdlog/spdlog.h>
+
 // Local includes:
 #include "nc_message_types.hpp"
 
@@ -27,6 +30,10 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
 [[nodiscard]] std::string nc_type_to_string(NCNodeMessageType const& msg_type);
 
 [[nodiscard]] std::string nc_type_to_string(NCServerMessageType const& msg_type);
+
+void nc_server_logger(std::string prefix, spdlog::level::level_enum log_level = spdlog::level::debug);
+
+void nc_node_logger(std::string prefix, spdlog::level::level_enum log_level = spdlog::level::debug);
 }
 
 #endif // FILE_NC_UTIL_HPP_INCLUDED

@@ -18,7 +18,7 @@
 MandelNodeProcessor::MandelNodeProcessor():
     NCNodeDataProcessor(),
     mandel_data(),
-    compute_time(5)
+    compute_time(1)
     {}
 
 void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {

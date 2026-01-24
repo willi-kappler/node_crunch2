@@ -18,12 +18,13 @@
 
 // Local includes:
 #include "nc_config.hpp"
+#include "nc_util.hpp"
 
 #include "mandel_node.hpp"
 #include "mandel_server.hpp"
 
 int main(int argc, char *argv[]) {
-    argparse::ArgumentParser program("test");
+    argparse::ArgumentParser program("mandel");
 
     program.add_argument("--server")
         .help("increase output verbosity")
@@ -38,16 +39,24 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
-    NCConfiguration config("config1.json");
+    NCConfiguration config = nc_config_from_file("example/mandel/config1.json");
 
     if (program["--server"] == true) {
         std::cout << "Server mode" << std::endl;
+
+        nc_server_logger("mandel");
+
         MandelData mandel_data;
         std::shared_ptr<MandelServerProcessor> mandel_server = std::make_shared<MandelServerProcessor>(mandel_data);
         NCServer nc_server(config, mandel_server);
+        nc_server.nc_run();
     } else {
         std::cout << "Node (client) mode" << std::endl;
+
+        nc_node_logger("mandel");
+
         std::shared_ptr<MandelNodeProcessor> mandel_node = std::make_shared<MandelNodeProcessor>();
         NCNode nc_node(config, mandel_node);
+        nc_node.nc_run();
     }
 }

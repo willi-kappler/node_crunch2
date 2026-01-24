@@ -9,9 +9,6 @@
 #ifndef FILE_MANDEL_NODE_HPP_INCLUDED
 #define FILE_MANDEL_NODE_HPP_INCLUDED
 
-// STD includes:
-#include <chrono>
-
 // Local includes:
 #include "nc_node.hpp"
 #include "util.hpp"
@@ -27,7 +24,6 @@ class MandelNodeProcessor: public NCNodeDataProcessor {
 
     private:
         MandelData mandel_data;
-        std::chrono::seconds compute_time;
 };
 
 #endif // FILE_MANDEL_NODE_HPP_INCLUDED

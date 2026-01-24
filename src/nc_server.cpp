@@ -167,9 +167,7 @@ void NCServer::nc_update_node_time(NCNodeID node_id) {
 }
 
 void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
-    //spdlog::debug("NCServer::nc_handle_node(), ip: {}", sock.remote_endpoint().address().to_string());
     spdlog::debug("NCServer::nc_handle_node(), ip: {}", socket->nc_address());
-    //uint8_t quit_counter;
     std::vector<uint8_t> message = socket->nc_receive_data();
     NCDecodedMessageFromNode node_message = message_codec_intern->nc_decode_message_from_node(NCEncodedMessageToServer(message));
     NCNodeID const node_id = node_message.node_id;

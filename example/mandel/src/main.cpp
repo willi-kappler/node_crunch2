@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
-    NCConfiguration config = nc_config_from_file("example/mandel/config1.json");
+    NCConfiguration config = nc_config_from_file("config1.json");
 
     if (program["--server"] == true) {
         std::cout << "Server mode" << std::endl;

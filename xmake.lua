@@ -15,7 +15,8 @@ add_rules("mode.debug", "mode.release")
 
 -- Force rebuild:
 -- rm -rf build/ .xmake/
--- xmake config -c
+-- xmake repo --update
+-- xmake f -c
 -- xmake clean
 -- xmake -a -r
 
@@ -24,7 +25,7 @@ add_cxxflags("-Wconversion", "-Wshadow", "-Wsign-conversion", "-Wdouble-promotio
 add_cxxflags("-Wundef", "-Wcast-qual", "-Wcast-align=strict", "-Wnon-virtual-dtor", "-Wold-style-cast")
 add_cxxflags("-Woverloaded-virtual", "-Wunused", "-Wuninitialized", "-Winit-self")
 add_cxxflags("-Wredundant-decls", "-Wsuggest-override", "-Wimplicit-fallthrough=5", "-Walloca")
-add_cxxflags("-O3")
+-- add_cxxflags("-O3")
 -- add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
 
 
@@ -38,11 +39,12 @@ set_defaultmode("release")
 
 add_requires("taocpp-json")
 add_requires("snitch")
-add_requires("lz4")
+add_requires("lz4", {system = false})
 add_requires("openssl3")
 add_requires("asio")
-add_requires("spdlog")
+add_requires("spdlog", {configs = {header_only = false}})
 add_requires("argparse")
+-- add_defines("SPDLOG_COMPILED_LIB")
 
 target("node_crunch2")
     set_kind("shared")
@@ -52,6 +54,10 @@ target("node_crunch2")
     add_packages("openssl3")
     add_packages("asio")
     add_packages("spdlog")
+    -- For spdlog, so that every object file sees the global logger:
+    add_defines("SPDLOG_COMPILED_LIB", {public = true})
+    -- Tell xmake which headers to give to the user when installing it:
+    add_headerfiles("src/*.hpp")
 
 target("nc_test")
     set_kind("binary")

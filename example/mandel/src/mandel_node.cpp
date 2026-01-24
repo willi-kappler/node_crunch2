@@ -17,20 +17,21 @@
 
 MandelNodeProcessor::MandelNodeProcessor():
     NCNodeDataProcessor(),
-    mandel_data(),
-    compute_time(1)
+    mandel_data()
     {}
 
 void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
     mandel_data = MandelData(data);
-    spdlog::debug("Initial data received: {}", mandel_data);
+    spdlog::debug("Mandel: Initial data received: {}", mandel_data);
 }
 
 [[nodiscard]] std::vector<uint8_t> MandelNodeProcessor::nc_process_data(std::vector<uint8_t> data) {
     std::vector<uint8_t> result;
+    std::chrono::milliseconds compute_time(100);
 
     if (data.size() != UINT32_SIZE) {
         // Size does not match, we expect 4 bytes.
+        std::this_thread::sleep_for(compute_time);
         return result;
     }
 
@@ -41,10 +42,11 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
 
     if (current_row >= mandel_data.height) {
         // Out of bounds, larger than image height:
+        std::this_thread::sleep_for(compute_time);
         return result;
     }
 
-    spdlog::debug("Data to process received: {} (current row)", current_row);
+    spdlog::debug("Mandel: Data to process received: {} (current row)", current_row);
 
     std::vector<uint32_t> line(mandel_data.width);
     std::float64_t im_start = mandel_data.im1 + (std::float64_t(current_row) * mandel_data.im_step);
@@ -78,6 +80,7 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
 
     // Simulate some heavy computations:
     std::this_thread::sleep_for(compute_time);
+    // spdlog::get("nc_logger")->flush();
 
     return result;
 }

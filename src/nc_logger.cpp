@@ -31,19 +31,19 @@ void nc_set_log_level(spdlog::level::level_enum level) {
     nc_get_logger()->set_level(level);
 }
 
-void nc_log_debug(std::string message) {
+void nc_log_debug(std::string_view message) {
     nc_get_logger()->debug(message);
 }
 
-void nc_log_info(std::string message) {
+void nc_log_info(std::string_view message) {
     nc_get_logger()->info(message);
 }
 
-void nc_log_error(std::string message) {
+void nc_log_error(std::string_view message) {
     nc_get_logger()->error(message);
 }
 
-std::string nc_gen_log_file_name(std::string prefix) {
+std::string nc_gen_log_file_name(std::string_view prefix) {
     uint32_t file_counter = 1;
     std::string file_name = fmt::format("{}_001.log", prefix);
 

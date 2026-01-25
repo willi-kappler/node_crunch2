@@ -37,7 +37,6 @@ class MandelData {
 
 // For spdlog:
 // Specialization of fmt::formatter for MandelData
-
 template<>
 struct fmt::formatter<MandelData> : fmt::formatter<std::string>
 {

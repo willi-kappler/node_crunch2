@@ -184,6 +184,7 @@ void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
             break;
             case NCNodeMessageType::Heartbeat:
                 if (nc_valid_node_id(node_id)) {
+                    nc_log_debug(fmt::format("Heartbeat from node: {}", node_id.id));
                     nc_update_node_time(node_id);
                     msg_to_node = message_codec_intern->nc_gen_heartbeat_message_ok();
                 } else {
@@ -222,6 +223,12 @@ void NCServer::nc_check_heartbeat() {
 
     while (!quit.load()) {
         std::this_thread::sleep_for(sleep_time);
+
+        if (quit.load()) {
+            // No need for heartbeat checks...
+            break;
+        }
+
         current_time = clock.now();
 
         const std::lock_guard<std::mutex> lock(server_mutex);

@@ -5,7 +5,6 @@
 - add empty connection class for testing.
 - add max_data_size limit to configuration and check for data size.
 - add a test case for the server: check for heartbeat timeout.
-- use std::complex for mandel example.
 
 
 Done:
@@ -27,3 +26,5 @@ Done:
 # add test cases for server
 # add mandelbrot example
 # use a different logger for lib and mandel example.
+# use std::complex for mandel example.
+# node: when an exception is caught, wait some time.

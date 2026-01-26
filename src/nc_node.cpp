@@ -112,6 +112,7 @@ void NCNode::nc_run() {
         } catch (std::exception &e) {
             error_counter++;
             nc_log_error(fmt::format("Caught exception: {}", e.what()));
+            std::this_thread::sleep_for(sleep_time);
         }
 
         switch (result.msg_type) {
@@ -185,11 +186,17 @@ void NCNode::nc_send_heartbeat() {
 
     while (!quit.load()) {
         std::this_thread::sleep_for(sleep_time);
+
+        if (quit.load()) {
+            // No need for sending any heartbeats...
+            break;
+        }
+
         try {
             result = nc_send_msg_return_answer(heartbeat_message);
         } catch (std::exception &e) {
             error_counter++;
-            nc_log_error(fmt::format("Caught exception: {}", e.what()));
+            nc_log_error(fmt::format("HB, Caught exception: {}", e.what()));
         }
 
         switch (result.msg_type) {
@@ -201,22 +208,22 @@ void NCNode::nc_send_heartbeat() {
                 // Invalid node id was sent to the server.
                 // This node hasn't registered yet to the server.
                 error_counter++;
-                nc_log_error(fmt::format("InvalidNodeID from server, error counter: {}", error_counter));
+                nc_log_error(fmt::format("HB, InvalidNodeID from server, error counter: {}", error_counter));
             break;
             case NCServerMessageType::Quit:
                 // Job is done, so we can quit.
-                nc_log_info("Quit from server, will exit now.");
+                nc_log_info("HB, Quit from server, will exit now.");
                 quit.store(true);
             break;
             default:
                 // Increase error_counter.
                 error_counter++;
-                nc_log_error(fmt::format("Unknown message: {}, error counter: {}", nc_type_to_string(result.msg_type), error_counter));
+                nc_log_error(fmt::format("HB, Unknown message: {}, error counter: {}", nc_type_to_string(result.msg_type), error_counter));
         }
 
         if (error_counter >= max_error_count) {
             // Too many errors, quit now.
-            nc_log_error(fmt::format("Too many errors: {}, will exit now.", error_counter));
+            nc_log_error(fmt::format("HB, Too many errors: {}, will exit now.", error_counter));
             quit.store(true);
         }
     }

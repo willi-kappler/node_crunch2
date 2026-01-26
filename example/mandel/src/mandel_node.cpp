@@ -8,6 +8,7 @@
 
 // STD include:
 #include <chrono>
+#include <complex>
 
 // Internal includes:
 #include "mandel_node.hpp"
@@ -47,26 +48,22 @@ void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
     spdlog::get("mandel_logger")->debug("Data to process received: {} (current row)", current_row);
 
     std::vector<uint32_t> line(mandel_data.width);
-    std::float64_t im_start = mandel_data.im1 + (std::float64_t(current_row) * mandel_data.im_step);
-    std::float64_t z_re, z_im, z2_re, z2_im, c_re, c_im;
+    const std::float64_t im_start = mandel_data.im1 + (std::float64_t(current_row) * mandel_data.im_step);
+    std::complex<std::float64_t> c, z;
 
     for (i = 0; i < mandel_data.width; i++) {
         current_iter = 0;
-        c_re = mandel_data.re1 + (std::float64_t(i) * mandel_data.re_step);
-        c_im = im_start;
-        z_re = c_re;
-        z_im = c_im;
+        c.real(mandel_data.re1 + (std::float64_t(i) * mandel_data.re_step));
+        c.imag(im_start);
+        z.real(c.real());
+        z.imag(c.imag());
 
         while (current_iter < mandel_data.max_iteration) {
-            z2_re = z_re * z_re;
-            z2_im = z_im * z_im;
+            z = c + (z*z);
 
-            if (z2_re + z2_im > 4.0) {
+            if (std::abs(z) > 4.0) {
                 break;
             }
-
-            z_im = (2.0 * z_re * z_im) + c_im;
-            z_re = z2_re - z2_im + c_re;
 
             current_iter++;
         }

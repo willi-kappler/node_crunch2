@@ -113,6 +113,7 @@ void NCNode::nc_run() {
             error_counter++;
             nc_log_error(fmt::format("Caught exception: {}", e.what()));
             std::this_thread::sleep_for(sleep_time);
+            continue;
         }
 
         switch (result.msg_type) {
@@ -197,11 +198,12 @@ void NCNode::nc_send_heartbeat() {
         } catch (std::exception &e) {
             error_counter++;
             nc_log_error(fmt::format("HB, Caught exception: {}", e.what()));
+            continue;
         }
 
         switch (result.msg_type) {
             case NCServerMessageType::HeartbeatOK:
-                nc_log_debug("HeartbeatOK from server.");
+                nc_log_debug("HB, HeartbeatOK from server.");
                 // Everything OK, nothing to do.
             break;
             case NCServerMessageType::InvalidNodeID:
@@ -228,6 +230,6 @@ void NCNode::nc_send_heartbeat() {
         }
     }
 
-    nc_log_info("Will exit now.");
+    nc_log_info("HB, Will exit now.");
 }
 }

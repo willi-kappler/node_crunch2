@@ -9,7 +9,7 @@
     ./run_mandel
 
     To just build use:
-    xmake build
+    xmake build mandel_nc
 */
 
 // External includes:

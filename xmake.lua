@@ -65,6 +65,7 @@ target("nc_test")
     add_packages("asio")
     add_deps("node_crunch2")
     add_includedirs("src")
+    set_default(false) -- Don't build by default
 
 target("mandel_nc")
     set_kind("binary")
@@ -74,3 +75,4 @@ target("mandel_nc")
     add_packages("asio")
     add_deps("node_crunch2")
     add_includedirs("src")
+    set_default(false) -- Don't build by default

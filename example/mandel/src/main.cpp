@@ -26,8 +26,12 @@ int main(int argc, char *argv[]) {
     argparse::ArgumentParser program("mandel");
 
     program.add_argument("--server")
-        .help("increase output verbosity")
+        .help("Set server mode")
         .flag();
+
+    program.add_argument("--ip")
+        .default_value(std::string(""))
+        .help("Set the ip address for the server");
 
     try {
         program.parse_args(argc, argv);
@@ -55,6 +59,11 @@ int main(int argc, char *argv[]) {
 
         nc_node_logger();
         mandel_node_logger();
+
+        if (program.is_used("--ip")) {
+            std::string server_address = program.get<std::string>("--ip");
+            config.server_address = server_address;
+        }
 
         std::shared_ptr<MandelNodeProcessor> mandel_node = std::make_shared<MandelNodeProcessor>();
         NCNode nc_node(config, mandel_node);

@@ -1,0 +1,48 @@
+\documentclass[convert={density=1200}]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, matrix, positioning, automata, backgrounds}
+
+\tikzstyle{server} = [rectangle, rounded corners, text centered, draw=black, fill=green!30, inner sep=5pt]
+\tikzstyle{node} = [rectangle, rounded corners, text centered, draw=black, fill=blue!30, inner sep=5pt]
+
+\tikzstyle{server_message} = [thick, green!50!black, dashed,->, >=stealth]
+\tikzstyle{node_message} = [thick, blue, dashed, ->, >=stealth]
+
+\begin{document}
+
+\begin{tikzpicture}
+
+    \matrix [column sep=10mm, row sep=10mm] {
+        \node (ncnode1) [node] {NCNode}; &
+        \node (ncserver) [server] {NCServer}; &
+        \node (ncnode2) [node] {NCNode}; \\
+        \node (ncnode3) [node] {NCNode}; &
+        \node (ncnode4) [node] {NCNode}; &
+        \node (ncnode5) [node] {NCNode}; \\
+    };
+
+    \draw [server_message] (ncserver) -- (ncnode1);
+    \draw [server_message] (ncserver) -- (ncnode2);
+    \draw [server_message] (ncserver) -- (ncnode3);
+    \draw [server_message] (ncserver) to [out=260, in=100] (ncnode4);
+    \draw [server_message] (ncserver) -- (ncnode5);
+
+    \draw [node_message] (ncnode1) to [out=30, in=150] (ncserver);
+    \draw [node_message] (ncnode2) to [out=150, in=30] (ncserver);
+    \draw [node_message] (ncnode3) to [out=0, in=240] (ncserver);
+    \draw [node_message] (ncnode5) to [out=180, in=300] (ncserver);
+    \draw [node_message] (ncnode4) to [out=80, in=280] (ncserver);
+
+    \draw [white] (-1, -3.0) rectangle (1, -2.9);
+
+    \matrix [column sep=10mm, row sep=0.3mm, rectangle, draw=black] at (-1.4, -2.1) {
+        \node (label1a) {}; & \node [font=\small] (label1b) {NCServerMessage}; \\
+        \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessage}; \\
+    };
+
+    \draw [server_message] (label1a) -- (label1b);
+    \draw [node_message] (label2a) -- (label2b);
+
+\end{tikzpicture}
+
+\end{document}

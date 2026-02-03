@@ -3,7 +3,7 @@ all: 00_overview.png 01_start.png 02_compute.png 03_finish.png 04_heartbeat.png
 .PHONY: clean
 
 clean:
-	rm *.aux *.fdb_latexmk *.fls *.dvi *.log *.ps *.pdf *.synctex.gz
+	rm *.aux *.dvi *.log *.ps
 
 00_overview.png: 00_overview.tex
 	latex -shell-escape 00_overview.tex

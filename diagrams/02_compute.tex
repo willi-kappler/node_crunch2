@@ -25,8 +25,8 @@
         \node (connected1) [action] {new connection}; &
         \node (connect1) [action] {connect to server}; \\
 
-        \node (prepare) [trait] {prepare\_data\_for\_node()}; &
-        \node (node_process) [trait] {process\_data\_from\_server()}; \\
+        \node (prepare) [trait] {nc\_get\_new\_data()}; &
+        \node (node_process) [trait] {nc\_process\_data()}; \\
 
         \node (separator1a) {}; &
         \node (separator1b) {}; \\
@@ -34,7 +34,8 @@
         \node (connected2) [action] {new connection}; &
         \node (connect2) [action] {connect to server}; \\
 
-        \node (server_process) [trait] {process\_data\_from\_node()}; & \\
+        \node (server_process) [trait] {nc\_process\_result()}; &
+        \node (result_ok) [action] {result ok}; \\
     };
 
     \draw [action_step] (wait) -- (connected1);
@@ -43,20 +44,22 @@
     \draw [action_step] (loop) -- (connect1);
     \draw [action_step] (connect1) -- (node_process);
     \draw [action_step] (node_process) -- node [right, text width=2.5cm] {after heavy computation...} (connect2);
-    \draw [action_step] (connect2.south) |- ++(3.2, -0.4) |- (loop.east);
+    \draw [action_step] (connect2) -- (result_ok);
+    \draw [action_step] (result_ok.south) |- ++(3.2, -0.4) |- (loop.east);
 
-    \draw [node_message] (connect1) -- node [above] {NeedsData} (connected1);
-    \draw [server_message] (prepare) -- node [above] {JobStatus::Unfinished} (node_process);
+    \draw [node_message] (connect1) -- node [above] {NodeNeedsMoreData} (connected1);
+    \draw [server_message] (prepare) -- node [above] {NewDataFromServer} (node_process);
     \draw [action_step] (prepare.south) |- ++(-3, -0.4) |- (wait.west);
 
     \begin{pgfonlayer}{background}
         \draw [action_step] (wait.310) to (connected2.50);
     \end{pgfonlayer}
 
-    \draw [node_message] (connect2) -- node [above] {HasData} (connected2);
+    \draw [node_message] (connect2) -- node [above] {NewResultFromNode} (connected2);
     \draw [action_step] (connected2) -- (server_process);
-
+    % ResultOK
     \draw [action_step] (server_process.south) |- ++(-3.5, -0.4) |- (wait.west);
+    \draw [server_message] (server_process) -- node [above] {ResultOK} (result_ok);
 
     % Add bottom page border with invisible node
     \node at (0, -8.5) {};
@@ -70,11 +73,11 @@
     \matrix [column sep=10mm, row sep=2.0mm, rectangle, draw=black,
              column 2/.style={anchor=west}
         ] at (-5.1, -6.5) {
-        \node (label1a) {}; & \node [font=\small] (label1b) {NCServerMessage}; \\
-        \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessage}; \\
+        \node (label1a) {}; & \node [font=\small] (label1b) {NCServerMessageType}; \\
+        \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessageType}; \\
         \node (label3a) {}; & \node [font=\small] (label3b) {state change}; \\
         \node [action] {foo}; & \node [font=\small] {internal state}; \\
-        \node [trait] {bar()}; & \node [font=\small] {trait method call}; \\
+        \node [trait] {bar()}; & \node [font=\small] {virtual method call}; \\
     };
 
     \draw [server_message] (label1a) -- (label1b);

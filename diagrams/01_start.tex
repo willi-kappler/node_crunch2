@@ -5,7 +5,7 @@
 \tikzstyle{server} = [rectangle, rounded corners, text centered, draw=black, fill=green!30, inner sep=5pt]
 \tikzstyle{node} = [rectangle, rounded corners, text centered, draw=black, fill=blue!30, inner sep=5pt]
 \tikzstyle{action} = [rectangle, text centered, draw=black, fill=white, inner sep=5pt]
-\tikzstyle{trait} = [trapezium, text centered, draw=black, fill=yellow!30, inner sep=5pt, text=red!50!black, font=\ttfamily]
+\tikzstyle{virtual} = [trapezium, text centered, draw=black, fill=yellow!30, inner sep=5pt, text=red!50!black, font=\ttfamily]
 
 \tikzstyle{server_message} = [thick, green!50!black, dashed,->, >=stealth]
 \tikzstyle{node_message} = [thick, blue, dashed, ->, >=stealth]
@@ -25,8 +25,8 @@
         \node (connected) [action] {new connection}; &
         \node (connect) [action] {connect to server}; \\
 
-        \node (initial) [trait] {initial\_data()}; &
-        \node (set_initial) [trait] {set\_initial\_data()}; \\
+        \node (initial) [virtual] {nc\_get\_init\_data()}; &
+        \node (set_initial) [virtual] {nc\_init()}; \\
 
         & \node (loop) [action] {compute loop}; \\
     };
@@ -38,11 +38,11 @@
     \draw [action_step] (connect) -- (set_initial);
     \draw [action_step] (set_initial) -- (loop);
 
-    \draw [node_message] (connect) -- node [above] {Register} (connected);
-    \draw [server_message] (initial) -- node [above] {InitialData} (set_initial);
+    \draw [node_message] (connect) -- node [above] {Init} (connected);
+    \draw [server_message] (initial) -- node [above] {InitOK} (set_initial);
 
     % \draw [action_step] (initial) -- node {} ++(0, -0.75) -- node {} ++(-2, 0) -- node {} ++(0, 3) -- (wait);
-    \draw [action_step] (initial.south) |- ++(-2.1, -0.4) |- (wait.west);
+    \draw [action_step] (initial.south) |- ++(-2.3, -0.4) |- (wait.west);
 
 
     % Add bottom page border with invisible node
@@ -52,13 +52,14 @@
     \node at (-5.3, 0) {};
 
     \matrix [column sep=10mm, row sep=2.0mm, rectangle, draw=black,
+             column 1/.style={anchor=center},
              column 2/.style={anchor=west}
         ] at (-2.2, -4.5) {
-        \node (label1a) {}; & \node [font=\small] (label1b) {NCServerMessage}; \\
-        \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessage}; \\
+        \node (label1a) {}; & \node [font=\small] (label1b) {NCServerMessageType}; \\
+        \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessageType}; \\
         \node (label3a) {}; & \node [font=\small] (label3b) {state change}; \\
         \node [action] {foo}; & \node [font=\small] {internal state}; \\
-        \node [trait] {bar()}; & \node [font=\small] {trait method call}; \\
+        \node [virtual] {bar()}; & \node [font=\small] {virtual method call}; \\
     };
 
     \draw [server_message] (label1a) -- (label1b);

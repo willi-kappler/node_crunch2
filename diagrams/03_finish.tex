@@ -77,11 +77,11 @@
     \matrix [column sep=10mm, row sep=2.0mm, rectangle, draw=black,
              column 2/.style={anchor=west}
         ] at (-3.9, -11.0) {
-        \node (label1a) {}; & \node [font=\small] (label1b) {NCServerMessage}; \\
-        \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessage}; \\
+        \node (label1a) {}; & \node [font=\small] (label1b) {NCServerMessageType}; \\
+        \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessageType}; \\
         \node (label3a) {}; & \node [font=\small] (label3b) {state change}; \\
         \node [action] {foo}; & \node [font=\small] {internal state}; \\
-        \node [trait] {bar()}; & \node [font=\small] {trait method call}; \\
+        \node [trait] {bar()}; & \node [font=\small] {virtual method call}; \\
     };
 
     \draw [server_message] (label1a) -- (label1b);

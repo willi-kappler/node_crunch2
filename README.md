@@ -34,7 +34,7 @@ Version v0.1.0 (2026.02.01)
 ## Features
 
 - Modern C++.
-- Easy to use API.
+- Easy to use API. The user doesn't have to write any network code, just implement virtual functions.
 - If one of the nodes crashes the server and all other nodes can still continue with their work. (Heartbeat messages are used internally.)
 - While running the user application more nodes can be added dynamically to speed up computation even more.
 - The nodes can be a mixture of different OS and hardware architectures, even different clusters at different locations. It just needs to have a network connection.
@@ -85,25 +85,25 @@ This is reflected in the two data processor classes that must be inherited by th
 ### Start of node and server:
 
 <p align="left">
-    <img src="diagrams/01_start.png" alt="Overview" title="Overview" />
+    <img src="diagrams/01_start.png" alt="Start" title="Start" />
 </p>
 
 ### Node receives data from server and does computation, sends results back to server:
 
 <p align="left">
-    <img src="diagrams/02_compute.png" alt="Overview" title="Overview" />
+    <img src="diagrams/02_compute.png" alt="Computation" title="Computation" />
 </p>
 
 ### All computation is done, server will exit:
 
 <p align="left">
-    <img src="diagrams/03_finish.png" alt="Overview" title="Overview" />
+    <img src="diagrams/03_finish.png" alt="Finish" title="Finish" />
 </p>
 
 ### Node sends heartbeat message to server:
 
 <p align="left">
-    <img src="diagrams/04_heartbeat.png" alt="Overview" title="Overview" />
+    <img src="diagrams/04_heartbeat.png" alt="Heartbeat" title="Heartbeat" />
 </p>
 
 ## Server template

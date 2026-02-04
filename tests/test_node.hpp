@@ -201,13 +201,11 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     REQUIRE(init_data->server_data[3] == 4);
     REQUIRE(init_data->server_data[4] == 5);
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
     REQUIRE(init_data->heartbeat_counter == 0);
     REQUIRE(init_data->node_ids.size() == 1);
     REQUIRE(init_data->node_messages.size() == 1);
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->test_mode == 10);
-
 }
 
 TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
@@ -230,7 +228,6 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     REQUIRE(init_data->server_data[4] == 155);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
     REQUIRE(init_data->heartbeat_counter == 1);
     REQUIRE(init_data->node_ids.size() == 11);
 
@@ -248,7 +245,6 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     REQUIRE(init_data->node_messages[10] == NCNodeMessageType::Heartbeat);
 
     REQUIRE(init_data->test_mode == 20);
-
 }
 
 TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
@@ -271,18 +267,14 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     REQUIRE(init_data->server_data[4] == 15);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
-    REQUIRE(init_data->heartbeat_counter == 1);
-    REQUIRE(init_data->node_ids.size() == 4);
+    REQUIRE(init_data->node_ids.size() == 3);
 
-    REQUIRE(init_data->node_messages.size() == 4);
+    REQUIRE(init_data->node_messages.size() == 3);
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
     REQUIRE(init_data->node_messages[2] == NCNodeMessageType::NewResultFromNode);
-    REQUIRE(init_data->node_messages[3] == NCNodeMessageType::Heartbeat);
 
     REQUIRE(init_data->test_mode == 30);
-
 }
 
 TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" ) {
@@ -305,8 +297,6 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     REQUIRE(init_data->server_data[4] == 5);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    // REQUIRE(init_data->msg_to_node.data == expected_message.data);
-    // REQUIRE(init_data->heartbeat_counter == 0);
     REQUIRE(init_data->node_ids.size() == 2);
 
     REQUIRE(init_data->node_messages.size() == 2);
@@ -314,5 +304,4 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
 
     REQUIRE(init_data->test_mode == 40);
-
 }

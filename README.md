@@ -84,25 +84,25 @@ This is reflected in the two data processor classes that must be inherited by th
 
 ### Start of node and server:
 
-<p align="left">
+<p align="center">
     <img src="diagrams/01_start.png" alt="Start" title="Start" />
 </p>
 
 ### Node receives data from server and does computation, sends results back to server:
 
-<p align="left">
+<p align="center">
     <img src="diagrams/02_compute.png" alt="Computation" title="Computation" />
 </p>
 
 ### All computation is done, server will exit:
 
-<p align="left">
+<p align="center">
     <img src="diagrams/03_finish.png" alt="Finish" title="Finish" />
 </p>
 
 ### Node sends heartbeat message to server:
 
-<p align="left">
+<p align="center">
     <img src="diagrams/04_heartbeat.png" alt="Heartbeat" title="Heartbeat" />
 </p>
 

@@ -234,7 +234,7 @@ And again like with the other job scheduler you can just start additional jobs a
 
 Using the two traits looks complicated at first but there are a couple of examples that show how to use it in "real world" applications:
 
-- Distributed [Mandelbrot](examples/mandel/)
+- Distributed [Mandelbrot](example/mandel/)
 - TODO: Add more examples.
 
 ## How does it compare to *x* ?

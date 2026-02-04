@@ -14,3 +14,9 @@ mandel_nc &
 mandel_nc &
 mandel_nc &
 ```
+
+Or you can use the bash script:
+
+```bash
+run_mandel.sh
+```

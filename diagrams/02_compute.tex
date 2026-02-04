@@ -5,7 +5,7 @@
 \tikzstyle{server} = [rectangle, rounded corners, text centered, draw=black, fill=green!30, inner sep=5pt]
 \tikzstyle{node} = [rectangle, rounded corners, text centered, draw=black, fill=blue!30, inner sep=5pt]
 \tikzstyle{action} = [rectangle, text centered, draw=black, fill=white, inner sep=5pt]
-\tikzstyle{trait} = [trapezium, text centered, draw=black, fill=yellow!30, inner sep=5pt, text=red!50!black, font=\ttfamily]
+\tikzstyle{virtual} = [trapezium, text centered, draw=black, fill=yellow!30, inner sep=5pt, text=red!50!black, font=\ttfamily]
 
 \tikzstyle{server_message} = [thick, green!50!black, dashed,->, >=stealth]
 \tikzstyle{node_message} = [thick, blue, dashed, ->, >=stealth]
@@ -25,8 +25,8 @@
         \node (connected1) [action] {new connection}; &
         \node (connect1) [action] {connect to server}; \\
 
-        \node (prepare) [trait] {nc\_get\_new\_data()}; &
-        \node (node_process) [trait] {nc\_process\_data()}; \\
+        \node (prepare) [virtual] {nc\_get\_new\_data()}; &
+        \node (node_process) [virtual] {nc\_process\_data()}; \\
 
         \node (separator1a) {}; &
         \node (separator1b) {}; \\
@@ -34,7 +34,7 @@
         \node (connected2) [action] {new connection}; &
         \node (connect2) [action] {connect to server}; \\
 
-        \node (server_process) [trait] {nc\_process\_result()}; &
+        \node (server_process) [virtual] {nc\_process\_result()}; &
         \node (result_ok) [action] {result ok}; \\
     };
 
@@ -77,7 +77,7 @@
         \node (label2a) {}; & \node [font=\small] (label2b) {NCNodeMessageType}; \\
         \node (label3a) {}; & \node [font=\small] (label3b) {state change}; \\
         \node [action] {foo}; & \node [font=\small] {internal state}; \\
-        \node [trait] {bar()}; & \node [font=\small] {virtual method call}; \\
+        \node [virtual] {bar()}; & \node [font=\small] {virtual method call}; \\
     };
 
     \draw [server_message] (label1a) -- (label1b);

@@ -1,0 +1,38 @@
+name: Build Matrix
+
+on:
+  # Allows manual triggering
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, cc: gcc }
+          - { os: ubuntu-latest, cc: clang }
+          - { os: windows-latest, cc: cl }
+          - { os: macos-latest, cc: clang }
+        # We can specify different modes (debug, release) or compilers here
+        mode: [debug, release]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 1. Install xmake
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      # 2. Configure
+      - name: Configure
+        run: xmake f --cc=${{ matrix.cc }} --cxx=${{ matrix.cc }}++ -y
+
+      # 3. Build
+      - name: Build
+        run: xmake

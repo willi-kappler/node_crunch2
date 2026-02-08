@@ -20,13 +20,38 @@ add_rules("mode.debug", "mode.release")
 -- xmake clean
 -- xmake -a -r
 
+-- For all compilers:
 set_warnings("error", "everything", "extra", "pedantic", "all")
-add_cxxflags("-Wconversion", "-Wshadow", "-Wsign-conversion", "-Wdouble-promotion", "-Wformat=2")
-add_cxxflags("-Wundef", "-Wcast-qual", "-Wcast-align=strict", "-Wnon-virtual-dtor", "-Wold-style-cast")
-add_cxxflags("-Woverloaded-virtual", "-Wunused", "-Wuninitialized", "-Winit-self")
-add_cxxflags("-Wredundant-decls", "-Wsuggest-override", "-Wimplicit-fallthrough=5", "-Walloca")
--- add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
 
+-- For GCC and Clang only:
+if is_kind("gcc", "clang") then
+    add_cxxflags("-Wconversion", "-Wshadow", "-Wsign-conversion", "-Wdouble-promotion", "-Wformat=2")
+    add_cxxflags("-Wundef", "-Wcast-qual", "-Wnon-virtual-dtor", "-Wold-style-cast")
+    add_cxxflags("-Woverloaded-virtual", "-Wunused", "-Wuninitialized", "-Winit-self")
+    add_cxxflags("-Wredundant-decls", "-Wsuggest-override")
+
+    -- For GCC only:
+    if is_kind("gcc") then
+        add_cxxflags("-Walloca", "-Wcast-align=strict", "-Wimplicit-fallthrough=5")
+    elseif is_kind("clang") then
+        -- Clang prefers the boolean flag without the numeric level
+        add_cxxflags("-Wimplicit-fallthrough")
+    end
+--    add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
+end
+
+-- For MSVC only:
+if is_kind("cl") then
+    -- add_cxxflags("/Wall")
+    add_cxxflags("/W4") -- Level 4 is the standard "Strict" for MSVC
+    add_cxxflags("/w14242") -- 'identifier': conversion from 'type1' to 'type1', possible loss of data
+    add_cxxflags("/w14265") -- 'class': class has virtual functions, but destructor is not virtual
+    add_cxxflags("/w14287") -- 'operator': unsigned/negative constant mismatch
+    add_cxxflags("/we4289") -- nonstandard extension used: 'variable': control variable declared in the for-loop is used outside the for-loop scope
+    add_cxxflags("/w14296") -- 'operator': expression is always false
+    add_cxxflags("/w14311") -- 'variable' : pointer truncation from 'type' to 'type'
+    add_cxxflags("/wd4068") -- disable "unknown pragma" (useful if you use GCC pragmas)
+end
 
 set_languages("c++23")
 set_version("0.1.0")

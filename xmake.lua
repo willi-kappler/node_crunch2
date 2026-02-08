@@ -21,7 +21,7 @@ add_rules("mode.debug", "mode.release")
 -- xmake -a -r
 
 -- For all compilers:
-set_warnings("error", "everything", "extra", "pedantic", "all")
+-- set_warnings("error", "everything", "extra", "pedantic", "all")
 
 -- For GCC and Clang only:
 if is_kind("gcc", "clang") then

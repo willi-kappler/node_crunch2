@@ -32,20 +32,19 @@ if is_kind("gcc", "clang") then
 
     -- For GCC only:
     if is_kind("gcc") then
+        set_warnings("error", "everything", "extra", "pedantic", "all")
         add_cxxflags("-Walloca", "-Wcast-align=strict", "-Wimplicit-fallthrough=5")
     elseif is_kind("clang") then
+        set_warnings("error", "extra", "pedantic", "all")
         -- Clang prefers the boolean flag without the numeric level
         add_cxxflags("-Wimplicit-fallthrough")
-        -- Disable the "You aren't writing code like it's 1998" warnings
-        add_cxxflags("-Wno-c++98-compat", "-Wno-c++98-compat-pedantic")
-        -- Also disable C++20 compatibility warnings if you are targeting C++23
-        add_cxxflags("-Wno-pre-c++20-compat")
     end
 --    add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
 end
 
 -- For MSVC only:
 if is_kind("cl") then
+    set_warnings("error", "everything", "extra", "pedantic", "all")
     -- add_cxxflags("/Wall")
     add_cxxflags("/W4") -- Level 4 is the standard "Strict" for MSVC
     add_cxxflags("/w14242") -- 'identifier': conversion from 'type1' to 'type1', possible loss of data

@@ -36,6 +36,10 @@ if is_kind("gcc", "clang") then
     elseif is_kind("clang") then
         -- Clang prefers the boolean flag without the numeric level
         add_cxxflags("-Wimplicit-fallthrough")
+        -- Disable the "You aren't writing code like it's 1998" warnings
+        add_cxxflags("-Wno-c++98-compat", "-Wno-c++98-compat-pedantic")
+        -- Also disable C++20 compatibility warnings if you are targeting C++23
+        add_cxxflags("-Wno-pre-c++20-compat")
     end
 --    add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
 end

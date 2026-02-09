@@ -1,5 +1,11 @@
 ## Mandelbrot example for node_crunch2.
 
+To build (in the top folder):
+
+```bash
+xmake build mandel_nc
+```
+
 To start the server:
 
 ```bash

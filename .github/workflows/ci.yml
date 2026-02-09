@@ -9,13 +9,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { os: ubuntu-latest, cc: gcc }
-          - { os: ubuntu-latest, cc: clang }
-          - { os: windows-latest, cc: cl }
-          - { os: macos-latest, cc: clang }
-        # We can specify different modes (debug, release) or compilers here
+        # Define the base sets here to ensure they multiply
+        os: [ubuntu-latest, windows-latest, macos-latest]
         mode: [debug, release]
+        include:
+          # Map specific compilers to the OS
+          - os: ubuntu-latest
+            cc: gcc
+          - os: ubuntu-latest
+            cc: clang
+          - os: windows-latest
+            cc: cl
+          - os: macos-latest
+            cc: clang
 
     runs-on: ${{ matrix.os }}
 
@@ -31,7 +37,7 @@ jobs:
 
       # 2. Configure
       - name: Configure
-        run: xmake f --cc=${{ matrix.cc }} --cxx=${{ matrix.cc }}++ -y
+        run: xmake f -m ${{ matrix.mode }} --cc=${{ matrix.cc }} --cxx=${{ matrix.cc }}++ -y
 
       # 3. Build
       - name: Build

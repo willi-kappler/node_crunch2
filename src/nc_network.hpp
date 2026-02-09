@@ -24,7 +24,7 @@ class NCNetworkSocketBase {
         virtual void nc_send_data(std::vector<uint8_t> const data);
         [[nodiscard]] virtual std::vector<uint8_t> nc_receive_data();
         [[nodiscard]] virtual std::string nc_address();
-        
+
         // Default special member functions:
         NCNetworkSocketBase() = default;
         virtual ~NCNetworkSocketBase() = default;
@@ -42,11 +42,11 @@ class NCNetworkSocket: public NCNetworkSocketBase {
 
         // Constructor:
         NCNetworkSocket(tcp::socket &socket);
-        
+
         // Default special member functions:
         ~NCNetworkSocket() = default;
         NCNetworkSocket(NCNetworkSocket&&) = default;
-        NCNetworkSocket(const NCNetworkSocket&) = default;
+        NCNetworkSocket(const NCNetworkSocket&) = delete;
         NCNetworkSocket& operator=(const NCNetworkSocket&) = default;
         NCNetworkSocket& operator=(NCNetworkSocket&&) = default;
 

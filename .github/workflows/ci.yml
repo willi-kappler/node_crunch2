@@ -16,12 +16,17 @@ jobs:
           # Map specific compilers to the OS
           - os: ubuntu-latest
             cc: gcc
+            cxx: g++
           - os: ubuntu-latest
             cc: clang
+            cxx: clang++
           - os: windows-latest
+            # On Windows, both are just 'cl'
             cc: cl
+            cxx: cl
           - os: macos-latest
             cc: clang
+            cxx: clang++
 
     runs-on: ${{ matrix.os }}
 
@@ -37,7 +42,7 @@ jobs:
 
       # 2. Configure
       - name: Configure
-        run: xmake f -m ${{ matrix.mode }} --cc=${{ matrix.cc }} --cxx=${{ matrix.cc }}++ -y
+        run: xmake f -m ${{ matrix.mode }} --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }} -y
 
       # 3. Build
       - name: Build

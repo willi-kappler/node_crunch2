@@ -34,6 +34,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Add MSVC to PATH
+        if: matrix.os == 'windows-latest'
+        uses: ilammy/msvc-dev-cmd@v1
+
       # 1. Install xmake
       - name: Setup xmake
         uses: xmake-io/github-action-setup-xmake@v1

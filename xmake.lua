@@ -14,10 +14,7 @@ add_rules("mode.debug", "mode.release")
 -- xmake f --toolchain=clang --runtimes=stdc++_shared
 
 -- Force rebuild:
--- rm -rf build/ ~/.xmake/
--- xmake repo --update
--- xmake f -c
--- xmake clean
+-- rm -rf build/ .xmake ~/.xmake/
 -- xmake -a -r
 
 -- For all compilers:
@@ -53,6 +50,7 @@ if is_kind("cl") then
     add_cxxflags("/w14296") -- 'operator': expression is always false
     add_cxxflags("/w14311") -- 'variable' : pointer truncation from 'type' to 'type'
     add_cxxflags("/wd4068") -- disable "unknown pragma" (useful if you use GCC pragmas)
+    add_cxxflags("/utf-8")
 end
 
 set_languages("c++23")
@@ -63,7 +61,7 @@ set_optimize("fastest")
 set_defaultmode("release")
 
 
-add_requires("taocpp-json")
+add_requires("taocpp-json 2025.03.11")
 add_requires("snitch")
 add_requires("lz4", {system = false})
 add_requires("openssl3")
@@ -73,6 +71,9 @@ add_requires("argparse")
 
 target("node_crunch2")
     set_kind("shared")
+    if is_plat("windows") then
+        add_rules("utils.symbols.export_all", {export_classes = true})
+    end
     add_files("src/*.cpp")
     add_packages("taocpp-json")
     add_packages("lz4")

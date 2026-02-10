@@ -48,7 +48,7 @@ jobs:
       - name: Configure
         run: |
           xmake global --clean
-          xmake f -m ${{ matrix.mode }} --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }} -y
+          xmake f -m ${{ matrix.mode }} --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }} -y --std=c++23
 
       # 3. Build
       - name: Build

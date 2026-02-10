@@ -104,3 +104,9 @@ target("mandel_nc")
     add_deps("node_crunch2")
     add_includedirs("src")
     set_default(false) -- Don't build by default
+
+
+-- Test package locally in xmake repo:
+-- xmake l scripts/test.lua --shallow -vD node_crunch2
+-- xmake l scripts/test.lua --shallow -vD -k shared -m debug node_crunch2
+-- xmake l scripts/test.lua --shallow -vD --runtimes=MD node_crunch2

@@ -47,6 +47,34 @@ Version v0.1.0 (2026.02.01)
 
 Node Crunch 2 is a library that allows users to write distributed C++ code easily. The code is organized in two main parts: one for the server and one for the node.
 
+It uses xmake as build system. You can simply use it in yout project by adding this dependency:
+
+```lua
+-- For the project:
+add_requires("node_crunch2")
+-- For the target:
+add_packages("node_crunch2")
+```
+
+To build the library, the test cases and the example just run:
+
+```bash
+xmake -a -r
+```
+
+To run the test cases:
+
+```bash
+xmake run -w ./ nc_test
+```
+
+To run the example:
+
+```bash
+cd exampke/mandel/
+./run_mandel.sh
+```
+
 This is reflected in the two data processor classes that must be inherited by the user code:
 
 <p align="center">

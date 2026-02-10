@@ -46,7 +46,9 @@ jobs:
 
       # 2. Configure
       - name: Configure
-        run: xmake f -m ${{ matrix.mode }} --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }} -y
+        run:
+          xmake global --clean
+          xmake f -m ${{ matrix.mode }} --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }} -y
 
       # 3. Build
       - name: Build

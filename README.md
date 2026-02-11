@@ -71,6 +71,7 @@ xmake run -w ./ nc_test
 To run the example:
 
 ```bash
+xmake build mandel_nc
 cd exampke/mandel/
 ./run_mandel.sh
 ```

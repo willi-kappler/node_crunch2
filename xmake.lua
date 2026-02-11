@@ -1,6 +1,10 @@
--- project("node_crunch2")
-
-add_rules("mode.debug", "mode.release")
+project("node_crunch2")
+    set_languages("c++23")
+    set_version("0.1.0")
+    set_optimize("fastest")
+    -- set_defaultmode("debug")
+    set_defaultmode("release")
+    add_rules("mode.debug", "mode.release")
 
 -- Clean configuration:
 -- xmake f -c
@@ -52,14 +56,6 @@ if is_kind("cl") then
     add_cxxflags("/wd4068") -- disable "unknown pragma" (useful if you use GCC pragmas)
     add_cxxflags("/utf-8")
 end
-
-set_languages("c++23")
-set_version("0.1.0")
-
--- set_defaultmode("debug")
-set_optimize("fastest")
-set_defaultmode("release")
-
 
 add_requires("taocpp-json 2025.03.11")
 add_requires("snitch")

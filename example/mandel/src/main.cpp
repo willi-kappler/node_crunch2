@@ -5,11 +5,11 @@
 
     This file includes the main function for the mandel example.
 
-    Run with:
-    ./run_mandel
-
     To just build use:
     xmake build mandel_nc
+
+    Run with:
+    ./run_mandel
 */
 
 // External includes:

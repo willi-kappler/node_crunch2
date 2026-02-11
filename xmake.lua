@@ -1,4 +1,4 @@
-project("node_crunch2")
+set_project("node_crunch2")
     set_languages("c++23")
     set_version("0.1.0")
     set_optimize("fastest")

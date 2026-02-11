@@ -12,12 +12,8 @@
 // STD includes:
 #include <string>
 #include <cstdint>
-#include <expected>
 #include <filesystem>
 #include <string_view>
-
-// Local includes:
-#include "nc_exceptions.hpp"
 
 namespace NodeCrunch2 {
 class NCConfiguration {
@@ -32,7 +28,7 @@ class NCConfiguration {
         NCConfiguration(std::string secret_key_user);
 
         // Default special member functions:
-        NCConfiguration (NCConfiguration&&) = default;
+        NCConfiguration(NCConfiguration&&) = default;
         NCConfiguration(const NCConfiguration&) = default;
 
         // Disable all other special member functions:

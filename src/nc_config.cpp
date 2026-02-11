@@ -10,9 +10,6 @@
 #include <fstream>
 #include <iostream>
 
-// External includes:
-#include <tao/json.hpp>
-
 // Local includes:
 #include "nc_config.hpp"
 #include "nc_exceptions.hpp"
@@ -34,9 +31,7 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
     }
 }
 
-[[nodiscard]] NCConfiguration nc_config_from_string(std::string_view config_as_string) {
-    const tao::json::value json_config = tao::json::from_string(config_as_string);
-
+[[nodiscard]] NCConfiguration nc_config_from_json(const tao::json::value json_config) {
     // Secret key must always be present.
     if (auto v = json_config.find("secret_key"); v == nullptr) {
         throw NCConfigurationException("Missing secret key");
@@ -70,6 +65,11 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
     }
 
     return config;
+}
+
+[[nodiscard]] NCConfiguration nc_config_from_string(std::string_view config_as_string) {
+    const tao::json::value json_config = tao::json::from_string(config_as_string);
+    return nc_config_from_json(json_config);
 }
 
 [[nodiscard]] NCConfiguration nc_config_from_file(std::filesystem::path file_path) {

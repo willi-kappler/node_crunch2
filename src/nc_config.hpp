@@ -15,6 +15,9 @@
 #include <filesystem>
 #include <string_view>
 
+// External includes:
+#include <tao/json.hpp>
+
 namespace NodeCrunch2 {
 class NCConfiguration {
     public:
@@ -36,6 +39,8 @@ class NCConfiguration {
         NCConfiguration& operator=(const NCConfiguration&) = delete;
         NCConfiguration& operator=(NCConfiguration&&) = delete;
 };
+
+[[nodiscard]] NCConfiguration nc_config_from_json(tao::json::value);
 
 [[nodiscard]] NCConfiguration nc_config_from_string(std::string_view);
 

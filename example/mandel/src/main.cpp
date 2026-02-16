@@ -16,8 +16,8 @@
 #include <argparse/argparse.hpp>
 
 // Local includes:
-#include "nc_config.hpp"
-#include "nc_logger.hpp"
+#include "nodcru2/nc_config.hpp"
+#include "nodcru2/nc_logger.hpp"
 
 #include "mandel_node.hpp"
 #include "mandel_server.hpp"

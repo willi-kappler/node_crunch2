@@ -16,7 +16,7 @@
 
 // Internal includes:
 #include "util.hpp"
-#include "nc_logger.hpp"
+#include "nodcru2/nc_logger.hpp"
 
 using namespace nodcru2;
 

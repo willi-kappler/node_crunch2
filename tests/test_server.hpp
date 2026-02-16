@@ -17,8 +17,8 @@
 #include <spdlog/spdlog.h>
 
 // Local includes:
-#include "nc_server.hpp"
-#include "nc_message.hpp"
+#include "nodcru2/nc_server.hpp"
+#include "nodcru2/nc_message.hpp"
 
 using namespace nodcru2;
 

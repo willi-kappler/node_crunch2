@@ -16,7 +16,7 @@
 #include <snitch/snitch.hpp>
 
 // Local includes:
-#include "nc_message.hpp"
+#include "nodcru2/nc_message.hpp"
 
 using namespace nodcru2;
 

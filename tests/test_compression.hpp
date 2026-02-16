@@ -16,8 +16,8 @@
 #include <snitch/snitch.hpp>
 
 // Local includes:
-#include "nc_compression.hpp"
-#include "nc_util.hpp"
+#include "nodcru2/nc_compression.hpp"
+#include "nodcru2/nc_util.hpp"
 
 using namespace nodcru2;
 

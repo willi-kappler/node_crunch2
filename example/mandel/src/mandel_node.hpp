@@ -10,7 +10,7 @@
 #define FILE_MANDEL_NODE_HPP_INCLUDED
 
 // Local includes:
-#include "nc_node.hpp"
+#include "nodcru2/nc_node.hpp"
 #include "util.hpp"
 
 using namespace nodcru2;

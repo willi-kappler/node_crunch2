@@ -13,7 +13,7 @@
 #include <unordered_map>
 
 // Local includes:
-#include "nc_server.hpp"
+#include "nodcru2/nc_server.hpp"
 #include "util.hpp"
 
 using namespace nodcru2;

@@ -13,7 +13,7 @@
 #include <snitch/snitch.hpp>
 
 // Local includes:
-#include "nc_encryption.hpp"
+#include "nodcru2/nc_encryption.hpp"
 
 using namespace nodcru2;
 

@@ -67,7 +67,7 @@ target("node_crunch2")
     if is_plat("windows") then
         add_rules("utils.symbols.export_all", {export_classes = true})
     end
-    add_files("src/*.cpp")
+    add_files("src/nodcru2/*.cpp")
     add_packages("taocpp-json")
     add_packages("lz4")
     add_packages("openssl3")
@@ -76,7 +76,7 @@ target("node_crunch2")
     -- For spdlog, so that every object file sees the global logger:
     add_defines("SPDLOG_COMPILED_LIB", {public = true})
     -- Tell xmake which headers to give to the user when installing it:
-    add_headerfiles("src/*.hpp")
+    add_headerfiles("src/nodcru2/*.hpp")
 
 target("nc_test")
     set_kind("binary")

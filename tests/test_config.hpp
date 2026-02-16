@@ -13,8 +13,8 @@
 #include <snitch/snitch.hpp>
 
 // Local includes:
-#include "nc_config.hpp"
-#include "nc_exceptions.hpp"
+#include "nodcru2/nc_config.hpp"
+#include "nodcru2/nc_exceptions.hpp"
 
 using namespace nodcru2;
 

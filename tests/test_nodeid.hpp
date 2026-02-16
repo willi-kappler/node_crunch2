@@ -17,7 +17,7 @@
 #include <snitch/snitch.hpp>
 
 // Local includes:
-#include "nc_nodeid.hpp"
+#include "nodcru2/nc_nodeid.hpp"
 
 using namespace nodcru2;
 

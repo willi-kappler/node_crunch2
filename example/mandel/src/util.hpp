@@ -17,7 +17,6 @@
 
 // External includes:
 #include <spdlog/spdlog.h>
-// #include <spdlog/fmt/bundled/format.h>
 
 // Size in bytes:
 const uint8_t FLOAT_SIZE = 8;

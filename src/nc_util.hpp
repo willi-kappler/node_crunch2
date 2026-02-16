@@ -19,7 +19,7 @@
 // Local includes:
 #include "nc_message_types.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noexcept;
 
 [[nodiscard]] uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes);

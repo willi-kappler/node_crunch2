@@ -13,7 +13,7 @@
 #include "nc_node.hpp"
 #include "util.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 class MandelNodeProcessor: public NCNodeDataProcessor {
     public:

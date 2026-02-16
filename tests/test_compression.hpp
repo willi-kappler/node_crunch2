@@ -19,7 +19,7 @@
 #include "nc_compression.hpp"
 #include "nc_util.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 TEST_CASE("Compress / decompress a message", "[compression]" ) {
     NCCompressor compressor;

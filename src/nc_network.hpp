@@ -16,7 +16,7 @@
 // External includes:
 #include <asio.hpp>
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 using asio::ip::tcp;
 
 class NCNetworkSocketBase {

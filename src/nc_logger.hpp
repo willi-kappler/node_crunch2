@@ -15,7 +15,7 @@
 // External includes:
 #include <spdlog/spdlog.h>
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 std::shared_ptr<spdlog::logger> nc_get_logger();
 
 void nc_set_log_level(spdlog::level::level_enum level);

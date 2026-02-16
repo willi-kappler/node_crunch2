@@ -23,7 +23,7 @@
 #include "nc_compression.hpp"
 #include "nc_encryption.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 class NCMessageCodecBase {
     public:
         [[nodiscard]] virtual std::vector<uint8_t> nc_encode(NCDecompressedMessage decompressed_message) const;

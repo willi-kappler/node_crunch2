@@ -18,7 +18,7 @@
 // External includes:
 #include <tao/json.hpp>
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 class NCConfiguration {
     public:
         std::string server_address;

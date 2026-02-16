@@ -21,7 +21,7 @@
 #include "nc_util.hpp"
 #include "nc_logger.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 [[nodiscard]] std::vector<uint8_t> NCServerDataProcessor::nc_get_init_data() {
     return std::vector<uint8_t>();
 }

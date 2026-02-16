@@ -18,7 +18,7 @@
 // Local includes:
 #include "nc_message_types.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 class NCCompressor {
     public:
         [[nodiscard]] virtual NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message) const;

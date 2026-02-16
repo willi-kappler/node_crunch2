@@ -22,7 +22,7 @@
 #include "nc_message.hpp"
 #include "nc_network.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 class NCServerDataProcessor {
     public:
         // Default special member functions:

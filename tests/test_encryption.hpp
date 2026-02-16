@@ -15,7 +15,7 @@
 // Local includes:
 #include "nc_encryption.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 TEST_CASE("Encrypt / decrypt a message", "[message]" ) {
     std::string key1 = "12345678901234567890123456789012";

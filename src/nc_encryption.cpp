@@ -18,7 +18,7 @@
 #include "nc_encryption.hpp"
 #include "nc_exceptions.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secret_key) {}
 
 [[nodiscard]] NCEncryptedMessage NCEncryption::nc_encrypt_message(NCDecryptedMessage const& message) const {

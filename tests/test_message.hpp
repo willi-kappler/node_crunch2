@@ -18,7 +18,7 @@
 // Local includes:
 #include "nc_message.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 TEST_CASE("Encode / decode a message to the server", "[message]" ) {
     NCNodeMessageType const message_type = NCNodeMessageType::Init;

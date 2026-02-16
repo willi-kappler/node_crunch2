@@ -16,7 +16,7 @@
 // Local includes:
 #include "nc_nodeid.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 enum struct NCNodeMessageType: uint8_t {
     Init = 0,
     Heartbeat,

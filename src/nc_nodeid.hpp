@@ -20,7 +20,7 @@
 // External includes:
 #include <spdlog/spdlog.h>
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 const size_t NC_NODEID_LENGTH = 64;
 
 class NCNodeID {
@@ -35,8 +35,8 @@ class NCNodeID {
 }
 
 // From cpp ref: https://en.cppreference.com/w/cpp/utility/hash.html
-template<> struct std::hash<NodeCrunch2::NCNodeID> {
-    std::size_t operator()(NodeCrunch2::NCNodeID const& node) const noexcept {
+template<> struct std::hash<nodcru2::NCNodeID> {
+    std::size_t operator()(nodcru2::NCNodeID const& node) const noexcept {
         return std::hash<std::string>{}(node.id);
     }
 };
@@ -44,9 +44,9 @@ template<> struct std::hash<NodeCrunch2::NCNodeID> {
 // For spdlog:
 // Specialization of fmt::formatter for NCNodeID
 template<>
-struct fmt::formatter<NodeCrunch2::NCNodeID> : fmt::formatter<std::string>
+struct fmt::formatter<nodcru2::NCNodeID> : fmt::formatter<std::string>
 {
-    auto format(const NodeCrunch2::NCNodeID& node, format_context& ctx) const -> decltype(ctx.out()) {
+    auto format(const nodcru2::NCNodeID& node, format_context& ctx) const -> decltype(ctx.out()) {
         return fmt::format_to(ctx.out(), "[NCNodeID: {}]", node.id);
     }
 };

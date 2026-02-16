@@ -19,7 +19,7 @@
 #include "nc_node.hpp"
 #include "nc_message.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 TEST_CASE("Create node and server, test init message", "[server]" ) {
     NCConfiguration config1 = NCConfiguration("12345678901234567890123456789012");

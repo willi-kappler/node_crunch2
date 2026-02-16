@@ -16,7 +16,7 @@
 #include "nc_server.hpp"
 #include "util.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 enum struct JobStatus {
     UnProcessed,

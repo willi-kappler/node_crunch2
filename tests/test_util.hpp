@@ -17,7 +17,7 @@
 // Local includes:
 #include "nc_util.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 TEST_CASE("Convert a number to a vector", "[util]" ) {
     uint32_t num1 = 0xDEADBEEFu;

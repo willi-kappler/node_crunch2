@@ -18,7 +18,7 @@
 #include "util.hpp"
 #include "nc_logger.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 MandelData::MandelData():
     re1(-2.0),

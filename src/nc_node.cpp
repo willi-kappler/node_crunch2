@@ -17,7 +17,7 @@
 #include "nc_util.hpp"
 #include "nc_logger.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 enum struct NCRunState: uint8_t {
     Init,
     NeedData,

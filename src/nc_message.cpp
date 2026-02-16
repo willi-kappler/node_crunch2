@@ -12,7 +12,7 @@
 // Local includes:
 #include "nc_message.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 NCMessageCodecBase::NCMessageCodecBase(std::string const secret_key):
     NCMessageCodecBase(std::make_unique<NCCompressor>(),
     std::make_unique<NCEncryption>(secret_key))

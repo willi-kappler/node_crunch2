@@ -18,7 +18,7 @@
 // Local includes:
 #include "nc_message_types.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 class NCEncryption {
     public:
         [[nodiscard]] virtual NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const;

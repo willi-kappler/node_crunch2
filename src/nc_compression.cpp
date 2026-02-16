@@ -14,7 +14,7 @@
 #include "nc_util.hpp"
 #include "nc_exceptions.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 [[nodiscard]] NCCompressedMessage NCCompressor::nc_compress_message(NCDecompressedMessage const& message) const {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());
     const size_t max_compressed_size = static_cast<size_t>(LZ4_compressBound(static_cast<int>(original_size)));

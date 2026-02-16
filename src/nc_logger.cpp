@@ -16,7 +16,7 @@
 // Local includes:
 #include "nc_logger.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 std::shared_ptr<spdlog::logger> nc_get_logger() {
     auto logger = spdlog::get("nc_logger");
 

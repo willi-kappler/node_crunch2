@@ -19,7 +19,7 @@
 #include "nc_node.hpp"
 #include "nc_message.hpp"
 
-using namespace NodeCrunch2;
+using namespace nodcru2;
 
 const std::string TEST_NODE_KEY("12345678901234567890123456789012");
 

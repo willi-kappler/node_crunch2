@@ -14,7 +14,7 @@
 #include "nc_config.hpp"
 #include "nc_exceptions.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 NCConfiguration::NCConfiguration(std::string secret_key_user):
     // Member initialization list:
     server_address("127.0.0.1"),

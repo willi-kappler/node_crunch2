@@ -10,7 +10,7 @@
 #include "nc_util.hpp"
 #include "nc_network.hpp"
 
-namespace NodeCrunch2 {
+namespace nodcru2 {
 void NCNetworkSocketBase::nc_send_data([[maybe_unused]] std::vector<uint8_t> const data) {
 }
 

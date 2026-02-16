@@ -76,10 +76,11 @@ target("node_crunch2")
     -- For spdlog, so that every object file sees the global logger:
     add_defines("SPDLOG_COMPILED_LIB", {public = true})
     -- Tell xmake which headers to give to the user when installing it:
-    add_headerfiles("src/(nodcru2/*.hpp)")
+    -- add_headerfiles("src/(nodcru2/*.hpp)")
     -- add_headerfiles("src/nodcru2/*.hpp")
     -- add_headerfiles("src/nodcru2/*.hpp", {prefixdir = "nodcru2"})
     -- add_headerfiles("src/nodcru2/*.hpp", {rootdir = "src"})
+    add_installfiles("src/nodcru2/*.hpp", {prefixdir = "include/nodcru2"})
 
 target("nc_test")
     set_kind("binary")

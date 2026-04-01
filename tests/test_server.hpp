@@ -244,7 +244,7 @@ TEST_CASE("Create server, send need more data message (test mode 10)", "[server]
 
     REQUIRE(init_data->test_mode == 10);
 
-    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
     REQUIRE(data_processor1->timeout_nodes.size() == 0);
     REQUIRE(data_processor1->data_nodes.size() == 2);
@@ -278,7 +278,7 @@ TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
 
     REQUIRE(init_data->test_mode == 20);
 
-    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
     REQUIRE(data_processor1->timeout_nodes.size() == 0);
     REQUIRE(data_processor1->data_nodes.size() == 0);
@@ -309,7 +309,7 @@ TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
 
     REQUIRE(init_data->test_mode == 30);
 
-    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
     REQUIRE(data_processor1->timeout_nodes.size() == 0);
     REQUIRE(data_processor1->data_nodes.size() == 0);
@@ -340,7 +340,7 @@ TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
 
     REQUIRE(init_data->test_mode == 40);
 
-    REQUIRE(data_processor1->job_counter == 6);
+    REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
     REQUIRE(data_processor1->timeout_nodes.size() == 0);
     REQUIRE(data_processor1->data_nodes.size() == 0);

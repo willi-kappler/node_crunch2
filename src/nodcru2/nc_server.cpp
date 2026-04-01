@@ -86,7 +86,7 @@ void NCServer::nc_run() {
     nc_log_info("NCServer::nc_run() - starting server");
     spdlog::stopwatch sw;
 
-    // Make threahsold configurable
+    // TODO: Make threahsold configurable
     const uint32_t max_thread_count = 10;
 
     std::unique_ptr<NCNetworkSocketBase> socket;
@@ -96,6 +96,7 @@ void NCServer::nc_run() {
 
     // Keep track of client threads
     std::queue<std::thread> client_threads;
+    size_t num_of_threads = 0;
 
     while (!quit.load()) {
         // Wait for a client to connect
@@ -122,14 +123,21 @@ void NCServer::nc_run() {
     nc_log_debug("Waiting for heartbeat thread...");
     heartbeat_thread.join();
 
-    nc_log_debug("Waiting for client threads...");
-    while (client_threads.size() > 0) {
+    num_of_threads = client_threads.size();
+    while (num_of_threads > 0) {
+        nc_log_debug(fmt::format("Waiting for client threads ({})...", num_of_threads));
         client_threads.front().join();
         client_threads.pop();
+        num_of_threads = client_threads.size();
     }
 
     nc_log_info(fmt::format("Elapsed time: {} sec.", sw));
     nc_log_info("Will exit now.");
+
+    // Wait for all log files to be written
+    // TODO: make this duration configurable:
+    auto const sleep_time = std::chrono::seconds(10);
+    std::this_thread::sleep_for(sleep_time);
 }
 
 bool NCServer::nc_valid_node_id(NCNodeID node_id) {
@@ -173,7 +181,10 @@ void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
     NCNodeID const node_id = node_message.node_id;
     NCEncodedMessageToNode msg_to_node;
 
-    if (data_processor_intern->nc_is_job_done()) {
+    if (quit.load()) {
+        msg_to_node = message_codec_intern->nc_gen_quit_message();
+    }
+    else if (data_processor_intern->nc_is_job_done()) {
         quit.store(true);
         msg_to_node = message_codec_intern->nc_gen_quit_message();
     } else {

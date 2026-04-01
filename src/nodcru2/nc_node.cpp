@@ -38,7 +38,7 @@ NCNode::NCNode(NCConfiguration config,
     config_intern(config),
     node_id(NCNodeID()),
     quit(false),
-    max_error_count(5),
+    max_error_count(5), // TODO: make this configurable
     node_mutex(),
     message_codec_intern(std::move(message_codec)),
     network_client_intern(std::move(network_client)),
@@ -76,7 +76,7 @@ void NCNode::nc_run() {
     NCEncodedMessageToServer const init_message = message_codec_intern->nc_gen_init_message(node_id);
     NCEncodedMessageToServer const need_more_data_message = message_codec_intern->nc_gen_need_more_data_message(node_id);
     // TODO: make this configurable:
-    auto const sleep_time = std::chrono::seconds(60);
+    auto const sleep_time = std::chrono::seconds(10);
 
     uint8_t error_counter = 0;
     NCDecodedMessageFromServer result;
@@ -88,6 +88,13 @@ void NCNode::nc_run() {
     std::thread heartbeat_thread([this](){nc_send_heartbeat();});
 
     while (!quit.load()) {
+        if (error_counter >= max_error_count) {
+            // Too many errors, quit now.
+            nc_log_error(fmt::format("Too many errors: {}, will exit now.", error_counter));
+            quit.store(true);
+            break;
+        }
+
         try {
             switch (run_state) {
                 case NCRunState::Init:
@@ -152,17 +159,15 @@ void NCNode::nc_run() {
                 nc_log_error(fmt::format("Unknown message: {}, error counter: {}", nc_type_to_string(result.msg_type), error_counter));
                 std::this_thread::sleep_for(sleep_time);
         }
-
-        if (error_counter >= max_error_count) {
-            // Too many errors, quit now.
-            nc_log_error(fmt::format("Too many errors: {}, will exit now.", error_counter));
-            quit.store(true);
-        }
     }
 
     nc_log_debug("Waiting for heartbeat thread...");
     heartbeat_thread.join();
     nc_log_info("Will exit now.");
+
+    // Wait for all log files to be written
+    // TODO: make this duration configurable:
+    std::this_thread::sleep_for(sleep_time);
 }
 
 [[nodiscard]] NCNodeID NCNode::nc_get_node_id() {

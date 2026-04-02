@@ -1,33 +1,35 @@
-- add documentation
-- add test cases for communication (node <-> server)
-- use #pragma once instead of guards
-- add [[nodiscard]], noexcept, ... when needed.
-- add empty connection class for testing.
-- add max_data_size limit to configuration and check for data size.
-- add a test case for the server: check for heartbeat timeout.
-- add a test case with one server and multiple nodes.
-- test nc_config_from_json
-- Refactor log class.
+TODO:
+    - add documentation
+    - add test cases for communication (node <-> server)
+    - use #pragma once instead of guards
+    - add [[nodiscard]], noexcept, ... when needed.
+    - add empty connection class for testing.
+    - add max_data_size limit to configuration and check for data size.
+    - add a test case for the server: check for heartbeat timeout.
+    - add a test case with one server and multiple nodes.
+    - test nc_config_from_json
+    - Refactor log class.
+    - add more test cases for invalid input.
 
 
 Done:
-# implement encryption for messages (openssl chacha20 poly1305)
-# add test cases for encryption
-# implement node
-# implement server
-# add logging (spdlog: https://github.com/gabime/spdlog)
-# add namespace NodeCrunch2
-# refactor compression and encryption into separate classes.
-# use dependency injection for server class and node class
-# add empty compressor class and encryption class for testing.
-# split enum NCMessageType into NCNodeMessageType and NCServerMessageType
-# refactor network into a NCConnector class.
-# use NCNodeDataProcessor
-# use unique_ptr and shared_ptr for dependency injection derived objects.
-# use NCServerDataProcessor base class.
-# add test cases for node
-# add test cases for server
-# add mandelbrot example
-# use a different logger for lib and mandel example.
-# use std::complex for mandel example.
-# node: when an exception is caught, wait some time.
+    # implement encryption for messages (openssl chacha20 poly1305)
+    # add test cases for encryption
+    # implement node
+    # implement server
+    # add logging (spdlog: https://github.com/gabime/spdlog)
+    # add namespace NodeCrunch2
+    # refactor compression and encryption into separate classes.
+    # use dependency injection for server class and node class
+    # add empty compressor class and encryption class for testing.
+    # split enum NCMessageType into NCNodeMessageType and NCServerMessageType
+    # refactor network into a NCConnector class.
+    # use NCNodeDataProcessor
+    # use unique_ptr and shared_ptr for dependency injection derived objects.
+    # use NCServerDataProcessor base class.
+    # add test cases for node
+    # add test cases for server
+    # add mandelbrot example
+    # use a different logger for lib and mandel example.
+    # use std::complex for mandel example.
+    # node: when an exception is caught, wait some time.

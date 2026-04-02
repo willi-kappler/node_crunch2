@@ -17,8 +17,8 @@ using namespace nodcru2;
 
 class MandelNodeProcessor: public NCNodeDataProcessor {
     public:
-        void nc_init(std::vector<uint8_t> data) override;
-        [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) override;
+        void nc_init(std::vector<uint8_t>, NCNodeID) override;
+        [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t>) override;
 
         MandelNodeProcessor();
 

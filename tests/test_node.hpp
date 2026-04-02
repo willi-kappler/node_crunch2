@@ -25,12 +25,13 @@ const std::string TEST_NODE_KEY("12345678901234567890123456789012");
 
 class TestNodeDataProcessor: public NCNodeDataProcessor {
     public:
-        void nc_init(std::vector<uint8_t> data) override;
-        [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data) override;
+        void nc_init(std::vector<uint8_t>, NCNodeID) override;
+        [[nodiscard]] std::vector<uint8_t> nc_process_data(std::vector<uint8_t>) override;
 
         TestNodeDataProcessor();
 
         std::vector<uint8_t> initial_data;
+        NCNodeID test_node_id;
 };
 
 TestNodeDataProcessor::TestNodeDataProcessor():
@@ -38,8 +39,9 @@ TestNodeDataProcessor::TestNodeDataProcessor():
     initial_data()
     {}
 
-void TestNodeDataProcessor::nc_init(std::vector<uint8_t> data) {
+void TestNodeDataProcessor::nc_init(std::vector<uint8_t> data, NCNodeID node_id) {
     initial_data = data;
+    test_node_id = node_id;
 }
 
 [[nodiscard]] std::vector<uint8_t> TestNodeDataProcessor::nc_process_data(std::vector<uint8_t> data) {
@@ -206,6 +208,7 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     REQUIRE(init_data->node_messages.size() == 1);
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->test_mode == 10);
+    REQUIRE(node1.nc_get_node_id() != data_processor1->test_node_id);
 }
 
 TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
@@ -245,6 +248,7 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     REQUIRE(init_data->node_messages[10] == NCNodeMessageType::Heartbeat);
 
     REQUIRE(init_data->test_mode == 20);
+    REQUIRE(node1.nc_get_node_id() == data_processor1->test_node_id);
 }
 
 TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
@@ -275,6 +279,7 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     REQUIRE(init_data->node_messages[2] == NCNodeMessageType::NewResultFromNode);
 
     REQUIRE(init_data->test_mode == 30);
+    REQUIRE(node1.nc_get_node_id() == data_processor1->test_node_id);
 }
 
 TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" ) {
@@ -304,4 +309,5 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
 
     REQUIRE(init_data->test_mode == 40);
+    REQUIRE(node1.nc_get_node_id() == data_processor1->test_node_id);
 }

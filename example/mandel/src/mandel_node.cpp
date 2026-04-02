@@ -19,7 +19,7 @@ MandelNodeProcessor::MandelNodeProcessor():
     mandel_data()
     {}
 
-void MandelNodeProcessor::nc_init(std::vector<uint8_t> data) {
+void MandelNodeProcessor::nc_init(std::vector<uint8_t> data, [[maybe_unused]] NCNodeID node_id) {
     mandel_data = MandelData(data);
     spdlog::get("mandel_logger")->debug("Initial data received: {}", mandel_data);
 }

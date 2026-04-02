@@ -34,8 +34,8 @@ class NCNodeDataProcessor {
         NCNodeDataProcessor& operator=(NCNodeDataProcessor&&) = default;
 
         // Must be implemented by the user:
-        virtual void nc_init(std::vector<uint8_t> data);
-        [[nodiscard]] virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t> data);
+        virtual void nc_init(std::vector<uint8_t>, NCNodeID);
+        [[nodiscard]] virtual std::vector<uint8_t> nc_process_data(std::vector<uint8_t>);
 };
 
 class NCNode {

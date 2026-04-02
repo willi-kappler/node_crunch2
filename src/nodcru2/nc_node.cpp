@@ -24,7 +24,8 @@ enum struct NCRunState: uint8_t {
     HasData
 };
 
-void NCNodeDataProcessor::nc_init([[maybe_unused]] std::vector<uint8_t> data) {
+void NCNodeDataProcessor::nc_init([[maybe_unused]] std::vector<uint8_t> data,
+    [[maybe_unused]] NCNodeID node_id) {
 }
 
 [[nodiscard]] std::vector<uint8_t> NCNodeDataProcessor::nc_process_data([[maybe_unused]] std::vector<uint8_t> data) {
@@ -126,7 +127,7 @@ void NCNode::nc_run() {
         switch (result.msg_type) {
             case NCServerMessageType::InitOK:
                 nc_log_debug("InitOK from server.");
-                data_processor_intern->nc_init(result.data);
+                data_processor_intern->nc_init(result.data, node_id);
                 run_state = NCRunState::NeedData;
             break;
             case NCServerMessageType::InvalidNodeID:

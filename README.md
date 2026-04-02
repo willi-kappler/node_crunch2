@@ -104,9 +104,9 @@ This is reflected in the two data processor classes that must be inherited by th
 
 2. The **NCNodeDataProcessor** class. This contains the actual computaton for each data block that is sent by the server to the node. Each node processes the data and sends it back to the server. Here only two methods have to be implemented by the user:
 
-    2.1 `nc_init(std::vector<uint8_t>)`
+    2.1 `nc_init(std::vector<uint8_t>, NCNodeID)`
     This is the initial data that is sent once by the server to the node at the beginning when the node registers for the first time to the server.
-    It can contain some initial data for the node state.
+    It can contain some initial data for the node state and also provides the node id.
 
     2.2 `std::vector<uint8_t> nc_process_data(std::vector<uint8_t>)`
     Here the node gets a block of data to process from the server. The actual computation happens in this method.

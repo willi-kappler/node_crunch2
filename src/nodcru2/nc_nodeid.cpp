@@ -26,6 +26,7 @@ NCNodeID::NCNodeID(): id(gen_id()) {}
 
 [[nodiscard]] std::string NCNodeID::gen_id() {
     std::string result;
+    result.reserve(NC_NODEID_LENGTH);
 
     for (size_t i = 0; i < NC_NODEID_LENGTH; i++) {
         result += NC_CHARACTERS[static_cast<size_t>(nc_dis(nc_gen))];

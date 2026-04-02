@@ -21,7 +21,11 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
     server_port(3100),
     heartbeat_timeout(60 * 5), // Seconds
     quit_counter(10), // Number of rounds to wait before quitting
-    secret_key(secret_key_user)
+    secret_key(secret_key_user),
+    nc_server_log_file(""),
+    nc_server_log_level(""),
+    nc_node_log_file(""),
+    nc_node_log_level("")
 {
     size_t key_length = secret_key_user.size();
     if (key_length != 32)
@@ -62,6 +66,22 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
 
     if (auto v = json_config.find("quit_counter"); v != nullptr) {
         config.quit_counter = v->as<uint8_t>();
+    }
+
+    if (auto v = json_config.find("nc_server_log_file"); v != nullptr) {
+        config.nc_server_log_file = v->as<std::string>();
+    }
+
+    if (auto v = json_config.find("nc_server_log_level"); v != nullptr) {
+        config.nc_server_log_level = v->as<std::string>();
+    }
+
+    if (auto v = json_config.find("nc_node_log_file"); v != nullptr) {
+        config.nc_node_log_file = v->as<std::string>();
+    }
+
+    if (auto v = json_config.find("nc_node_log_level"); v != nullptr) {
+        config.nc_node_log_level = v->as<std::string>();
     }
 
     return config;

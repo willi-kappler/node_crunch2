@@ -3,5 +3,9 @@
     "server_port": 9999,
     "heartbeat_timeout": 10,
     "secret_key": "123456789012345678901234567890A1",
-    "quit_counter": 3
+    "quit_counter": 3,
+    "nc_server_log_file": "nc_server",
+    "nc_server_log_level": "debug",
+    "nc_node_log_file": "nc_node",
+    "nc_node_log_level": "debug"
 }

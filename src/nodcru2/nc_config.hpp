@@ -26,6 +26,10 @@ class NCConfiguration {
         uint16_t heartbeat_timeout;
         uint8_t quit_counter;
         std::string secret_key;
+        std::string nc_server_log_file;
+        std::string nc_server_log_level;
+        std::string nc_node_log_file;
+        std::string nc_node_log_level;
 
         // Constructor:
         NCConfiguration(std::string secret_key_user);

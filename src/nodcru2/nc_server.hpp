@@ -16,6 +16,9 @@
 #include <atomic>
 #include <mutex>
 
+// External includes:
+#include <spdlog/spdlog.h>
+
 // Local includes:
 #include "nc_config.hpp"
 #include "nc_nodeid.hpp"
@@ -72,9 +75,11 @@ class NCServer {
 
         // API:
         void nc_run();
+        void nc_set_logger(std::shared_ptr<spdlog::logger>);
 
     private:
         NCConfiguration config_intern;
+        std::shared_ptr<spdlog::logger> nc_logger;
         std::atomic_bool quit;
         std::unordered_map<NCNodeID, std::chrono::time_point<std::chrono::steady_clock>> all_nodes;
         std::mutex server_mutex;

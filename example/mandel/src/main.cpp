@@ -17,7 +17,7 @@
 
 // Local includes:
 #include "nodcru2/nc_config.hpp"
-#include "nodcru2/nc_logger.hpp"
+#include "nodcru2/nc_util.hpp"
 
 #include "mandel_node.hpp"
 #include "mandel_server.hpp"
@@ -47,7 +47,6 @@ int main(int argc, char *argv[]) {
     if (program["--server"] == true) {
         std::cout << "Server mode" << std::endl;
 
-        nc_server_logger();
         mandel_server_logger();
 
         MandelData mandel_data;
@@ -57,7 +56,6 @@ int main(int argc, char *argv[]) {
     } else {
         std::cout << "Node (client) mode" << std::endl;
 
-        nc_node_logger();
         mandel_node_logger();
 
         if (program.is_used("--ip")) {

@@ -17,6 +17,9 @@
 #include <mutex>
 #include <atomic>
 
+// External includes:
+#include <spdlog/spdlog.h>
+
 // Local includes:
 #include "nc_config.hpp"
 #include "nc_message.hpp"
@@ -63,9 +66,11 @@ class NCNode {
         // API:
         void nc_run();
         [[nodiscard]] NCNodeID nc_get_node_id();
+        void nc_set_logger(std::shared_ptr<spdlog::logger>);
 
     private:
         NCConfiguration config_intern;
+        std::shared_ptr<spdlog::logger> nc_logger;
         const NCNodeID node_id;
         std::atomic_bool quit;
         // TODO: make this configurable (max_error_count)
@@ -75,7 +80,7 @@ class NCNode {
         std::unique_ptr<NCNetworkClientBase> network_client_intern;
         std::shared_ptr<NCNodeDataProcessor> data_processor_intern;
 
-        [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const& message);
+        [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const&);
         void nc_send_heartbeat();
 };
 }

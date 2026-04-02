@@ -8,7 +8,6 @@ TODO:
     - add a test case for the server: check for heartbeat timeout.
     - add a test case with one server and multiple nodes.
     - test nc_config_from_json
-    - Refactor log class.
     - add more test cases for invalid input.
 
 
@@ -33,3 +32,4 @@ Done:
     # use a different logger for lib and mandel example.
     # use std::complex for mandel example.
     # node: when an exception is caught, wait some time.
+    # Refactor log class.

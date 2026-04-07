@@ -142,7 +142,7 @@ void NCServer::nc_run() {
     }
 
     // Save all data:
-    nc_logger->debug("Saving data...");
+    nc_logger->debug("Job done, saving data...");
     data_processor_intern->nc_save_data();
 
     nc_logger->debug("Waiting for heartbeat thread...");
@@ -158,6 +158,7 @@ void NCServer::nc_run() {
 
     nc_logger->info("Elapsed time: {} sec.", sw);
     nc_logger->info("Will exit now.");
+    nc_logger->flush();
 
     // Wait for all log files to be written
     // TODO: make this duration configurable:

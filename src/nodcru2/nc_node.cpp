@@ -192,6 +192,7 @@ void NCNode::nc_run() {
     nc_logger->debug("Waiting for heartbeat thread...");
     heartbeat_thread.join();
     nc_logger->info("Will exit now.");
+    nc_logger->flush();
 
     // Wait for all log files to be written
     // TODO: make this duration configurable:

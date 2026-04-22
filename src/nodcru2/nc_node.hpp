@@ -1,5 +1,6 @@
 /*
     Node Crunch2
+    SPDX-License-Identifier: MIT
     Written by Willi Kappler, MIT License
     https://github.com/willi-kappler/node_crunch2
 

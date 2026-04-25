@@ -9,6 +9,9 @@ TODO:
     - add a test case with one server and multiple nodes.
     - test nc_config_from_json
     - add more test cases for invalid input.
+    - use constexpr when possible.
+    - use std::initializer_list overload when possible.
+    - use final instead of override when possible.
 
 
 Done:

@@ -37,6 +37,11 @@ if is_kind("gcc", "clang") then
         -- Clang prefers the boolean flag without the numeric level
         add_cxxflags("-Wimplicit-fallthrough")
     end
+    -- Optimization:
+    add_cxflags("-march=native")
+    add_cxflags("-Ofast")
+
+    -- Warnings:
 --    add_cxxflags("-Wnull-dereference", "-Wswitch-enum")
     add_cxxflags("-Wconversion", "-Wshadow", "-Wsign-conversion", "-Wdouble-promotion", "-Wformat=2")
     add_cxxflags("-Wundef", "-Wcast-qual", "-Wnon-virtual-dtor", "-Wold-style-cast")

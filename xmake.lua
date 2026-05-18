@@ -89,7 +89,7 @@ target("node_crunch2")
 
 target("nc_test")
     set_kind("binary")
-    add_files("tests/test_all.cpp")
+    add_files("tests/*.cpp")
     add_packages("taocpp-json")
     add_packages("snitch")
     add_packages("spdlog")

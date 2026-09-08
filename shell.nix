@@ -1,0 +1,24 @@
+{ pkgs ? import <nixpkgs> {} }:
+
+# pkgs.mkShell.override { stdenv = pkgs.llvmPackages_23.stdenv; } {
+# pkgs.mkShell.override { stdenv = pkgs.llvmPackages.stdenv; } {
+# pkgs.mkShell.override { stdenv = pkgs.gcc16Stdenv; } {
+pkgs.mkShell {
+  nativeBuildInputs = with pkgs; [
+    gnumake
+    cmake
+    meson
+    pkg-config
+    vcpkg
+    ninja
+  ];
+
+  buildInputs = with pkgs; [
+    lz4
+  ];
+
+  shellHook = ''
+    echo "Development environment loaded for c++!"
+  '';
+}
+

@@ -17,9 +17,12 @@
 // STD includes:
 #include <string>
 #include <random>
+// #include <format>
 
 // External includes:
 #include <spdlog/spdlog.h>
+// #include <spdlog/fmt/fmt.h>
+#include <spdlog/fmt/bundled/format.h>
 
 namespace nodcru2 {
 const size_t NC_NODEID_LENGTH = 64;

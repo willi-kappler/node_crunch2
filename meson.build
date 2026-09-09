@@ -144,7 +144,8 @@ install_headers(
   'src/nodcru2/nc_node.hpp',
   'src/nodcru2/nc_nodeid.hpp',
   'src/nodcru2/nc_server.hpp',
-  'src/nodcru2/nc_util.hpp'
+  'src/nodcru2/nc_util.hpp',
+  subdir: 'nodcru2'
 )
 
 # Unit test configuration

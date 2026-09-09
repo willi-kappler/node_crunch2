@@ -128,7 +128,8 @@ lib = shared_library(
 # Declare dependency for other targets/projects
 node_crunch2_dep = declare_dependency(
   include_directories: inc_dir,
-  link_with: lib
+  link_with: lib,
+  dependencies: [tao_json_dep, lz4_dep, openssl_dep, asio_dep, spdlog_dep, fmt_dep]
 )
 
 # Explicitly list header files to install them to system paths
@@ -163,7 +164,7 @@ test_sources = files(
 test_exe = executable(
   'node_crunch2_tests',
   test_sources,
-  dependencies: [node_crunch2_dep, snitch_dep, tao_json_dep, asio_dep, spdlog_dep, fmt_dep],
+  dependencies: [node_crunch2_dep, snitch_dep],
   # override_options: ['werror=true'],
   cpp_args: supported_flags_lib
 )
@@ -181,7 +182,7 @@ executable(
   'mandel_nc',
   example_sources,
   include_directories: include_directories('example/mandel/src'),
-  dependencies: [node_crunch2_dep, tao_json_dep, asio_dep, spdlog_dep, argparse_dep, fmt_dep],
+  dependencies: [node_crunch2_dep, argparse_dep],
   override_options: ['werror=true', 'b_lto=true'],
   cpp_args: supported_flags_lib
 )

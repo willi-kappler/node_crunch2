@@ -78,7 +78,7 @@ elif cpp_compiler.get_id() == 'msvc'
 endif
 
 # Point the include directory to 'src'
-inc_dir = include_directories('src/nodcru2')
+inc_dir = include_directories('src')
 
 # Source files
 sources = files(
@@ -121,7 +121,7 @@ lib = shared_library(
   include_directories: inc_dir,
   override_options: ['werror=true', 'b_lto=true'],
   cpp_args: supported_flags_lib,
-  dependencies: [tao_json_dep, lz4_dep, openssl_dep, asio_dep, argparse_dep, spdlog_dep, fmt_dep],
+  dependencies: [tao_json_dep, lz4_dep, openssl_dep, asio_dep, spdlog_dep, fmt_dep],
   install: true
 )
 
@@ -163,7 +163,6 @@ test_sources = files(
 test_exe = executable(
   'node_crunch2_tests',
   test_sources,
-  include_directories: include_directories('src'),
   dependencies: [node_crunch2_dep, snitch_dep, tao_json_dep, asio_dep, spdlog_dep, fmt_dep],
   # override_options: ['werror=true'],
   cpp_args: supported_flags_lib
@@ -178,11 +177,11 @@ example_sources = files(
   'example/mandel/src/util.cpp'
 )
 
-example_exe = executable(
+executable(
   'mandel_nc',
   example_sources,
-  include_directories: include_directories('src', 'example/mandel/src'),
+  include_directories: include_directories('example/mandel/src'),
   dependencies: [node_crunch2_dep, tao_json_dep, asio_dep, spdlog_dep, argparse_dep, fmt_dep],
-  # override_options: ['werror=true'],
+  override_options: ['werror=true', 'b_lto=true'],
   cpp_args: supported_flags_lib
 )

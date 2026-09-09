@@ -1,6 +1,6 @@
 #!/run/current-system/sw/bin/bash
 
-EXECUTABLE="../../build/linux/x86_64/release/mandel_nc"
+EXECUTABLE="../../builddir/mandel_nc"
 
 # Start the server:
 $EXECUTABLE --server &

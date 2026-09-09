@@ -20,9 +20,9 @@
 // #include <format>
 
 // External includes:
-#include <spdlog/spdlog.h>
+// #include <spdlog/spdlog.h>
+// #include <spdlog/fmt/bundled/format.h>
 // #include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/bundled/format.h>
 
 namespace nodcru2 {
 const size_t NC_NODEID_LENGTH = 64;
@@ -32,9 +32,10 @@ class NCNodeID {
         std::string id;
         NCNodeID();
         bool operator==(const NCNodeID&) const = default;
+        [[nodiscard]] std::string to_string();
 
     private:
-        std::string gen_id();
+        [[nodiscard]] std::string gen_id();
 };
 }
 
@@ -42,16 +43,6 @@ class NCNodeID {
 template<> struct std::hash<nodcru2::NCNodeID> {
     std::size_t operator()(nodcru2::NCNodeID const& node) const noexcept {
         return std::hash<std::string>{}(node.id);
-    }
-};
-
-// For spdlog:
-// Specialization of fmt::formatter for NCNodeID
-template<>
-struct fmt::formatter<nodcru2::NCNodeID> : fmt::formatter<std::string>
-{
-    auto format(const nodcru2::NCNodeID& node, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "[NCNodeID: {}]", node.id);
     }
 };
 

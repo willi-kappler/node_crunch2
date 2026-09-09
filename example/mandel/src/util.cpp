@@ -12,8 +12,10 @@
 #include <bit>
 
 // External includes:
-// #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
+// #include <spdlog/fmt/fmt.h>
+#include <spdlog/fmt/bundled/format.h>
+#include <spdlog/spdlog.h>
 
 // Internal includes:
 #include "util.hpp"
@@ -67,7 +69,7 @@ MandelData::MandelData(std::vector<uint8_t> data):
     im_step = ((im2 - im1) / std::float64_t(height));
 }
 
-std::vector<uint8_t> MandelData::to_vector() {
+[[nodiscard]] std::vector<uint8_t> MandelData::to_vector() {
     std::vector<uint8_t> result;
     result.resize(MANDEL_DATA_SIZE);
     uint8_t* ptr = result.data();
@@ -93,7 +95,15 @@ std::vector<uint8_t> MandelData::to_vector() {
     return result;
 }
 
-std::vector<uint8_t> u32_to_vec_u8(uint32_t in) {
+[[nodiscard]] std::string MandelData::to_string() {
+    std::string result = fmt::format("[MandelData: Re({:.2f}, {:.2f}), Im({:.2f}, {:.2f}), Size({}x{}), Iter({})]",
+            re1, re2, im1, im2, width, height, max_iteration);
+
+    return result;
+}
+
+
+[[nodiscard]] std::vector<uint8_t> u32_to_vec_u8(uint32_t in) {
     std::vector<uint8_t> result(4);
     uint8_t* ptr = result.data();
 
@@ -102,7 +112,7 @@ std::vector<uint8_t> u32_to_vec_u8(uint32_t in) {
     return result;
 }
 
-uint32_t vec_u8_to_u32(std::vector<uint8_t> in) {
+[[nodiscard]] uint32_t vec_u8_to_u32(std::vector<uint8_t> in) {
     uint32_t result;
 
     std::memcpy(&result, in.data(), UINT32_SIZE);

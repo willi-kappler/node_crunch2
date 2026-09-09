@@ -10,6 +10,10 @@
 // STD includes:
 #include <filesystem>
 
+// External includes:
+// #include <spdlog/fmt/fmt.h>
+#include <spdlog/fmt/bundled/format.h>
+
 // Local includes:
 #include "nc_util.hpp"
 

@@ -35,4 +35,10 @@ NCNodeID::NCNodeID(): id(gen_id()) {}
 
     return result;
 }
+
+[[nodiscard]] std::string NCNodeID::to_string() {
+    std::string result = "[NCNodeID: " + id + "]";
+
+    return result;
+}
 }

@@ -170,3 +170,19 @@ test_exe = executable(
 )
 
 test('all unit tests', test_exe)
+
+example_sources = files(
+  'example/mandel/src/main.cpp',
+  'example/mandel/src/mandel_node.cpp',
+  'example/mandel/src/mandel_server.cpp',
+  'example/mandel/src/util.cpp'
+)
+
+example_exe = executable(
+  'mandel_nc',
+  example_sources,
+  include_directories: include_directories('src', 'example/mandel/src'),
+  dependencies: [node_crunch2_dep, tao_json_dep, asio_dep, spdlog_dep, argparse_dep, fmt_dep],
+  # override_options: ['werror=true'],
+  cpp_args: supported_flags_lib
+)

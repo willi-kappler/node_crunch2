@@ -30,7 +30,7 @@ TEST_CASE("Compress / decompress a message", "[compression]" ) {
 
     auto compressed_message1 = compressor.nc_compress_message(msg1r);
 
-    REQUIRE(compressed_message1.data.size() == 99);
+    REQUIRE(compressed_message1.data.size() == static_cast<size_t>(99));
 
     uint32_t msg_size = nc_from_big_endian_bytes(compressed_message1.data);
     REQUIRE(msg_size == msg1.size());

@@ -31,7 +31,7 @@ TEST_CASE("Encode / decode a message to the server", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == 186);
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(186));
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == msg1.size());
@@ -51,10 +51,10 @@ TEST_CASE("Encode / decode an empty message to the server", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == 99);
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(99));
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
-    REQUIRE(decoded_message1.data.size() == 0);
+    REQUIRE(decoded_message1.data.size() == static_cast<size_t>(0));
     REQUIRE(decoded_message1.msg_type == message_type);
     REQUIRE(decoded_message1.node_id.id == node_id.id);
 }
@@ -69,7 +69,7 @@ TEST_CASE("Encode / decode a message to the node", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == 186);
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(186));
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == msg1.size());
@@ -88,10 +88,10 @@ TEST_CASE("Encode / decode an empty message to the node", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     auto const encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == 99);
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(99));
 
     auto const decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
-    REQUIRE(decoded_message1.data.size() == 0);
+    REQUIRE(decoded_message1.data.size() == static_cast<size_t>(0));
     REQUIRE(decoded_message1.msg_type == message_type);
 }
 
@@ -106,7 +106,7 @@ TEST_CASE("Generate heartbeat message", "[message]" ) {
 
     REQUIRE(message2.msg_type == NCNodeMessageType::Heartbeat);
     REQUIRE(message2.node_id.id == node_id.id);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Generate heartbeat ok message", "[message]" ) {
@@ -119,7 +119,7 @@ TEST_CASE("Generate heartbeat ok message", "[message]" ) {
     auto const message2 = node_codec.nc_decode_message_from_server(message1);
 
     REQUIRE(message2.msg_type == NCServerMessageType::HeartbeatOK);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Generate init message", "[message]" ) {
@@ -133,7 +133,7 @@ TEST_CASE("Generate init message", "[message]" ) {
 
     REQUIRE(message2.msg_type == NCNodeMessageType::Init);
     REQUIRE(message2.node_id.id == node_id.id);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Generate init ok message", "[message]" ) {
@@ -176,7 +176,7 @@ TEST_CASE("Generate need more data message", "[message]" ) {
 
     REQUIRE(message2.msg_type == NCNodeMessageType::NodeNeedsMoreData);
     REQUIRE(message2.node_id.id == node_id.id);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Generate new data from server message", "[message]" ) {
@@ -203,7 +203,7 @@ TEST_CASE("Generate result ok message", "[message]" ) {
     auto const message2 = node_codec.nc_decode_message_from_server(message1);
 
     REQUIRE(message2.msg_type == NCServerMessageType::ResultOK);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Generate quit message", "[message]" ) {
@@ -216,7 +216,7 @@ TEST_CASE("Generate quit message", "[message]" ) {
     auto const message2 = node_codec.nc_decode_message_from_server(message1);
 
     REQUIRE(message2.msg_type == NCServerMessageType::Quit);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Generate invalid node id message", "[message]" ) {
@@ -229,7 +229,7 @@ TEST_CASE("Generate invalid node id message", "[message]" ) {
     auto const message2 = node_codec.nc_decode_message_from_server(message1);
 
     REQUIRE(message2.msg_type == NCServerMessageType::InvalidNodeID);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Generate unknown error message", "[message]" ) {
@@ -242,5 +242,5 @@ TEST_CASE("Generate unknown error message", "[message]" ) {
     auto const message2 = node_codec.nc_decode_message_from_server(message1);
 
     REQUIRE(message2.msg_type == NCServerMessageType::UnknownError);
-    REQUIRE(message2.data.size() == 0);
+    REQUIRE(message2.data.size() == static_cast<size_t>(0));
 }

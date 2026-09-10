@@ -197,7 +197,7 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
-    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data.size() == static_cast<size_t>(5));
     REQUIRE(init_data->server_data[0] == 1);
     REQUIRE(init_data->server_data[1] == 2);
     REQUIRE(init_data->server_data[2] == 3);
@@ -205,8 +205,8 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     REQUIRE(init_data->server_data[4] == 5);
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
     REQUIRE(init_data->heartbeat_counter == 0);
-    REQUIRE(init_data->node_ids.size() == 1);
-    REQUIRE(init_data->node_messages.size() == 1);
+    REQUIRE(init_data->node_ids.size() == static_cast<size_t>(1));
+    REQUIRE(init_data->node_messages.size() == static_cast<size_t>(1));
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->test_mode == 10);
     REQUIRE(node1.nc_get_node_id() != data_processor1->test_node_id);
@@ -224,7 +224,7 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
-    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data.size() == static_cast<size_t>(5));
     REQUIRE(init_data->server_data[0] == 31);
     REQUIRE(init_data->server_data[1] == 62);
     REQUIRE(init_data->server_data[2] == 93);
@@ -233,9 +233,9 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
     REQUIRE(init_data->heartbeat_counter == 1);
-    REQUIRE(init_data->node_ids.size() == 11);
+    REQUIRE(init_data->node_ids.size() == static_cast<size_t>(11));
 
-    REQUIRE(init_data->node_messages.size() == 11);
+    REQUIRE(init_data->node_messages.size() == static_cast<size_t>(11));
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
     REQUIRE(init_data->node_messages[2] == NCNodeMessageType::NewResultFromNode);
@@ -264,7 +264,7 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
-    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data.size() == static_cast<size_t>(5));
     REQUIRE(init_data->server_data[0] == 3);
     REQUIRE(init_data->server_data[1] == 6);
     REQUIRE(init_data->server_data[2] == 9);
@@ -272,9 +272,9 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     REQUIRE(init_data->server_data[4] == 15);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    REQUIRE(init_data->node_ids.size() == 3);
+    REQUIRE(init_data->node_ids.size() == static_cast<size_t>(3));
 
-    REQUIRE(init_data->node_messages.size() == 3);
+    REQUIRE(init_data->node_messages.size() == static_cast<size_t>(3));
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
     REQUIRE(init_data->node_messages[2] == NCNodeMessageType::NewResultFromNode);
@@ -295,7 +295,7 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     NCNode node1(config1, data_processor1, std::move(client1));
     node1.nc_run();
 
-    REQUIRE(init_data->server_data.size() == 5);
+    REQUIRE(init_data->server_data.size() == static_cast<size_t>(5));
     REQUIRE(init_data->server_data[0] == 1);
     REQUIRE(init_data->server_data[1] == 2);
     REQUIRE(init_data->server_data[2] == 3);
@@ -303,9 +303,9 @@ TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" )
     REQUIRE(init_data->server_data[4] == 5);
 
     NCEncodedMessageToNode expected_message = init_data->message_codec.nc_gen_quit_message();
-    REQUIRE(init_data->node_ids.size() == 2);
+    REQUIRE(init_data->node_ids.size() == static_cast<size_t>(2));
 
-    REQUIRE(init_data->node_messages.size() == 2);
+    REQUIRE(init_data->node_messages.size() == static_cast<size_t>(2));
     REQUIRE(init_data->node_messages[0] == NCNodeMessageType::Init);
     REQUIRE(init_data->node_messages[1] == NCNodeMessageType::NodeNeedsMoreData);
 

@@ -228,14 +228,14 @@ TEST_CASE("Create server, send need more data message (test mode 10)", "[server]
     NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
-    REQUIRE(init_data->node_data.size() == 5);
+    REQUIRE(init_data->node_data.size() == static_cast<size_t>(5));
     REQUIRE(init_data->node_data[0] == 3);
     REQUIRE(init_data->node_data[1] == 4);
     REQUIRE(init_data->node_data[2] == 5);
     REQUIRE(init_data->node_data[3] == 6);
     REQUIRE(init_data->node_data[4] == 7);
 
-    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages.size() == static_cast<size_t>(6));
     REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
     REQUIRE(init_data->server_messages[1] == NCServerMessageType::NewDataFromServer);
     REQUIRE(init_data->server_messages[2] == NCServerMessageType::ResultOK);
@@ -247,11 +247,11 @@ TEST_CASE("Create server, send need more data message (test mode 10)", "[server]
 
     REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
-    REQUIRE(data_processor1->timeout_nodes.size() == 0);
-    REQUIRE(data_processor1->data_nodes.size() == 2);
+    REQUIRE(data_processor1->timeout_nodes.size() == static_cast<size_t>(0));
+    REQUIRE(data_processor1->data_nodes.size() == static_cast<size_t>(2));
     REQUIRE(data_processor1->data_nodes[0] == node_id);
     REQUIRE(data_processor1->data_nodes[1] == node_id);
-    REQUIRE(data_processor1->process_nodes.size() == 1);
+    REQUIRE(data_processor1->process_nodes.size() == static_cast<size_t>(1));
     REQUIRE(data_processor1->process_nodes[0] == node_id);
 }
 
@@ -267,9 +267,9 @@ TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
     NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
-    REQUIRE(init_data->node_data.size() == 0);
+    REQUIRE(init_data->node_data.size() == static_cast<size_t>(0));
 
-    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages.size() == static_cast<size_t>(6));
     REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
     REQUIRE(init_data->server_messages[1] == NCServerMessageType::HeartbeatOK);
     REQUIRE(init_data->server_messages[2] == NCServerMessageType::HeartbeatOK);
@@ -281,9 +281,9 @@ TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
 
     REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
-    REQUIRE(data_processor1->timeout_nodes.size() == 0);
-    REQUIRE(data_processor1->data_nodes.size() == 0);
-    REQUIRE(data_processor1->process_nodes.size() == 0);
+    REQUIRE(data_processor1->timeout_nodes.size() == static_cast<size_t>(0));
+    REQUIRE(data_processor1->data_nodes.size() == static_cast<size_t>(0));
+    REQUIRE(data_processor1->process_nodes.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
@@ -298,9 +298,9 @@ TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
     NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
-    REQUIRE(init_data->node_data.size() == 0);
+    REQUIRE(init_data->node_data.size() == static_cast<size_t>(0));
 
-    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages.size() == static_cast<size_t>(6));
     REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
     REQUIRE(init_data->server_messages[1] == NCServerMessageType::InvalidNodeID);
     REQUIRE(init_data->server_messages[2] == NCServerMessageType::InvalidNodeID);
@@ -312,9 +312,9 @@ TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
 
     REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
-    REQUIRE(data_processor1->timeout_nodes.size() == 0);
-    REQUIRE(data_processor1->data_nodes.size() == 0);
-    REQUIRE(data_processor1->process_nodes.size() == 0);
+    REQUIRE(data_processor1->timeout_nodes.size() == static_cast<size_t>(0));
+    REQUIRE(data_processor1->data_nodes.size() == static_cast<size_t>(0));
+    REQUIRE(data_processor1->process_nodes.size() == static_cast<size_t>(0));
 }
 
 TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
@@ -329,9 +329,9 @@ TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
     NCServer server1(config1, data_processor1, std::move(network_server1));
     server1.nc_run();
 
-    REQUIRE(init_data->node_data.size() == 0);
+    REQUIRE(init_data->node_data.size() == static_cast<size_t>(0));
 
-    REQUIRE(init_data->server_messages.size() == 6);
+    REQUIRE(init_data->server_messages.size() == static_cast<size_t>(6));
     REQUIRE(init_data->server_messages[0] == NCServerMessageType::InitOK);
     REQUIRE(init_data->server_messages[1] == NCServerMessageType::UnknownError);
     REQUIRE(init_data->server_messages[2] == NCServerMessageType::UnknownError);
@@ -343,7 +343,7 @@ TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
 
     REQUIRE(data_processor1->job_counter == 5);
     REQUIRE(data_processor1->save_data_called == 1);
-    REQUIRE(data_processor1->timeout_nodes.size() == 0);
-    REQUIRE(data_processor1->data_nodes.size() == 0);
-    REQUIRE(data_processor1->process_nodes.size() == 0);
+    REQUIRE(data_processor1->timeout_nodes.size() == static_cast<size_t>(0));
+    REQUIRE(data_processor1->data_nodes.size() == static_cast<size_t>(0));
+    REQUIRE(data_processor1->process_nodes.size() == static_cast<size_t>(0));
 }

@@ -113,18 +113,47 @@ tao_json_sub = cmake.subproject('taocpp-json')
 tao_json_dep = tao_json_sub.dependency('taocpp-json', include_type: 'system')
 
 # Main dependencies:
-lz4_dep = dependency('lz4', fallback: ['lz4', 'lz4_dep'])
-openssl_dep = dependency('openssl', fallback: ['openssl', 'openssl_dep'], include_type: 'system')
-asio_dep = dependency('asio', fallback: ['asio', 'asio_dep'], include_type: 'system')
-argparse_dep = dependency('argparse', fallback: ['argparse', 'argparse_dep'])
-spdlog_dep = dependency('spdlog', fallback: ['spdlog', 'spdlog_dep'], include_type: 'system')
-fmt_dep = dependency('fmt', fallback: ['fmt', 'fmt_dep'])
+lz4_dep = dependency(
+  'lz4',
+  fallback: ['lz4', 'lz4_dep']
+)
+
+openssl_dep = dependency(
+  'openssl',
+  fallback: ['openssl', 'openssl_dep'],
+  include_type: 'system'
+)
+
+asio_dep = dependency(
+  'asio',
+  fallback: ['asio', 'asio_dep'],
+  include_type: 'system'
+)
+
+argparse_dep = dependency(
+  'argparse',
+  fallback: ['argparse', 'argparse_dep']
+)
+
+spdlog_dep = dependency(
+  'spdlog',
+  fallback: ['spdlog', 'spdlog_dep'],
+  include_type: 'system'
+)
+
+fmt_dep = dependency(
+  'fmt',
+  fallback: ['fmt', 'fmt_dep']
+)
 
 # For unit testing:
-snitch_dep = dependency('snitch', fallback: ['snitch', 'snitch_dep'])
+snitch_dep = dependency(
+  'snitch',
+  fallback: ['snitch', 'snitch_dep'],
+)
 
 # Build the library
-lib = shared_library(
+node_crunch2_lib = shared_library(
   'node_crunch2',
   sources,
   include_directories: inc_dir,
@@ -135,7 +164,7 @@ lib = shared_library(
 # Declare dependency for other targets/projects
 node_crunch2_dep = declare_dependency(
   include_directories: inc_dir,
-  link_with: lib,
+  link_with: node_crunch2_lib,
   dependencies: [tao_json_dep, lz4_dep, openssl_dep, asio_dep, spdlog_dep, fmt_dep]
 )
 

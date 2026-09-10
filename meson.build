@@ -1,14 +1,19 @@
 project(
   'node_crunch2',
   'cpp',
-  version: '0.0.1',
-  default_options: ['cpp_std=c++23', 'warning_level=3', 'buildtype=release']
+  version: '0.2.0',
+  default_options: ['cpp_std=c++23', 'buildtype=release']
 )
 
 # Define custom warning or optimization flags
 extra_flags_gcc_clang = [
   '-march=native',
+  '-flto',
 
+  #'-Werror',
+  '-Wall',
+  '-Wextra',
+  '-Wpedantic',
   '-Wdouble-promotion',
   '-Wformat=2',
   '-Wundef',
@@ -47,7 +52,8 @@ extra_flags_gcc = [
 ]
 
 extra_flags_clang = [
-  '-O3 -ffast-math',
+  '-O3',
+  '-ffast-math',
   '-Wimplicit-fallthrough',
   '-Wshadow-field',
   '-Wabstract-final-class',
@@ -77,6 +83,9 @@ elif cpp_compiler.get_id() == 'msvc'
   supported_flags_lib = cpp_compiler.get_supported_arguments(extra_flags_msvc)
 endif
 
+# Only apply flags to current project
+add_project_arguments(supported_flags_lib, language: 'cpp')
+
 # Point the include directory to 'src'
 inc_dir = include_directories('src')
 
@@ -105,7 +114,7 @@ tao_json_dep = tao_json_sub.dependency('taocpp-json', include_type: 'system')
 
 # Main dependencies:
 lz4_dep = dependency('lz4', fallback: ['lz4', 'lz4_dep'])
-openssl_dep = dependency('openssl', fallback: ['openssl', 'openssl_dep'])
+openssl_dep = dependency('openssl', fallback: ['openssl', 'openssl_dep'], include_type: 'system')
 asio_dep = dependency('asio', fallback: ['asio', 'asio_dep'], include_type: 'system')
 argparse_dep = dependency('argparse', fallback: ['argparse', 'argparse_dep'])
 spdlog_dep = dependency('spdlog', fallback: ['spdlog', 'spdlog_dep'], include_type: 'system')
@@ -119,8 +128,6 @@ lib = shared_library(
   'node_crunch2',
   sources,
   include_directories: inc_dir,
-  override_options: ['werror=true', 'b_lto=true'],
-  cpp_args: supported_flags_lib,
   dependencies: [tao_json_dep, lz4_dep, openssl_dep, asio_dep, spdlog_dep, fmt_dep],
   install: true
 )
@@ -131,6 +138,9 @@ node_crunch2_dep = declare_dependency(
   link_with: lib,
   dependencies: [tao_json_dep, lz4_dep, openssl_dep, asio_dep, spdlog_dep, fmt_dep]
 )
+
+# Register the dependency
+meson.override_dependency('node_crunch2', node_crunch2_dep)
 
 # Explicitly list header files to install them to system paths
 install_headers(
@@ -166,8 +176,6 @@ test_exe = executable(
   'node_crunch2_tests',
   test_sources,
   dependencies: [node_crunch2_dep, snitch_dep],
-  # override_options: ['werror=true'],
-  cpp_args: supported_flags_lib
 )
 
 test('all unit tests', test_exe)
@@ -184,6 +192,4 @@ executable(
   example_sources,
   include_directories: include_directories('example/mandel/src'),
   dependencies: [node_crunch2_dep, argparse_dep],
-  override_options: ['werror=true', 'b_lto=true'],
-  cpp_args: supported_flags_lib
 )

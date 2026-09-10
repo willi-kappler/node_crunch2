@@ -48,7 +48,7 @@ class NCNetworkSocket: public NCNetworkSocketBase {
         ~NCNetworkSocket() = default;
         NCNetworkSocket(NCNetworkSocket&&) = default;
         NCNetworkSocket(const NCNetworkSocket&) = delete;
-        NCNetworkSocket& operator=(const NCNetworkSocket&) = default;
+        NCNetworkSocket& operator=(const NCNetworkSocket&) = delete;
         NCNetworkSocket& operator=(NCNetworkSocket&&) = default;
 
     private:

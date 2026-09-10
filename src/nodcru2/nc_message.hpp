@@ -40,7 +40,7 @@ class NCMessageCodecBase {
 
         // Default special member functions:
         NCMessageCodecBase(const NCMessageCodecBase&) = delete;
-        NCMessageCodecBase& operator=(const NCMessageCodecBase&) = default;
+        NCMessageCodecBase& operator=(const NCMessageCodecBase&) = delete;
         NCMessageCodecBase(NCMessageCodecBase&&) = default;
 
         // Disable all other special member functions:
@@ -73,8 +73,8 @@ class NCMessageCodecNode: NCMessageCodecBase {
         virtual ~NCMessageCodecNode() = default;
 
        // Default special member functions:
-       NCMessageCodecNode(const NCMessageCodecNode&) = default;
-       NCMessageCodecNode& operator=(const NCMessageCodecNode&) = default;
+       NCMessageCodecNode(const NCMessageCodecNode&) = delete;
+       NCMessageCodecNode& operator=(const NCMessageCodecNode&) = delete;
        NCMessageCodecNode(NCMessageCodecNode&&) = default;
 
        // Disable all other special member functions:
@@ -103,8 +103,8 @@ class NCMessageCodecServer: NCMessageCodecBase {
         virtual ~NCMessageCodecServer() = default;
 
         // Default special member functions:
-        NCMessageCodecServer(const NCMessageCodecServer&) = default;
-        NCMessageCodecServer& operator=(const NCMessageCodecServer&) = default;
+        NCMessageCodecServer(const NCMessageCodecServer&) = delete;
+        NCMessageCodecServer& operator=(const NCMessageCodecServer&) = delete;
         NCMessageCodecServer(NCMessageCodecServer&&) = default;
 
         // Disable all other special member functions:

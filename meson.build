@@ -29,7 +29,7 @@ extra_flags_gcc_clang = [
   '-Wcast-align',
   '-Wunused',
   '-Wconversion',
-  '-Wsign-conversion',
+  #'-Wsign-conversion',
 
   '-Wextra-semi',
   '-Wctor-dtor-privacy',

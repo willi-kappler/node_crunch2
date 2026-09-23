@@ -10,7 +10,7 @@ extra_flags_gcc_clang = [
   '-march=native',
   '-flto',
 
-  #'-Werror',
+  '-Werror',
   '-Wall',
   '-Wextra',
   '-Wpedantic',

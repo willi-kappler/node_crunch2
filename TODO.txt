@@ -1,7 +1,6 @@
 TODO:
     - add documentation
     - add test cases for communication (node <-> server)
-    - use #pragma once instead of guards
     - add [[nodiscard]], noexcept, ... when needed.
     - add empty connection class for testing.
     - add max_data_size limit to configuration and check for data size.
@@ -12,6 +11,11 @@ TODO:
     - use constexpr when possible.
     - use std::initializer_list overload when possible.
     - use final instead of override when possible.
+    - replace tao json with nlohmann json.
+    - add GCC flag "-fhardened" and fix warnings.
+    - fix clang warnings and errors.
+    - compile and test on MacOS.
+    - compile and test on Windows.
 
 
 Done:

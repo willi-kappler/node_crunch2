@@ -10,7 +10,6 @@ extra_flags_gcc_clang = [
   '-march=native',
   '-Wall',
   '-Wextra',
-  '-Wpedantic',
   '-Wdouble-promotion',
   '-Wformat=2',
   '-Wundef',
@@ -20,9 +19,7 @@ extra_flags_gcc_clang = [
   '-Winit-self',
   '-Wredundant-decls',
   '-Wsuggest-override',
-  '-Wshadow',
   '-Wnon-virtual-dtor',
-  '-Wold-style-cast',
   '-Wcast-align',
   '-Wunused',
   '-Wconversion',
@@ -38,6 +35,7 @@ extra_flags_gcc_clang = [
 
 extra_flags_gcc = [
   '-Werror',
+  '-Wpedantic',
   '-flto',
   '-Ofast',
   '-Walloca',
@@ -46,17 +44,22 @@ extra_flags_gcc = [
   '-Wduplicated-cond',
   '-Wduplicated-branches',
   # '-Wuseless-cast',
-  '-Wtrampolines'
+  '-Wtrampolines',
+  '-Wshadow',
+  '-Wold-style-cast'
 ]
 
 extra_flags_clang = [
+  '-stdlib=libc++',
   '-O3',
   '-ffast-math',
   '-Wimplicit-fallthrough',
   '-Wshadow-field',
   '-Wabstract-final-class',
   '-Wheader-hygiene',
-  '-Wno-sign-conversion'
+  '-Wno-sign-conversion',
+  '-Wno-unused-command-line-argument',
+  '-Wno-unused-but-set-global'
 ]
 
 extra_flags_msvc = [

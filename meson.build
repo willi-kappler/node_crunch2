@@ -7,9 +7,10 @@ project(
 
 # Define custom warning or optimization flags
 extra_flags_gcc_clang = [
-  '-march=native',
   '-Wall',
   '-Wextra',
+  '-Wpedantic',
+  '-march=native',
   '-Wdouble-promotion',
   '-Wformat=2',
   '-Wundef',
@@ -35,9 +36,8 @@ extra_flags_gcc_clang = [
 
 extra_flags_gcc = [
   '-Werror',
-  '-Wpedantic',
   '-flto',
-  '-Ofast',
+  #'-Ofast',
   '-Walloca',
   '-Wcast-align=strict',
   '-Wimplicit-fallthrough=5',
@@ -46,20 +46,24 @@ extra_flags_gcc = [
   # '-Wuseless-cast',
   '-Wtrampolines',
   '-Wshadow',
-  '-Wold-style-cast'
+  '-Wold-style-cast',
+  '-D_FORTIFY_SOURCE=3',
+  '-D_GLIBCXX_ASSERTIONS',
+  '-fstack-protector-strong',
+  '-ftrivial-auto-var-init=zero',
+  '-fPIE',
+  '-pie',
+  '-fstack-clash-protection',
+  '-fcf-protection=full'
 ]
 
 extra_flags_clang = [
-  '-stdlib=libc++',
-  '-O3',
   '-ffast-math',
   '-Wimplicit-fallthrough',
   '-Wshadow-field',
   '-Wabstract-final-class',
   '-Wheader-hygiene',
   '-Wno-sign-conversion',
-  '-Wno-unused-command-line-argument',
-  '-Wno-unused-but-set-global'
 ]
 
 extra_flags_msvc = [

@@ -17,7 +17,7 @@
 #include <string_view>
 
 // External includes:
-#include <tao/json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace nodcru2 {
 class NCConfiguration {
@@ -45,7 +45,7 @@ class NCConfiguration {
         NCConfiguration& operator=(NCConfiguration&&) = delete;
 };
 
-[[nodiscard]] NCConfiguration nc_config_from_json(tao::json::value);
+[[nodiscard]] NCConfiguration nc_config_from_json(const nlohmann::json);
 
 [[nodiscard]] NCConfiguration nc_config_from_string(std::string_view);
 

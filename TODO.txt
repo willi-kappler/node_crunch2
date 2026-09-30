@@ -11,7 +11,6 @@ TODO:
     - use constexpr when possible.
     - use std::initializer_list overload when possible.
     - use final instead of override when possible.
-    - replace tao json with nlohmann json.
     - add GCC flag "-fhardened" and fix warnings.
     - fix clang warnings and errors.
     - compile and test on MacOS.
@@ -40,3 +39,4 @@ Done:
     # use std::complex for mandel example.
     # node: when an exception is caught, wait some time.
     # Refactor log class.
+    # replace tao json with nlohmann json.

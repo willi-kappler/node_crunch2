@@ -36,60 +36,60 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
     }
 }
 
-[[nodiscard]] NCConfiguration nc_config_from_json(const tao::json::value json_config) {
+[[nodiscard]] NCConfiguration nc_config_from_json(const nlohmann::json json_config) {
     // Secret key must always be present.
-    if (auto v = json_config.find("secret_key"); v == nullptr) {
+    if (!json_config.contains("secret_key")) {
         throw NCConfigurationException("Missing secret key");
     }
 
-    std::string secret_key = json_config.at("secret_key").as<std::string>();
+    std::string secret_key = json_config["secret_key"].get<std::string>();
     NCConfiguration config = NCConfiguration(secret_key);
 
-    if (auto v = json_config.find("server_address"); v != nullptr) {
-        config.server_address = v->as<std::string>();
+    if (json_config.contains("server_address")) {
+        config.server_address = json_config["server_address"].get<std::string>();
     }
 
-    if (auto v = json_config.find("server_port"); v != nullptr) {
-        config.server_port = v->as<uint16_t>();
+    if (json_config.contains("server_port")) {
+        config.server_port = json_config["server_port"].get<uint16_t>();
 
         if (config.server_port < 1) {
             throw NCConfigurationException("Invalid port");
         }
     }
 
-    if (auto v = json_config.find("heartbeat_timeout"); v != nullptr) {
-        config.heartbeat_timeout = v->as<uint16_t>();
+    if (json_config.contains("heartbeat_timeout")) {
+        config.heartbeat_timeout = json_config["heartbeat_timeout"].get<uint16_t>();
 
         if (config.heartbeat_timeout < 10) {
             throw NCConfigurationException("Invalid heartbeat");
         }
     }
 
-    if (auto v = json_config.find("quit_counter"); v != nullptr) {
-        config.quit_counter = v->as<uint8_t>();
+    if (json_config.contains("quit_counter")) {
+        config.quit_counter = json_config["quit_counter"].get<uint8_t>();
     }
 
-    if (auto v = json_config.find("nc_server_log_file"); v != nullptr) {
-        config.nc_server_log_file = v->as<std::string>();
+    if (json_config.contains("nc_server_log_file")) {
+        config.nc_server_log_file = json_config["nc_server_log_file"].get<std::string>();
     }
 
-    if (auto v = json_config.find("nc_server_log_level"); v != nullptr) {
-        config.nc_server_log_level = v->as<std::string>();
+    if (json_config.contains("nc_server_log_level")) {
+        config.nc_server_log_level = json_config["nc_server_log_level"].get<std::string>();
     }
 
-    if (auto v = json_config.find("nc_node_log_file"); v != nullptr) {
-        config.nc_node_log_file = v->as<std::string>();
+    if (json_config.contains("nc_node_log_file")) {
+        config.nc_node_log_file = json_config["nc_node_log_file"].get<std::string>();
     }
 
-    if (auto v = json_config.find("nc_node_log_level"); v != nullptr) {
-        config.nc_node_log_level = v->as<std::string>();
+    if (json_config.contains("nc_node_log_level")) {
+        config.nc_node_log_level = json_config["nc_node_log_level"].get<std::string>();
     }
 
     return config;
 }
 
 [[nodiscard]] NCConfiguration nc_config_from_string(std::string_view config_as_string) {
-    const tao::json::value json_config = tao::json::from_string(config_as_string);
+    const nlohmann::json json_config = nlohmann::json::parse(config_as_string);
     return nc_config_from_json(json_config);
 }
 

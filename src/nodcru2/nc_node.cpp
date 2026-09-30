@@ -11,11 +11,12 @@
 #include <thread>
 #include <chrono>
 #include <tuple>
+#include <format>
 
 // External includes:
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
-#include <spdlog/fmt/bundled/ranges.h>
+// #include <spdlog/fmt/bundled/ranges.h>
 
 // Local includes:
 #include "nc_node.hpp"
@@ -70,7 +71,7 @@ NCNode::NCNode(NCConfiguration config,
         } else if (config_intern.nc_node_log_level == "error") {
             nc_logger->set_level(spdlog::level::level_enum::err);
         } else {
-            throw NCConfigurationException(fmt::format("Unknown log level: {}", config_intern.nc_node_log_level).c_str());
+            throw NCConfigurationException(std::format("Unknown log level: {}", config_intern.nc_node_log_level).c_str());
         }
     }
 

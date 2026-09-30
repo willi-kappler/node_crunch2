@@ -9,10 +9,11 @@
 
 // STD includes:
 #include <filesystem>
+#include <format>
 
 // External includes:
 // #include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/bundled/format.h>
+// #include <spdlog/fmt/bundled/format.h>
 
 // Local includes:
 #include "nc_util.hpp"
@@ -93,12 +94,12 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
 
 std::string nc_gen_log_file_name(std::string_view prefix) {
     uint32_t file_counter = 1;
-    std::string file_name = fmt::format("{}_001.log", prefix);
+    std::string file_name = std::format("{}_001.log", prefix);
 
     while (true) {
         if (std::filesystem::exists(file_name)) {
             file_counter++;
-            file_name = fmt::format("{}_{:03}.log", prefix, file_counter);
+            file_name = std::format("{}_{:03}.log", prefix, file_counter);
         } else {
             break;
         }

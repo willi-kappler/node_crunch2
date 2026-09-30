@@ -5,16 +5,22 @@
 # pkgs.mkShell.override { stdenv = pkgs.gcc16Stdenv; } {
 pkgs.mkShell {
   nativeBuildInputs = with pkgs; [
-    gnumake
     cmake
+    gnumake
     meson
+    ninja
     pkg-config
     vcpkg
-    ninja
   ];
 
   buildInputs = with pkgs; [
+    argparse
+    asio
+    fmt
     lz4
+    nlohmann_json
+    openssl
+    spdlog
   ];
 
   shellHook = ''

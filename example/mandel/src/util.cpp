@@ -10,11 +10,12 @@
 // STD includes:
 #include <cstring>
 #include <bit>
+#include <format>
 
 // External includes:
 #include <spdlog/sinks/basic_file_sink.h>
 // #include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/bundled/format.h>
+// #include <spdlog/fmt/bundled/format.h>
 #include <spdlog/spdlog.h>
 
 // Internal includes:
@@ -96,7 +97,7 @@ MandelData::MandelData(std::vector<uint8_t> data):
 }
 
 [[nodiscard]] std::string MandelData::to_string() {
-    std::string result = fmt::format("[MandelData: Re({:.2f}, {:.2f}), Im({:.2f}, {:.2f}), Size({}x{}), Iter({})]",
+    std::string result = std::format("[MandelData: Re({:.2f}, {:.2f}), Im({:.2f}, {:.2f}), Size({}x{}), Iter({})]",
             re1, re2, im1, im2, width, height, max_iteration);
 
     return result;

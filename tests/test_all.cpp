@@ -4,12 +4,12 @@
     Written by Willi Kappler, MIT License
     https://github.com/willi-kappler/node_crunch2
 
-    This file includes all the test cases.
+    This file defines the main test file.
 
     Run with:
-    normal: xmake run -w ./ nc_test
-    debug:  xmake run -d -w ./ nc_test
-    List all tests: xmake run -w ./ nc_test -l
+    builddir/node_crunch2_tests
+
+    List all tests: builddir/node_crunch2_tests -l
 */
 
 #define SNITCH_IMPLEMENTATION

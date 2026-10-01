@@ -46,32 +46,37 @@ Version v0.1.0 (2026.02.01)
 ## Introduction
 
 Node Crunch 2 is a library that allows users to write distributed C++ code easily.
-It uses xmake as build system. You can simply use it in yout project by adding this dependency:
+It uses meson as build system. You can simply use it in your project by adding this dependency:
 
-```lua
--- For the project:
-add_requires("node_crunch2")
--- For the target:
-add_packages("node_crunch2")
+```bash
+meson wrap install node_crunch2
+```
+
+In youe meson.build file:
+
+```meson
+node_crunch2_dep = dependency(
+  'node_crunch2',
+  fallback: ['node_crunch2', 'node_crunch2_dep']
+)
 ```
 
 To build the library, the test cases and the example just run:
 
 ```bash
-xmake -a -r
+./build.sh --clean
 ```
 
 To run the test cases:
 
 ```bash
-xmake run -w ./ nc_test
+builddir/node_crunch2_tests
 ```
 
 To run the example:
 
 ```bash
-xmake build mandel_nc
-cd exampke/mandel/
+cd example/mandel/
 ./run_mandel.sh
 ```
 

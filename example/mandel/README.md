@@ -3,7 +3,7 @@
 To build (in the top folder):
 
 ```bash
-xmake build mandel_nc
+./build.sh --clean
 ```
 
 To start the server:

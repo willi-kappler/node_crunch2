@@ -7,7 +7,7 @@
     This file contains the tests for the node and server class.
 
     Run only configuration tests:
-    xmake run -w ./ nc_test [server_node]
+    builddir/node_crunch2_tests [server_node]
 */
 
 // STD includes:

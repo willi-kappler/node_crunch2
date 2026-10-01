@@ -7,7 +7,7 @@
     This file contains the tests for the nodeid class.
 
     Run only nodeid tests:
-    xmake run -w ./ nc_test [nodeid]
+    builddir/node_crunch2_tests [nodeid]
 */
 
 // STD includes:

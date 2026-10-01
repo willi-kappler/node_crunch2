@@ -7,7 +7,7 @@
     This file contains the tests for the message encoding / decoding functions.
 
     Run only configuration tests:
-    xmake run -w ./ nc_test [message]
+    builddir/node_crunch2_tests [message]
 */
 
 // STD includes:

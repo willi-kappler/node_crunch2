@@ -7,7 +7,7 @@
     This file contains the tests for the configuration class.
 
     Run only configuration tests:
-    xmake run -w ./ nc_test [configuration]
+    builddir/node_crunch2_tests [configuration]
 */
 
 // External includes:

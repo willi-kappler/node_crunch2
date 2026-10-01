@@ -7,7 +7,7 @@
     This file contains the tests for the utils functions.
 
     Run only configuration tests:
-    xmake run -w ./ nc_test [util]
+    builddir/node_crunch2_tests [util]
 */
 
 // STD includes:

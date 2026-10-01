@@ -6,8 +6,8 @@
 
     This file includes the main function for the mandel example.
 
-    To just build use:
-    xmake build mandel_nc
+    To just build call (from the main folder):
+    ./build.sh --clean
 
     Run with:
     ./run_mandel

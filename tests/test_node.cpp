@@ -63,7 +63,7 @@ void TestNodeDataProcessor::nc_init(std::vector<uint8_t> data, NCNodeID node_id)
     }
 
     // Simulate long computation:
-    auto const sleep_time = std::chrono::seconds(2);
+    const auto sleep_time = std::chrono::seconds(2);
     std::this_thread::sleep_for(sleep_time);
 
     return result;
@@ -97,7 +97,7 @@ TestNodeSocketData::TestNodeSocketData():
 class TestNodeSocket: public NCNetworkSocketBase {
     public:
         // API
-        void nc_send_data(std::vector<uint8_t> const data) override;
+        void nc_send_data(const std::vector<uint8_t> data) override;
         [[nodiscard]] std::vector<uint8_t> nc_receive_data() override;
         [[nodiscard]] std::string nc_address() override;
 
@@ -112,9 +112,9 @@ TestNodeSocket::TestNodeSocket(std::shared_ptr<TestNodeSocketData> init_data):
     data_intern(init_data)
     {}
 
-void TestNodeSocket::nc_send_data(std::vector<uint8_t> const data) {
+void TestNodeSocket::nc_send_data(const std::vector<uint8_t> data) {
     NCDecodedMessageFromNode node_message = data_intern->message_codec.nc_decode_message_from_node(NCEncodedMessageToServer(data));
-    NCNodeID const node_id = node_message.node_id;
+    const NCNodeID node_id = node_message.node_id;
 
     data_intern->node_ids.push_back(node_id);
     data_intern->node_messages.push_back(node_message.msg_type);

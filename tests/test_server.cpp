@@ -116,7 +116,7 @@ TestServerSocketData::TestServerSocketData(NCNodeID id, uint8_t mode):
 class TestServerSocket: public NCNetworkSocketBase {
     public:
         // API
-        void nc_send_data(std::vector<uint8_t> const data) override;
+        void nc_send_data(const std::vector<uint8_t> data) override;
         [[nodiscard]] std::vector<uint8_t> nc_receive_data() override;
         [[nodiscard]] std::string nc_address() override;
 
@@ -131,7 +131,7 @@ TestServerSocket::TestServerSocket(std::shared_ptr<TestServerSocketData> init_da
     data_intern(init_data)
     {}
 
-void TestServerSocket::nc_send_data(std::vector<uint8_t> const data) {
+void TestServerSocket::nc_send_data(const std::vector<uint8_t> data) {
     NCDecodedMessageFromServer server_message = data_intern->message_codec.nc_decode_message_from_server(NCEncodedMessageToNode(data));
     data_intern->server_messages.push_back(server_message.msg_type);
     NCNodeID new_node_id;
@@ -209,7 +209,7 @@ TestNetworkServer::TestNetworkServer(std::shared_ptr<TestServerSocketData> init_
     {}
 
 std::unique_ptr<NCNetworkSocketBase> TestNetworkServer::nc_accept() {
-    auto const sleep_time = std::chrono::seconds(2);
+    const auto sleep_time = std::chrono::seconds(2);
     // Simulate long computation:
     std::this_thread::sleep_for(sleep_time);
 

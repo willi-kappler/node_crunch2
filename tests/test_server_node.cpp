@@ -25,4 +25,5 @@ using namespace nodcru2;
 TEST_CASE("Create node and server, test init message", "[server]" ) {
     NCConfiguration config1 = NCConfiguration("12345678901234567890123456789012");
     //NCServer server1(config1);
+    // TODO: add test cases!
 }

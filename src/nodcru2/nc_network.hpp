@@ -22,7 +22,7 @@ using asio::ip::tcp;
 
 class NCNetworkSocketBase {
     public:
-        virtual void nc_send_data(std::vector<uint8_t> const data);
+        virtual void nc_send_data(const std::vector<uint8_t> data);
         [[nodiscard]] virtual std::vector<uint8_t> nc_receive_data();
         [[nodiscard]] virtual std::string nc_address();
 
@@ -37,7 +37,7 @@ class NCNetworkSocketBase {
 
 class NCNetworkSocket: public NCNetworkSocketBase {
     public:
-        void nc_send_data(std::vector<uint8_t> const data) override;
+        void nc_send_data(const std::vector<uint8_t> data) override;
         [[nodiscard]] std::vector<uint8_t> nc_receive_data() override;
         [[nodiscard]] std::string nc_address() override;
 

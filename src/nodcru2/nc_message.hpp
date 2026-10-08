@@ -28,10 +28,10 @@ namespace nodcru2 {
 class NCMessageCodecBase {
     public:
         [[nodiscard]] virtual std::vector<uint8_t> nc_encode(NCDecompressedMessage decompressed_message) const;
-        [[nodiscard]] virtual NCDecompressedMessage nc_decode(std::vector<uint8_t> const& message) const;
+        [[nodiscard]] virtual NCDecompressedMessage nc_decode(const std::vector<uint8_t> &message) const;
 
         // Constructor:
-        NCMessageCodecBase(std::string const secret_key);
+        NCMessageCodecBase(const std::string secret_key);
         NCMessageCodecBase(std::unique_ptr<NCCompressor> compressor,
             std::unique_ptr<NCEncryption> encryption);
 
@@ -54,18 +54,18 @@ class NCMessageCodecBase {
 class NCMessageCodecNode: NCMessageCodecBase {
     public:
         [[nodiscard]] virtual NCEncodedMessageToServer nc_encode_message_to_server(
-            NCNodeMessageType const msg_type, std::vector<uint8_t> const& data, NCNodeID const node_id) const;
+            const NCNodeMessageType msg_type, const std::vector<uint8_t> &data, const NCNodeID node_id) const;
         [[nodiscard]] virtual NCDecodedMessageFromServer nc_decode_message_from_server(
-            NCEncodedMessageToNode const& message) const;
+            const NCEncodedMessageToNode &message) const;
 
-        [[nodiscard]] virtual NCEncodedMessageToServer nc_gen_heartbeat_message(NCNodeID const node_id) const;
-        [[nodiscard]] virtual NCEncodedMessageToServer nc_gen_init_message(NCNodeID const node_id) const;
+        [[nodiscard]] virtual NCEncodedMessageToServer nc_gen_heartbeat_message(const NCNodeID node_id) const;
+        [[nodiscard]] virtual NCEncodedMessageToServer nc_gen_init_message(const NCNodeID node_id) const;
         [[nodiscard]] virtual NCEncodedMessageToServer nc_gen_result_message(
-            std::vector<uint8_t> const& new_data, NCNodeID const node_id) const;
-        [[nodiscard]] virtual NCEncodedMessageToServer nc_gen_need_more_data_message(NCNodeID const node_id) const;
+            const std::vector<uint8_t> &new_data, const NCNodeID node_id) const;
+        [[nodiscard]] virtual NCEncodedMessageToServer nc_gen_need_more_data_message(const NCNodeID node_id) const;
 
         // Constructor:
-        NCMessageCodecNode(std::string const secret_key);
+        NCMessageCodecNode(const std::string secret_key);
         NCMessageCodecNode(std::unique_ptr<NCCompressor> compressor,
             std::unique_ptr<NCEncryption> encryption);
 
@@ -83,19 +83,19 @@ class NCMessageCodecNode: NCMessageCodecBase {
 
 class NCMessageCodecServer: NCMessageCodecBase {
     public:
-        [[nodiscard]] virtual NCEncodedMessageToNode nc_encode_message_to_node(NCServerMessageType const msg_type, std::vector<uint8_t> const& data) const;
-        [[nodiscard]] virtual NCDecodedMessageFromNode nc_decode_message_from_node(NCEncodedMessageToServer const& message) const;
+        [[nodiscard]] virtual NCEncodedMessageToNode nc_encode_message_to_node(const NCServerMessageType msg_type, const std::vector<uint8_t> &data) const;
+        [[nodiscard]] virtual NCDecodedMessageFromNode nc_decode_message_from_node(const NCEncodedMessageToServer &message) const;
 
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_heartbeat_message_ok() const;
-        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_init_message_ok(std::vector<uint8_t> const& init_data) const;
-        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_new_data_message(std::vector<uint8_t> const& new_data) const;
+        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_init_message_ok(const std::vector<uint8_t> &init_data) const;
+        [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_new_data_message(const std::vector<uint8_t> &new_data) const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_result_ok_message() const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_quit_message() const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_invalid_node_id_error() const;
         [[nodiscard]] virtual NCEncodedMessageToNode nc_gen_unknown_error() const;
 
         // Constructor:
-        NCMessageCodecServer(std::string const secret_key);
+        NCMessageCodecServer(const std::string secret_key);
         NCMessageCodecServer(std::unique_ptr<NCCompressor> compressor,
             std::unique_ptr<NCEncryption> encryption);
 

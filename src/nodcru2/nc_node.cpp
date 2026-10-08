@@ -103,10 +103,10 @@ NCNode::NCNode(NCConfiguration config,
 
 void NCNode::nc_run() {
     nc_logger->info("NCNode::nc_run() - starting node");
-    NCEncodedMessageToServer const init_message = message_codec_intern->nc_gen_init_message(node_id);
-    NCEncodedMessageToServer const need_more_data_message = message_codec_intern->nc_gen_need_more_data_message(node_id);
+    const NCEncodedMessageToServer init_message = message_codec_intern->nc_gen_init_message(node_id);
+    const NCEncodedMessageToServer need_more_data_message = message_codec_intern->nc_gen_need_more_data_message(node_id);
     // TODO: make this configurable:
-    auto const sleep_time = std::chrono::seconds(10);
+    const auto sleep_time = std::chrono::seconds(10);
 
     uint8_t error_counter = 0;
     NCDecodedMessageFromServer result;
@@ -205,7 +205,7 @@ void NCNode::nc_run() {
     return node_id;
 }
 
-[[nodiscard]] NCDecodedMessageFromServer NCNode::nc_send_msg_return_answer(NCEncodedMessageToServer const& message) {
+[[nodiscard]] NCDecodedMessageFromServer NCNode::nc_send_msg_return_answer(const NCEncodedMessageToServer &message) {
     const std::lock_guard<std::mutex> lock(node_mutex);
     std::unique_ptr<NCNetworkSocketBase> socket = network_client_intern->nc_connect();
     socket->nc_send_data(message.data);
@@ -216,8 +216,8 @@ void NCNode::nc_run() {
 
 void NCNode::nc_send_heartbeat() {
     nc_logger->info("NCNode::nc_send_heartbeat() - starting heartbeat thread.");
-    auto const sleep_time = std::chrono::seconds(config_intern.heartbeat_timeout);
-    auto const heartbeat_message = message_codec_intern->nc_gen_heartbeat_message(node_id);
+    const auto sleep_time = std::chrono::seconds(config_intern.heartbeat_timeout);
+    const auto heartbeat_message = message_codec_intern->nc_gen_heartbeat_message(node_id);
     uint8_t error_counter = 0;
     NCDecodedMessageFromServer result;
 

@@ -164,7 +164,7 @@ void NCServer::nc_run() {
 
     // Wait for all log files to be written
     // TODO: make this duration configurable:
-    auto const sleep_time = std::chrono::seconds(10);
+    const auto sleep_time = std::chrono::seconds(10);
     std::this_thread::sleep_for(sleep_time);
 }
 
@@ -206,7 +206,7 @@ void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
     nc_logger->debug("NCServer::nc_handle_node(), ip: {}", socket->nc_address());
     std::vector<uint8_t> message = socket->nc_receive_data();
     NCDecodedMessageFromNode node_message = message_codec_intern->nc_decode_message_from_node(NCEncodedMessageToServer(message));
-    NCNodeID const node_id = node_message.node_id;
+    const NCNodeID node_id = node_message.node_id;
     NCEncodedMessageToNode msg_to_node;
 
     if (quit.load()) {
@@ -258,7 +258,7 @@ void NCServer::nc_handle_node(std::unique_ptr<NCNetworkSocketBase> &socket) {
 void NCServer::nc_check_heartbeat() {
     std::chrono::steady_clock clock;
     std::chrono::time_point current_time = clock.now();
-    auto const sleep_time = std::chrono::seconds(config_intern.heartbeat_timeout);
+    const auto sleep_time = std::chrono::seconds(config_intern.heartbeat_timeout);
 
     while (!quit.load()) {
         std::this_thread::sleep_for(sleep_time);
@@ -272,7 +272,7 @@ void NCServer::nc_check_heartbeat() {
 
         const std::lock_guard<std::mutex> lock(server_mutex);
         for (const auto& [node_id, node_time]: all_nodes) {
-            auto const time_diff = std::chrono::duration_cast<std::chrono::seconds>(current_time - node_time);
+            const auto time_diff = std::chrono::duration_cast<std::chrono::seconds>(current_time - node_time);
             if (time_diff > sleep_time) {
                 nc_logger->debug("Node timeout: {}", node_id.id);
                 data_processor_intern->nc_node_timeout(node_id);

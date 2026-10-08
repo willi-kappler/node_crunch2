@@ -19,7 +19,7 @@
 #include "nc_util.hpp"
 
 namespace nodcru2 {
-void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noexcept {
+void nc_to_big_endian_bytes(const uint32_t value, std::span<uint8_t> bytes) noexcept {
     uint32_t final_value = value;
 
     if (std::endian::native == std::endian::little) {
@@ -29,7 +29,7 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     std::memcpy(bytes.data(), &final_value, sizeof(uint32_t));
 }
 
-[[nodiscard]] uint32_t nc_from_big_endian_bytes(std::span<const uint8_t> const bytes) {
+[[nodiscard]] uint32_t nc_from_big_endian_bytes(const std::span<const uint8_t> bytes) {
     uint32_t result;
 
     std::memcpy(&result, bytes.data(), sizeof(uint32_t));
@@ -41,7 +41,7 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     return result;
 }
 
-[[nodiscard]] std::string nc_type_to_string(NCNodeMessageType const& msg_type) {
+[[nodiscard]] std::string nc_type_to_string(const NCNodeMessageType &msg_type) {
     std::string result = "Unknown type";
 
     switch (msg_type) {
@@ -62,7 +62,7 @@ void nc_to_big_endian_bytes(uint32_t const value, std::span<uint8_t> bytes) noex
     return result;
 }
 
-[[nodiscard]] std::string nc_type_to_string(NCServerMessageType const& msg_type) {
+[[nodiscard]] std::string nc_type_to_string(const NCServerMessageType &msg_type) {
     std::string result = "Unknown type";
 
     switch (msg_type) {

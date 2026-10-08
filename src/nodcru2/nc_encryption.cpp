@@ -20,9 +20,9 @@
 #include "nc_exceptions.hpp"
 
 namespace nodcru2 {
-NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secret_key) {}
+NCEncryption::NCEncryption(const std::string secret_key): secret_key_intern(secret_key) {}
 
-[[nodiscard]] NCEncryptedMessage NCEncryption::nc_encrypt_message(NCDecryptedMessage const& message) const {
+[[nodiscard]] NCEncryptedMessage NCEncryption::nc_encrypt_message(const NCDecryptedMessage &message) const {
     EVP_CIPHER_CTX* ctx = nullptr;
 
     // Create and initialize context:
@@ -65,7 +65,7 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
 
     // Provide the message data to be encrypted:
     int32_t len = 0;
-    size_t const message_len = message.data.size();
+    const size_t message_len = message.data.size();
     // std::cout << "Message length: " << message_len << std::endl;
     // Ciphertext will be same size as message:
     result.data.resize(message_len + block_size);
@@ -135,13 +135,13 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
         throw NCEncryptionException("Cipher set tag error.");
     }
 
-    size_t const block_size = static_cast<size_t>(EVP_CIPHER_get_block_size(EVP_chacha20_poly1305()));
+    const size_t block_size = static_cast<size_t>(EVP_CIPHER_get_block_size(EVP_chacha20_poly1305()));
 
     // std::cout << "block_size: " << block_size << "\n";
 
     // Provide the ciphertext data to be decrypted:
     NCDecryptedMessage result;
-    size_t const ciphertext_len = message.data.size();
+    const size_t ciphertext_len = message.data.size();
      // Plaintext will be same size as ciphertext:
     result.data.resize(ciphertext_len + block_size);
     int32_t len = 0;
@@ -172,9 +172,9 @@ NCEncryption::NCEncryption(std::string const secret_key): secret_key_intern(secr
     return result;
 }
 
-NCNonEncryption::NCNonEncryption(std::string const secret_key): NCEncryption(secret_key) {}
+NCNonEncryption::NCNonEncryption(const std::string secret_key): NCEncryption(secret_key) {}
 
-[[nodiscard]] NCEncryptedMessage NCNonEncryption::nc_encrypt_message(NCDecryptedMessage const& message) const {
+[[nodiscard]] NCEncryptedMessage NCNonEncryption::nc_encrypt_message(const NCDecryptedMessage &message) const {
     return NCEncryptedMessage{{}, {}, message.data};
 }
 
@@ -183,7 +183,7 @@ NCNonEncryption::NCNonEncryption(std::string const secret_key): NCEncryption(sec
 }
 
 
-void nc_print_tag(std::vector<uint8_t> const& tag) {
+void nc_print_tag(const std::vector<uint8_t> &tag) {
     std::cout << "Tag: " << std::endl;
     for (auto v: tag) {
         std::cout << std::hex << static_cast<uint16_t>(v) << ":";
@@ -191,7 +191,7 @@ void nc_print_tag(std::vector<uint8_t> const& tag) {
     std::cout << std::dec << std::endl;
 }
 
-void nc_print_nonce(std::vector<uint8_t> const& nonce) {
+void nc_print_nonce(const std::vector<uint8_t> &nonce) {
     std::cout << "Nonce: " << std::endl;
     for (auto v: nonce) {
         std::cout << std::hex << static_cast<uint16_t>(v) << ":";

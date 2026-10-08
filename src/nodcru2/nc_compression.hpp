@@ -22,8 +22,8 @@
 namespace nodcru2 {
 class NCCompressor {
     public:
-        [[nodiscard]] virtual NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message) const;
-        [[nodiscard]] virtual NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message) const;
+        [[nodiscard]] virtual NCCompressedMessage nc_compress_message(const NCDecompressedMessage &message) const;
+        [[nodiscard]] virtual NCDecompressedMessage nc_decompress_message(const NCCompressedMessage &message) const;
 
         // Constructor:
         NCCompressor() = default;
@@ -42,8 +42,8 @@ class NCCompressor {
 
 class NCNonCompressor: NCCompressor {
     public:
-        [[nodiscard]] NCCompressedMessage nc_compress_message(NCDecompressedMessage const& message) const override;
-        [[nodiscard]] NCDecompressedMessage nc_decompress_message(NCCompressedMessage const& message) const override;
+        [[nodiscard]] NCCompressedMessage nc_compress_message(const NCDecompressedMessage &message) const override;
+        [[nodiscard]] NCDecompressedMessage nc_decompress_message(const NCCompressedMessage &message) const override;
 
         // Constructor:
         NCNonCompressor() = default;

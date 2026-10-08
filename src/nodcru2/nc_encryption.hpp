@@ -22,11 +22,11 @@
 namespace nodcru2 {
 class NCEncryption {
     public:
-        [[nodiscard]] virtual NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const;
+        [[nodiscard]] virtual NCEncryptedMessage nc_encrypt_message(const NCDecryptedMessage &message) const;
         [[nodiscard]] virtual NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage &message) const;
 
         // Constructor:
-        NCEncryption(std::string const secret_key);
+        NCEncryption(const std::string secret_key);
 
         // Destructor
         virtual ~NCEncryption() = default;
@@ -45,11 +45,11 @@ class NCEncryption {
 
 class NCNonEncryption: NCEncryption {
     public:
-        [[nodiscard]] NCEncryptedMessage nc_encrypt_message(NCDecryptedMessage const& message) const override;
+        [[nodiscard]] NCEncryptedMessage nc_encrypt_message(const NCDecryptedMessage &message) const override;
         [[nodiscard]] NCDecryptedMessage nc_decrypt_message(NCEncryptedMessage &message) const override;
 
         // Constructor:
-        NCNonEncryption(std::string const secret_key);
+        NCNonEncryption(const std::string secret_key);
 
         // Default special member functions:
         NCNonEncryption(NCNonEncryption&&) = default;

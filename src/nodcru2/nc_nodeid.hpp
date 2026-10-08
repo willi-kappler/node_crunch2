@@ -41,7 +41,7 @@ class NCNodeID {
 
 // From cpp ref: https://en.cppreference.com/w/cpp/utility/hash.html
 template<> struct std::hash<nodcru2::NCNodeID> {
-    std::size_t operator()(nodcru2::NCNodeID const& node) const noexcept {
+    std::size_t operator()(const nodcru2::NCNodeID &node) const noexcept {
         return std::hash<std::string>{}(node.id);
     }
 };

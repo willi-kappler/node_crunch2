@@ -16,7 +16,7 @@
 #include "nc_exceptions.hpp"
 
 namespace nodcru2 {
-[[nodiscard]] NCCompressedMessage NCCompressor::nc_compress_message(NCDecompressedMessage const& message) const {
+[[nodiscard]] NCCompressedMessage NCCompressor::nc_compress_message(const NCDecompressedMessage &message) const {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());
     const size_t max_compressed_size = static_cast<size_t>(LZ4_compressBound(static_cast<int>(original_size)));
     std::vector<uint8_t> compressed_data(max_compressed_size + 4);
@@ -37,7 +37,7 @@ namespace nodcru2 {
     }
 }
 
-[[nodiscard]] NCDecompressedMessage NCCompressor::nc_decompress_message(NCCompressedMessage const& message) const {
+[[nodiscard]] NCDecompressedMessage NCCompressor::nc_decompress_message(const NCCompressedMessage &message) const {
     const uint32_t original_size = nc_from_big_endian_bytes(message.data);
     std::vector<uint8_t> decompressed_data(original_size);
     const int32_t decompressed_size = LZ4_decompress_safe(
@@ -54,7 +54,7 @@ namespace nodcru2 {
     }
 }
 
-[[nodiscard]] NCCompressedMessage NCNonCompressor::nc_compress_message(NCDecompressedMessage const& message) const {
+[[nodiscard]] NCCompressedMessage NCNonCompressor::nc_compress_message(const NCDecompressedMessage &message) const {
     const uint32_t original_size = static_cast<uint32_t>(message.data.size());
     std::vector<uint8_t> compressed_data(original_size + 4);
     std::copy(message.data.cbegin(), message.data.cend(), compressed_data.begin() + 4);
@@ -62,7 +62,7 @@ namespace nodcru2 {
     return NCCompressedMessage(compressed_data);
 }
 
-[[nodiscard]] NCDecompressedMessage NCNonCompressor::nc_decompress_message(NCCompressedMessage const& message) const {
+[[nodiscard]] NCDecompressedMessage NCNonCompressor::nc_decompress_message(const NCCompressedMessage &message) const {
     const uint32_t original_size = nc_from_big_endian_bytes(message.data);
     std::vector<uint8_t> decompressed_data(original_size);
     std::copy(message.data.cbegin() + 4, message.data.cend(), decompressed_data.begin());

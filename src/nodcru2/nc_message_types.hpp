@@ -35,8 +35,8 @@ enum struct NCServerMessageType: uint8_t {
     Quit
 };
 
-uint8_t const NC_NONCE_LENGTH = 12;
-uint8_t const NC_GCM_TAG_LENGTH = 16;
+const uint8_t NC_NONCE_LENGTH = 12;
+const uint8_t NC_GCM_TAG_LENGTH = 16;
 
 struct NCCompressedMessage {
     std::vector<uint8_t> data = {};

@@ -81,7 +81,7 @@ class NCNode {
         std::unique_ptr<NCNetworkClientBase> network_client_intern;
         std::shared_ptr<NCNodeDataProcessor> data_processor_intern;
 
-        [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(NCEncodedMessageToServer const&);
+        [[nodiscard]] NCDecodedMessageFromServer nc_send_msg_return_answer(const NCEncodedMessageToServer &);
         void nc_send_heartbeat();
 };
 }

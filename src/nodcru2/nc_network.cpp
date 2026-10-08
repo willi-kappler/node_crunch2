@@ -12,7 +12,7 @@
 #include "nc_network.hpp"
 
 namespace nodcru2 {
-void NCNetworkSocketBase::nc_send_data([[maybe_unused]] std::vector<uint8_t> const data) {
+void NCNetworkSocketBase::nc_send_data([[maybe_unused]] const std::vector<uint8_t> data) {
 }
 
 [[nodiscard]] std::vector<uint8_t> NCNetworkSocketBase::nc_receive_data() {
@@ -23,7 +23,7 @@ void NCNetworkSocketBase::nc_send_data([[maybe_unused]] std::vector<uint8_t> con
     return std::string();
 }
 
-void NCNetworkSocket::nc_send_data(std::vector<uint8_t> const data) {
+void NCNetworkSocket::nc_send_data(const std::vector<uint8_t> data) {
     uint32_t data_size = static_cast<uint32_t>(data.size());
     std::array<uint8_t, 4> size_bytes;
     nc_to_big_endian_bytes(data_size, size_bytes);

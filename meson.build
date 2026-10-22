@@ -113,7 +113,7 @@ sources = files(
 # Main dependencies:
 lz4_dep = dependency(
   'lz4',
-  fallback: ['lz4', 'lz4_dep']
+  fallback: ['lz4', 'liblz4_dep']
 )
 
 openssl_dep = dependency(

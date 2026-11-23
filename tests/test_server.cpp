@@ -220,7 +220,7 @@ TEST_CASE("Create server, send need more data message (test mode 10)", "[server]
     NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
     config1.heartbeat_timeout = 20;
 
-    NCNodeID node_id;
+    NCNodeID node_id("test_10_");
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 10);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
     std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);
@@ -259,7 +259,7 @@ TEST_CASE("Create server, send heartbeat message (test mode 20)", "[server]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
     config1.heartbeat_timeout = 20;
 
-    NCNodeID node_id;
+    NCNodeID node_id("test_20_");
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 20);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
     std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);
@@ -290,7 +290,7 @@ TEST_CASE("Create server, send invalid node id (test mode 30)", "[server]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
     config1.heartbeat_timeout = 20;
 
-    NCNodeID node_id;
+    NCNodeID node_id("test_30_");
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 30);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
     std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);
@@ -321,7 +321,7 @@ TEST_CASE("Create server, send invalid message (test mode 40)", "[server]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_SERVER_KEY);
     config1.heartbeat_timeout = 20;
 
-    NCNodeID node_id;
+    NCNodeID node_id("test_40_");
     std::shared_ptr<TestServerSocketData> init_data = std::make_shared<TestServerSocketData>(node_id, 40);
     std::vector<uint8_t> first_data = {1, 2, 3, 4, 5};
     std::shared_ptr<TestServerDataProcessor> data_processor1 = std::make_shared<TestServerDataProcessor>(first_data);

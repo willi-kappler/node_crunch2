@@ -31,6 +31,7 @@ class NCConfiguration {
         std::string nc_server_log_level;
         std::string nc_node_log_file;
         std::string nc_node_log_level;
+        std::string nc_node_prefix;
 
         // Constructor:
         NCConfiguration(std::string secret_key_user);

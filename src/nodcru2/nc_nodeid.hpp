@@ -31,11 +31,12 @@ class NCNodeID {
     public:
         std::string id;
         NCNodeID();
+        NCNodeID(std::string);
         bool operator==(const NCNodeID&) const = default;
         [[nodiscard]] std::string to_string() const;
 
     private:
-        [[nodiscard]] std::string gen_id();
+        [[nodiscard]] std::string gen_id(std::string);
 };
 }
 

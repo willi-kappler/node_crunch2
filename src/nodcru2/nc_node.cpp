@@ -45,7 +45,7 @@ NCNode::NCNode(NCConfiguration config,
     std::unique_ptr<NCNetworkClientBase> network_client):
     config_intern(config),
     nc_logger(),
-    node_id(NCNodeID()),
+    node_id(NCNodeID(config.nc_node_prefix)),
     quit(false),
     max_error_count(5), // TODO: make this configurable
     node_mutex(),

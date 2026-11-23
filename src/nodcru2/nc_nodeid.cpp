@@ -23,13 +23,19 @@ std::random_device nc_rd;
 std::mt19937 nc_gen(nc_rd());
 std::uniform_int_distribution nc_dis(0, static_cast<int32_t>(NC_CHARACTERS.size()) - 1);
 
-NCNodeID::NCNodeID(): id(gen_id()) {}
+NCNodeID::NCNodeID(): NCNodeID("") {}
+NCNodeID::NCNodeID(const std::string prefix): id(gen_id(prefix)) {}
 
-[[nodiscard]] std::string NCNodeID::gen_id() {
-    std::string result;
+[[nodiscard]] std::string NCNodeID::gen_id(std::string prefix) {
+    if (prefix.size() > 10) {
+        prefix.resize(10);
+    }
+
+    const size_t prefix_size = prefix.size();
+    std::string result = prefix;
     result.reserve(NC_NODEID_LENGTH);
 
-    for (size_t i = 0; i < NC_NODEID_LENGTH; i++) {
+    for (size_t i = 0; i < NC_NODEID_LENGTH - prefix_size; i++) {
         result += NC_CHARACTERS[static_cast<size_t>(nc_dis(nc_gen))];
     }
 

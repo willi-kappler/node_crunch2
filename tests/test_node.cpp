@@ -188,6 +188,7 @@ std::unique_ptr<NCNetworkSocketBase> TestClient::nc_connect() {
 
 TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
+    config1.nc_node_prefix = "test_10_";
     std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 10;
     init_data->server_data = {1, 2, 3, 4, 5};
@@ -214,6 +215,7 @@ TEST_CASE("Create node, send init message (test mode 10)", "[node]" ) {
 
 TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
+    config1.nc_node_prefix = "test_20_";
     config1.heartbeat_timeout = 10;
     std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 20;
@@ -254,6 +256,7 @@ TEST_CASE("Create node, send heartbeat message (test mode 20)", "[node]" ) {
 
 TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
+    config1.nc_node_prefix = "test_30_";
     config1.heartbeat_timeout = 10;
     std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 30;
@@ -285,6 +288,7 @@ TEST_CASE("Create node, send new result message (test mode 30)", "[node]" ) {
 
 TEST_CASE("Create node, send node needs data message (test mode 40)", "[node]" ) {
     NCConfiguration config1 = NCConfiguration(TEST_NODE_KEY);
+    config1.nc_node_prefix = "test_40_";
     config1.heartbeat_timeout = 10;
     std::shared_ptr<TestNodeSocketData> init_data = std::make_shared<TestNodeSocketData>();
     init_data->test_mode = 40;

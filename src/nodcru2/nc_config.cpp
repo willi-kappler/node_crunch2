@@ -26,7 +26,8 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
     nc_server_log_file(""),
     nc_server_log_level(""),
     nc_node_log_file(""),
-    nc_node_log_level("")
+    nc_node_log_level(""),
+    nc_node_prefix("")
 {
     size_t key_length = secret_key_user.size();
     if (key_length != 32)
@@ -83,6 +84,15 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
 
     if (json_config.contains("nc_node_log_level")) {
         config.nc_node_log_level = json_config["nc_node_log_level"].get<std::string>();
+    }
+
+    if (json_config.contains("nc_node_prefix")) {
+        config.nc_node_prefix = json_config["nc_node_prefix"].get<std::string>();
+        const size_t prefix_length = config.nc_node_prefix.size();
+
+        if ((prefix_length == 0) || (prefix_length > 10)) {
+            throw NCConfigurationException("NC node prefix length must be > 0 and <= 10");
+        }
     }
 
     return config;

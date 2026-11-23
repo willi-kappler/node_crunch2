@@ -27,6 +27,7 @@ TEST_CASE("Create valid default configuration", "[configuration]" ) {
     REQUIRE(config1.heartbeat_timeout == 60*5);
     REQUIRE(config1.quit_counter == 10);
     REQUIRE(config1.secret_key == "12345678901234567890123456789012");
+    REQUIRE(config1.nc_node_prefix == "");
 }
 
 TEST_CASE("Create invalid default configuration", "[configuration]" ) {
@@ -41,6 +42,7 @@ TEST_CASE("Read valid JSON configuration", "[configuration]" ) {
     REQUIRE(config1.heartbeat_timeout == 10);
     REQUIRE(config1.quit_counter == 3);
     REQUIRE(config1.secret_key == "123456789012345678901234567890A1");
+    REQUIRE(config1.nc_node_prefix == "");
 }
 
 TEST_CASE("File open error", "[configuration]") {
@@ -56,6 +58,7 @@ TEST_CASE("Only server address", "[configuration]") {
     REQUIRE(config1.heartbeat_timeout == 60*5);
     REQUIRE(config1.quit_counter == 10);
     REQUIRE(config1.secret_key == "123456789012345678901234567890A2");
+    REQUIRE(config1.nc_node_prefix == "");
 }
 
 TEST_CASE("Only server port", "[configuration]") {
@@ -67,6 +70,7 @@ TEST_CASE("Only server port", "[configuration]") {
     REQUIRE(config1.heartbeat_timeout == 60*5);
     REQUIRE(config1.quit_counter == 10);
     REQUIRE(config1.secret_key == "123456789012345678901234567890A3");
+    REQUIRE(config1.nc_node_prefix == "");
 }
 
 TEST_CASE("Only heartbeat timeout", "[configuration]") {
@@ -78,6 +82,7 @@ TEST_CASE("Only heartbeat timeout", "[configuration]") {
     REQUIRE(config1.heartbeat_timeout == 500);
     REQUIRE(config1.quit_counter == 10);
     REQUIRE(config1.secret_key == "123456789012345678901234567890A4");
+    REQUIRE(config1.nc_node_prefix == "");
 }
 
 TEST_CASE("Only quit counter", "[configuration]") {
@@ -89,6 +94,19 @@ TEST_CASE("Only quit counter", "[configuration]") {
     REQUIRE(config1.heartbeat_timeout == 60*5);
     REQUIRE(config1.quit_counter == 20);
     REQUIRE(config1.secret_key == "123456789012345678901234567890A5");
+    REQUIRE(config1.nc_node_prefix == "");
+}
+
+TEST_CASE("Only node prefix", "[configuration]") {
+    std::string input1{R"({"secret_key": "123456789012345678901234567890A5", "nc_node_prefix": "test_"})"};
+    auto config1 = nc_config_from_string(input1);
+
+    REQUIRE(config1.server_address == "127.0.0.1");
+    REQUIRE(config1.server_port == 3100);
+    REQUIRE(config1.heartbeat_timeout == 60*5);
+    REQUIRE(config1.quit_counter == 10);
+    REQUIRE(config1.secret_key == "123456789012345678901234567890A5");
+    REQUIRE(config1.nc_node_prefix == "test_");
 }
 
 TEST_CASE("Missing secret key", "[configuration]") {
@@ -103,5 +121,15 @@ TEST_CASE("Invalid server port", "[configuration]") {
 
 TEST_CASE("Invalid heartbeat timeout", "[configuration]") {
     std::string input1{R"({"secret_key": "123456789012345678901234567890A7", "heartbeat_timeout": 0})"};
+    REQUIRE_THROWS_AS(nc_config_from_string(input1), NCConfigurationException);
+}
+
+TEST_CASE("Invalid node prefix 1", "[configuration]") {
+    std::string input1{R"({"secret_key": "123456789012345678901234567890A7", "nc_node_prefix": ""})"};
+    REQUIRE_THROWS_AS(nc_config_from_string(input1), NCConfigurationException);
+}
+
+TEST_CASE("Invalid node prefix 2", "[configuration]") {
+    std::string input1{R"({"secret_key": "123456789012345678901234567890A7", "nc_node_prefix": "01234567890"})"};
     REQUIRE_THROWS_AS(nc_config_from_string(input1), NCConfigurationException);
 }

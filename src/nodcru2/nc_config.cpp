@@ -14,6 +14,7 @@
 // Local includes:
 #include "nc_config.hpp"
 #include "nc_exceptions.hpp"
+#include "nc_nodeid.hpp"
 
 namespace nodcru2 {
 NCConfiguration::NCConfiguration(std::string secret_key_user):
@@ -90,7 +91,7 @@ NCConfiguration::NCConfiguration(std::string secret_key_user):
         config.nc_node_prefix = json_config["nc_node_prefix"].get<std::string>();
         const size_t prefix_length = config.nc_node_prefix.size();
 
-        if ((prefix_length == 0) || (prefix_length > 10)) {
+        if ((prefix_length == 0) || (prefix_length > NC_NODEID_PREFIX_LENGTH)) {
             throw NCConfigurationException("NC node prefix length must be > 0 and <= 10");
         }
     }

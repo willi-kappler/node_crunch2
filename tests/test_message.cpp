@@ -31,7 +31,7 @@ TEST_CASE("Encode / decode a message to the server", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     const auto encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(186));
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(202));
 
     const auto decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == msg1.size());
@@ -51,7 +51,7 @@ TEST_CASE("Encode / decode an empty message to the server", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     const auto encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(99));
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(115));
 
     const auto decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == static_cast<size_t>(0));
@@ -69,7 +69,7 @@ TEST_CASE("Encode / decode a message to the node", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     const auto encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(186));
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(202));
 
     const auto decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == msg1.size());
@@ -88,7 +88,7 @@ TEST_CASE("Encode / decode an empty message to the node", "[message]" ) {
     NCMessageCodecServer server_codec(key1);
 
     const auto encoded_message1 = node_codec.nc_encode_message_to_server(message_type, data, node_id);
-    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(99));
+    REQUIRE(encoded_message1.data.size() == static_cast<size_t>(115));
 
     const auto decoded_message1 = server_codec.nc_decode_message_from_node(encoded_message1);
     REQUIRE(decoded_message1.data.size() == static_cast<size_t>(0));

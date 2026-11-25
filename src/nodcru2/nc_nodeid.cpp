@@ -27,8 +27,8 @@ NCNodeID::NCNodeID(): NCNodeID("") {}
 NCNodeID::NCNodeID(const std::string prefix): id(gen_id(prefix)) {}
 
 [[nodiscard]] std::string NCNodeID::gen_id(std::string prefix) {
-    if (prefix.size() > 10) {
-        prefix.resize(10);
+    if (prefix.size() > NC_NODEID_PREFIX_LENGTH) {
+        prefix.resize(NC_NODEID_PREFIX_LENGTH);
     }
 
     const size_t prefix_size = prefix.size();

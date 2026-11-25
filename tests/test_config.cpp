@@ -130,6 +130,6 @@ TEST_CASE("Invalid node prefix 1", "[configuration]") {
 }
 
 TEST_CASE("Invalid node prefix 2", "[configuration]") {
-    std::string input1{R"({"secret_key": "123456789012345678901234567890A7", "nc_node_prefix": "01234567890"})"};
+    std::string input1{R"({"secret_key": "123456789012345678901234567890A7", "nc_node_prefix": "0123456789012345678901234567890"})"};
     REQUIRE_THROWS_AS(nc_config_from_string(input1), NCConfigurationException);
 }

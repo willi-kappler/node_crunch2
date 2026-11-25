@@ -25,7 +25,8 @@
 // #include <spdlog/fmt/fmt.h>
 
 namespace nodcru2 {
-const size_t NC_NODEID_LENGTH = 64;
+const size_t NC_NODEID_LENGTH = 80;
+const size_t NC_NODEID_PREFIX_LENGTH = 30;
 
 class NCNodeID {
     public:

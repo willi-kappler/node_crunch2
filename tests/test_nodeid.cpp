@@ -48,13 +48,13 @@ TEST_CASE("Create valid nodeid with prefix 2", "[nodeid]" ) {
 }
 
 TEST_CASE("Create valid nodeid with prefix 3", "[nodeid]" ) {
-    NCNodeID nodeid1("abc_012345_6789");
+    NCNodeID nodeid1("abc_56789012345678901234567890_");
 
     // std::cout << "NodeId: " << nodeid1.id << std::endl;
 
     REQUIRE(nodeid1.id.length() == NC_NODEID_LENGTH);
-    REQUIRE(nodeid1.id.starts_with("abc_012345"));
-    REQUIRE(!nodeid1.id.starts_with("abc_012345_"));
+    REQUIRE(nodeid1.id.starts_with("abc_56789012345678901234567890"));
+    REQUIRE(!nodeid1.id.starts_with("abc_56789012345678901234567890_"));
 }
 
 TEST_CASE("Compare nodeid", "[nodeid]" ) {
